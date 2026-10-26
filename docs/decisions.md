@@ -10,17 +10,23 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-26 — **The CMS is Darmio** (darmio.io), was Dharmify. The repo is
+  `alexbeltechi/darmio`, the folder `~/Documents/Code/products/darmio`, and
+  the name runs through the code (the `darmio-project` cookie, the
+  `x-darmio-project` header, `darmio` as the suggested database). Parabola
+  keeps its name. Figma references still say "Folio Dharmify" until the
+  Figma file is renamed.
 - 2026-10-26 — **Parabola's text buttons hover like a default button** (its surface plus the hover tint, so it shows even on a hovered card), and take the same padding to make room for it; text links that must line up with a field pull back with a negative margin.
 - 2026-10-26 — **A project's database name fits in 38 bytes,** MongoDB Atlas's limit (found when a long project name failed): the hub's name and the slug, cut short with a bit of the project's id when needed. The database is made before the project is listed, and a project whose database can't be read still lists.
 - 2026-10-26 — Library's icon is an image, though it holds documents too: it reads as the pictures.
 - 2026-10-26 — **Your Settings are two cards,** like a project's: Account
   (name, and the email you sign in with) and Password. Changing the email
-  asks for your password instead of a confirmation email, since Dharmify
+  asks for your password instead of a confirmation email, since Darmio
   can't send email yet; the field says so. Confirmation by email comes
   with email.
-- 2026-10-26 — Sign-in is titled **Sign in to Dharmify**, so you know where you are; setup, **Set up Dharmify**.
+- 2026-10-26 — Sign-in is titled **Sign in to Darmio**, so you know where you are; setup, **Set up Darmio**.
 - 2026-10-26 — **A forgotten password is a one-time link from your AI.**
-  Dharmify can't send email yet. Sign-in has a quiet "Forgot your
+  Darmio can't send email yet. Sign-in has a quiet "Forgot your
   password?" that opens in place: "Email isn't set up for this site yet.
   You can reset it manually by code or through AI:" over a prompt for the
   AI that installed the site. The AI runs `npm run reset-link`,
@@ -48,7 +54,7 @@ with the why. To change one, add a new line that overrides it.
   project name in the menu still opens a projects menu. Signing in and setting up land on Home; opening a project goes
   to its posts. Overrides the same day's Home page with rows.
 - 2026-10-26 — **Without a working setup link, setup is a page, not a
-  form:** "Set up Dharmify", then "This site isn't set up yet. Paste this
+  form:** "Set up Darmio", then "This site isn't set up yet. Paste this
   into the AI that installed it:" over a prompt that asks that AI for the link (it carries
   the site's address). No "if it's yours": a stranger can't use the prompt. A wrong link adds "That setup link
   didn't work." The paste-your-link field is gone: whoever has the link
@@ -126,11 +132,11 @@ with the why. To change one, add a new line that overrides it.
   install with no users opens `/admin/setup` (name the site, make the
   owner); `/api/setup` only works while there are no users.
 
-- 2026-10-26 — The CMS is called **Dharmify CMS** (Alex, 2026-10-25, in his
+- 2026-10-26 — The CMS is called **Darmio CMS** (Alex, 2026-10-25, in his
   brain; working title since 2026-10-21). **Parabola** stays the design
   system's name and nothing else, which settles 2026-10-04's idea of
   calling the whole project Parabola. The repo keeps `beltechi-cms` until
-  Alex renames it. beltechi.com is on Framer today and moves onto Dharmify
+  Alex renames it. beltechi.com is on Framer today and moves onto Darmio
   at the pre-release, 2026-11-25.
 
 - 2026-10-24 — The example site a fresh install ships with is **Ilo
@@ -196,7 +202,7 @@ with the why. To change one, add a new line that overrides it.
   admin and public site alike (an empty page centres it in the page).
   Side notes go in an info card (`DsInfoCard`).
 - 2026-10-26 — The onboarding opens straight on its first step, titled by
-  the step ("Set up Dharmify", then "Your projects"), with no outline;
+  the step ("Set up Darmio", then "Your projects"), with no outline;
   doing it with an AI is an info card with a prompt to copy (it points at
   `INSTALL.md`), not a choice up front. Refines the same day's onboarding
   decision.
@@ -279,16 +285,16 @@ with the why. To change one, add a new line that overrides it.
   Each project's content is its own database on the same cluster: the first
   in the hub's own (so an install from before projects keeps its data
   where it is), the rest in `<hub>-<slug>`. The admin's project is a cookie
-  the middleware turns into `x-dharmify-project`; an agent sends the header
+  the middleware turns into `x-darmio-project`; an agent sends the header
   itself; none means the first project, which is also what the public site
   shows until projects get domains. An install with no projects listed
   works as before, and only one with several reads the request, so
   single-project sites keep their static pages. Implements 2026-10-24's
   "separate databases"; a project's own connection string comes later.
 
-- 2026-10-26 — **Two repos: the core and installs on top.** `dharmify` is the
+- 2026-10-26 — **Two repos: the core and installs on top.** `darmio` is the
   core (private until the pre-release, then public). A maker's site is an
-  install: a copy that tracks `dharmify` as its upstream and pulls updates.
+  install: a copy that tracks `darmio` as its upstream and pulls updates.
   Alex's is `alexbeltechi/beltechi` (beltechi.com, y3k.club). Core features
   are built here, never in an install, so updates flow one way. An install
   keeps its brands, site-specific code and its own docs; its content lives

@@ -20,7 +20,7 @@ const WRONG = "Wrong email or password";
 
 /**
  * Forgot your password? It opens in place (decisions, 2026-10-26): email
- * isn't set up for a Dharmify site yet, so a reset comes from the computer,
+ * isn't set up for a Darmio site yet, so a reset comes from the computer,
  * by hand or from the AI that installed it, as a one-time link
  * (`npm run reset-link`). The prompt asks that AI for one.
  */
@@ -49,7 +49,7 @@ function ForgotPassword() {
           <p className="text-p text-ds-fg-muted">
             Email isn&apos;t set up for this site yet. You can reset it manually by code or through AI:
           </p>
-          <DsCopyField wrap value={`Give me a password reset link for my Dharmify site at ${address}`} aria-label="Prompt for your AI" />
+          <DsCopyField wrap value={`Give me a password reset link for my Darmio site at ${address}`} aria-label="Prompt for your AI" />
         </div>
       )}
     </div>
@@ -113,7 +113,7 @@ function LoginForm() {
   return (
     <div className="flex min-h-screen justify-center bg-ds-bg px-ds-20 py-ds-80 text-ds-fg">
       <form onSubmit={handleSubmit} className="flex w-full max-w-[440px] flex-col gap-ds-40">
-        <h1 className="text-h2">Sign in to Dharmify</h1>
+        <h1 className="text-h2">Sign in to Darmio</h1>
 
         <div className="flex flex-col gap-ds-20">
           <DsField label="Email">

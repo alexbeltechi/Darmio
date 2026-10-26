@@ -91,7 +91,7 @@ function ResetForm() {
           <div className="flex flex-col gap-ds-8">
             <p className="text-p text-ds-error">That reset link didn&apos;t work. It may have expired or been used.</p>
             <p className="text-p text-ds-fg-muted">Paste this into the AI that installed it for a new one:</p>
-            <DsCopyField wrap value={`Give me a password reset link for my Dharmify site at ${address}`} aria-label="Prompt for your AI" />
+            <DsCopyField wrap value={`Give me a password reset link for my Darmio site at ${address}`} aria-label="Prompt for your AI" />
           </div>
         )}
       </div>

@@ -15,7 +15,7 @@ who makes things and wants to show them. Publish agentically (ask your agent)
 or by hand, through a simple, minimal, clean interface.
 
 Alex is the first customer: beltechi.com moves onto it at the pre-release
-(2026-11-25); until then it's on Framer. The CMS is **Dharmify** (decisions,
+(2026-11-25); until then it's on Framer. The CMS is **Darmio** (decisions,
 2026-10-26); **Parabola** is its design system.
 
 ## Why

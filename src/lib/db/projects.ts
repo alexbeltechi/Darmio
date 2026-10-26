@@ -53,7 +53,7 @@ const DB_NAME_MAX = 38;
 
 /**
  * A project's database: the hub's name and the project's slug
- * (`dharmify-y3k-club`), cut short with a bit of the project's id when that
+ * (`darmio-y3k-club`), cut short with a bit of the project's id when that
  * runs past Atlas's limit, so it stays unique.
  */
 function projectDbName(hubName: string, slug: string, id: string): string {

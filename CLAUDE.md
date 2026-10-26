@@ -1,4 +1,4 @@
-# Dharmify
+# Darmio
 
 An open-source publishing platform for makers, agent first: a headless CMS
 with an optional site built on the Parabola design system. This repo is the
@@ -51,9 +51,9 @@ UI is built on **Parabola**, its own package in this workspace
 
 ## Data
 
-Local dev (`.env.local`) points at a database of its own (`dharmify-dev`), never
+Local dev (`.env.local`) points at a database of its own (`darmio-dev`), never
 at a real install's. It starts empty: the first visit to `/admin` runs the
-setup. Test data is fine there. Dev server: `preview_start` with `dharmify-dev`
+setup. Test data is fine there. Dev server: `preview_start` with `darmio-dev`
 (port 3010, so it runs beside an install on 3000).
 
 ## Skills

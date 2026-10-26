@@ -189,6 +189,18 @@ settings into the clone (`npx vercel env pull .env.local`) and read
 `GET <address>/api/admin/agent` with `Authorization: Bearer
 <CMS_AGENT_TOKEN>`: it explains the rest.
 
+## A forgotten password
+
+**"Give me a password reset link for my Dharmify site at <address>"**:
+that's the prompt the sign-in page gives someone who's forgotten their
+password (the site can't email them yet). Pull that site's settings into
+the clone (`npx vercel env pull .env.local`, or use `.env.local` for a site
+on this computer), ask which email they sign in with if you don't know it,
+and run `npm run reset-link -- <email> <address>`. Hand over the link it
+prints. They open it and choose the new password **there**, never in this
+chat; it works once, for an hour. Then remove the pulled `.env.local` if
+it holds another site's keys you don't need.
+
 ## If something goes wrong
 
 Say what failed in one line and what you'll do about it. Common ones: every page "not

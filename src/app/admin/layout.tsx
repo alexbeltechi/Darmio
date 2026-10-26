@@ -30,8 +30,8 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   useSetupGuard(pathname);
 
-  // The login and setup pages stand alone, without the navigation.
-  if (pathname === "/admin/login" || pathname === "/admin/setup") return <>{children}</>;
+  // Signing in, setting up and resetting a password stand alone, without the navigation.
+  if (pathname === "/admin/login" || pathname === "/admin/setup" || pathname === "/admin/reset") return <>{children}</>;
 
   // Home's pages (every project, the install's settings) get Home's sidebar; a project's, the rail.
   const home = isHomePath(pathname);

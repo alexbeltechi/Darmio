@@ -10,6 +10,15 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-26 — **Setup is the account only.** The setup link asks for
+  email and password, then creates the account and a first project ("My
+  site") and opens the admin. Projects are added later from the menu
+  behind the letter (wayfinding cards to point there: Alex designs them
+  later). The site's name and its project's name are one: renaming the
+  site in Settings › Site renames the project. Overrides the same day's
+  projects-as-tabs step. The README and the AI's hand-over say the admin
+  is always at `/admin`; the AI narrates every action it takes, what and
+  why, before and after.
 - 2026-10-26 — From the first fresh install: the repo carries
   `vercel.json` (`framework: nextjs`), so a Vercel project created before
   the code arrived still builds as Next.js; Blob works with either

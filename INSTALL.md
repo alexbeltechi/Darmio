@@ -6,10 +6,26 @@ at a web address they can open anywhere, and them signed in to it. Don't
 set it up on their computer first and don't talk about localhost: the
 first address they see is their live site.
 
-Talk plainly. Say what you're doing in a line before each step, and ask
-only for what only they can do (sign up, sign in, click a button in a site
-you can't reach). Ask before anything that costs money; everything below
-fits free plans.
+Talk plainly. Say what you're doing in a line before each step. Do
+everything you can yourself; ask them only for what only they can do (sign
+up, sign in, click in a site you can't reach). Ask before anything that
+costs money; everything below fits free plans.
+
+## How to guide them through a click step
+
+Assume they've never seen the site you're sending them to. Each time:
+
+1. **What and why, in one line.** "Vercel is where your site will live."
+   "The database is where your posts and settings are kept."
+2. **The link** to open, as directly as you can.
+3. **The clicks, numbered,** with the exact words on the buttons, one action
+   per line. Labels can change: say what to look for, not only the label.
+4. **What they'll see when it worked.**
+5. **"Tell me if anything looks different,"** and help from what they
+   describe. Offer more explanation; don't front-load it.
+
+Then **check it yourself** instead of asking whether they did it (each step
+says how), and say what you found.
 
 ## What they'll need
 
@@ -33,23 +49,53 @@ so updates still come in with `git pull upstream main`.
 
 ## 2. The site on Vercel
 
-Create a Vercel project from their fork: on vercel.com, **Add New →
-Project → Import** the fork; or with the CLI in the clone, `npx vercel
-link` (they sign in when it asks) and `npx vercel git connect`. Don't
-deploy yet: it needs its settings first.
+Vercel is where the site runs. Create a Vercel project from their copy.
+With the CLI in the clone: `npx vercel link` (it opens a browser for them
+to sign in or sign up: say so first) and `npx vercel git connect`. Without
+the CLI, walk them through it:
+
+1. Open vercel.com and sign up or log in, choosing **Continue with GitHub**.
+2. Click **Add New…**, then **Project**.
+3. Find their copy of Dharmify in the list and click **Import**.
+4. Leave the settings as they are. Don't click **Deploy** yet: tell them
+   it needs its settings first, and stop at that screen.
+
+Check: `npx vercel project ls` lists the project.
 
 ## 3. Database and image storage
 
-In the Vercel project's **Storage** tab:
+Both are added from the project's **Storage** tab on Vercel, so they don't
+need another account. Tell them: "Your site needs two things: a database,
+where your posts and settings live, and storage for your images. Vercel
+can create both for you. Here's how."
 
-- **Add MongoDB Atlas** (free). It sets `MONGODB_URI` for the project.
-  If Atlas isn't offered there, they create a free cluster at
-  mongodb.com/atlas: a database user, network access from anywhere
-  (`0.0.0.0/0`, because Vercel's servers change address), and the
-  connection string. Either way the string must name a database in its
-  path (`…mongodb.net/dharmify?…`); add it as `MONGODB_URI`.
-- **Add Blob** and connect it to the project. It sets
-  `BLOB_READ_WRITE_TOKEN`, for uploaded images.
+The database (MongoDB Atlas, free):
+
+1. Open vercel.com, click the project, then **Storage** in the menu along
+   the top.
+2. Click **Create Database** (or **Connect Database**).
+3. Choose **MongoDB Atlas**. If Vercel asks them to accept terms or
+   create a MongoDB account through Vercel, that's expected: accept.
+4. Pick the **free** plan, a region close to them, and **Create**.
+5. When it asks which environments to connect, keep **Production**
+   (and **Preview**) ticked, then **Connect**.
+
+They'll see the database listed in the Storage tab. If MongoDB Atlas isn't
+offered there, they create a free cluster at mongodb.com/atlas instead:
+walk them through a database user, network access from anywhere
+(`0.0.0.0/0`, because Vercel's servers change address), and copying the
+connection string; you add it as `MONGODB_URI`.
+
+The images (Vercel Blob):
+
+1. Same **Storage** tab, **Create Database** again.
+2. Choose **Blob**, give it any name (the site's name is fine), **Create**.
+3. Connect it to the project, **Production** ticked.
+
+Check: `npx vercel env ls production` lists `MONGODB_URI` and
+`BLOB_READ_WRITE_TOKEN`. Then add `MONGODB_DB` = `dharmify` to
+Production: the integration's connection string usually names no
+database, and you don't edit the string itself (Vercel manages it).
 
 ## 4. Keys and the setup code
 
@@ -90,8 +136,8 @@ settings into the clone (`npx vercel env pull .env.local`) and read
 
 ## If something goes wrong
 
-Say what failed in one line and what you'll do about it. Common ones: the
-database string without a database name; Atlas network access not open
+Say what failed in one line and what you'll do about it. Common ones: `MONGODB_DB`
+missing (the site then uses a database called `test`); Atlas network access not open
 to Vercel; a key added to Preview instead of Production; `NEXTAUTH_URL`
 not matching the address they use.
 

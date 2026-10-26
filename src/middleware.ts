@@ -8,6 +8,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
+import { PROJECT_COOKIE, PROJECT_HEADER } from "@/lib/cms/projects";
 
 function constantTimeEquals(a: string, b: string): boolean {
   if (a.length !== b.length) return false;
@@ -41,6 +42,13 @@ function forward(request: NextRequest, actor: "agent" | "user", userId?: string)
   headers.set("x-cms-actor", actor);
   headers.delete("x-cms-user-id");
   if (userId) headers.set("x-cms-user-id", userId);
+  // Which project: a person's from the switcher's cookie; an agent names it
+  // in the header itself (no header means the first project).
+  if (actor === "user") {
+    headers.delete(PROJECT_HEADER);
+    const project = request.cookies.get(PROJECT_COOKIE)?.value;
+    if (project) headers.set(PROJECT_HEADER, project);
+  }
   return NextResponse.next({ request: { headers } });
 }
 

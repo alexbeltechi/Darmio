@@ -1,10 +1,11 @@
 /**
  * MongoDB Users Storage
- * 
- * Stores user data in MongoDB instead of JSON files
+ *
+ * Users belong to the whole install, not one project, so they live in the hub
+ * (getHubDb), above every project's database.
  */
 
-import { getDb, Collections } from "@/lib/db/mongodb";
+import { getHubDb as getDb, Collections } from "@/lib/db/mongodb";
 
 export interface User {
   id: string;

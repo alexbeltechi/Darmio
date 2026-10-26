@@ -18,7 +18,7 @@ import {
   type SourceLineSettings,
 } from "@/lib/integrations/types";
 
-const SETTINGS_KEY = "site";
+export const SETTINGS_KEY = "site";
 
 export interface SiteSettings {
   /** The brand: the admin's mark, the site's logo, the footer, browser titles. */

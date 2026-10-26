@@ -91,7 +91,11 @@ When a task changes an item, update this file in the same change.
       Done: a non-technical maker deploys and sees Ilo's site without a
       terminal; before that, the V0 folder runs Ilo's site from its own
       database.
-   5. **Projects.** A hub holding each project's name, domains, encrypted
+   5. **Projects.** First version done 2026-10-26 (decisions): the hub, a
+      database per project, the switcher and Add project, onboarding with
+      several projects. Left: domains (the public site shows the first
+      project today), a project's own connection string and media store,
+      renaming a project in Settings. Was: a hub holding each project's name, domains, encrypted
       connection string, media store and agent token; the project menu on
       the rail mark switches between them; the host picks the project on
       the public site; no memberships. Done: beltechi.com and Y3K Club run

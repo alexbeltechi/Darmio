@@ -1,13 +1,21 @@
 import { NextResponse } from "next/server";
 import { listCategories } from "@/lib/db/categories";
+import { getCurrentProject } from "@/lib/db/mongodb";
 
 // GET /api/admin/agent - Everything an agent needs to work with this CMS, in
 // one short Markdown document: the rules, the endpoints, the post Markdown
 // format and the live category ids. Read this first instead of the code.
 export async function GET() {
-  const categories = await listCategories();
+  const [categories, project] = await Promise.all([listCategories(), getCurrentProject()]);
+  const projectLines = project
+    ? `
+## This project
+${project.name} (\`${project.slug}\`). Every request works on one project: send \`x-dharmify-project: <slug>\` for another; GET /projects lists them.${project.brain ? `
+Its brain: ${project.brain}. Read it before you write anything for this project.` : ""}
+`
+    : "";
   const guide = `# Dharmify: agent guide
-
+${projectLines}
 Base: /api/admin. Auth: \`Authorization: Bearer $CMS_AGENT_TOKEN\`.
 
 ## Rules

@@ -10,6 +10,14 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-26 — **Onboarding is steps on the page, no window**: start (set it
+  up here, or hand it to your agent with a prompt to paste), then *you* (name,
+  username, password: global, for the whole install), then *your projects*
+  as tabs (a name each and an optional brain). Nothing is saved until the
+  last step. "Project", not "site": a project can be a site, a newsletter, a
+  brand. A project's **brain** is a folder or link an agent reads before
+  working on it; the agent guide names it.
+
 - 2026-10-26 — **A fresh install is a blank slate.** Nothing about one site
   is in code. A site's sections are its top-level categories: each has a
   page, and is in the nav unless switched off, so the nav grows as sections
@@ -152,6 +160,18 @@ with the why. To change one, add a new line that overrides it.
   hand-written CSS kit.
 
 ## Engineering
+
+- 2026-10-26 — **Projects, first version.** The hub is the database in the
+  connection string: it holds the users (global) and the `projects` list.
+  Each project's content is its own database on the same cluster: the first
+  in the hub's own (so an install from before projects keeps its data
+  where it is), the rest in `<hub>-<slug>`. The admin's project is a cookie
+  the middleware turns into `x-dharmify-project`; an agent sends the header
+  itself; none means the first project, which is also what the public site
+  shows until projects get domains. An install with no projects listed
+  works as before, and only one with several reads the request, so
+  single-project sites keep their static pages. Implements 2026-10-24's
+  "separate databases"; a project's own connection string comes later.
 
 - 2026-10-26 — **Two repos: the core and installs on top.** `dharmify` is the
   core (private until the pre-release, then public). A maker's site is an

@@ -57,13 +57,22 @@ export async function getMongoClient(): Promise<MongoClient> {
 }
 
 /**
- * The hub: the database named in the connection string. It holds the account
- * (users) and the list of projects; with one project, that project's content
- * too. See lib/db/projects.ts.
+ * The hub's database name: MONGODB_DB when set (a hosting integration's
+ * connection string often names none, and is managed by the integration),
+ * else the one in the connection string.
+ */
+export function hubDbName(): string | undefined {
+  return process.env.MONGODB_DB?.trim() || undefined;
+}
+
+/**
+ * The hub: the database named by MONGODB_DB or the connection string. It
+ * holds the account (users) and the list of projects; with one project, that
+ * project's content too. See lib/db/projects.ts.
  */
 export async function getHubDb(): Promise<Db> {
   const client = await getMongoClient();
-  return client.db();
+  return client.db(hubDbName());
 }
 
 /** A project as the hub stores it; `dbName` is where its content lives. */
@@ -117,7 +126,7 @@ export async function getCurrentProject(): Promise<ProjectRow | null> {
 export async function getDb(): Promise<Db> {
   const client = await getMongoClient();
   const project = await getCurrentProject();
-  return project ? client.db(project.dbName) : client.db();
+  return project ? client.db(project.dbName) : client.db(hubDbName());
 }
 
 /**

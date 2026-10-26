@@ -10,11 +10,11 @@ export async function GET() {
   const projectLines = project
     ? `
 ## This project
-${project.name} (\`${project.slug}\`). Every request works on one project: send \`x-dharmify-project: <slug>\` for another; GET /projects lists them.${project.brain ? `
+${project.name} (\`${project.slug}\`). Every request works on one project: send \`x-darmio-project: <slug>\` for another; GET /projects lists them.${project.brain ? `
 Its brain: ${project.brain}. Read it before you write anything for this project.` : ""}
 `
     : "";
-  const guide = `# Dharmify: agent guide
+  const guide = `# Darmio: agent guide
 ${projectLines}
 Base: /api/admin. Auth: \`Authorization: Bearer $CMS_AGENT_TOKEN\`.
 

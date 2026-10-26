@@ -6,9 +6,9 @@
 import { slugify } from "@/lib/slug";
 
 /** The admin's current project, remembered per browser. */
-export const PROJECT_COOKIE = "dharmify-project";
+export const PROJECT_COOKIE = "darmio-project";
 /** The project a request is for: set by the middleware from the cookie, or sent by an agent. */
-export const PROJECT_HEADER = "x-dharmify-project";
+export const PROJECT_HEADER = "x-darmio-project";
 
 export const PROJECT_NAME_MAX = 60;
 export const PROJECTS_MAX = 20;

@@ -1,7 +1,7 @@
-# Install Dharmify (for an AI)
+# Install Darmio (for an AI)
 
-You're setting up Dharmify, an open-source publishing platform, for its
-owner. They may not be technical. The goal: their own Dharmify **online**,
+You're setting up Darmio, an open-source publishing platform, for its
+owner. They may not be technical. The goal: their own Darmio **online**,
 at a web address they can open anywhere, and them signed in to it. Don't
 set it up on their computer first and don't talk about localhost: the
 first address they see is their live site.
@@ -42,12 +42,12 @@ OK?" Use the name they choose.
 Three free accounts. They create each one themselves when you get there:
 GitHub (their copy of the code), Vercel (where the site runs), MongoDB
 Atlas (the database; Vercel creates it for them). GitHub isn't optional:
-Vercel builds the site from it, and Dharmify's updates reach them through
+Vercel builds the site from it, and Darmio's updates reach them through
 it.
 
 ## 1. Their copy
 
-Tell them: "GitHub keeps your own copy of Dharmify's code. Your site is
+Tell them: "GitHub keeps your own copy of Darmio's code. Your site is
 built from it, and updates come in through it."
 
 **Signed in?** Check with `gh auth status` (the GitHub command-line tool;
@@ -66,16 +66,16 @@ creating anything (see above). If not:
 
 **Then make the copy.**
 
-Fork `alexbeltechi/dharmify` into their GitHub account, so updates can
+Fork `alexbeltechi/darmio` into their GitHub account, so updates can
 come in later (GitHub's "Sync fork"). With the GitHub CLI:
-`gh repo fork alexbeltechi/dharmify --clone`, after `gh auth login` if
+`gh repo fork alexbeltechi/darmio --clone`, after `gh auth login` if
 needed. Without it, send them to the repo page to click **Fork**.
 
-If GitHub won't fork it (they own Dharmify's repo, or can't fork it):
-clone Dharmify, create a new private repo of theirs
+If GitHub won't fork it (they own Darmio's repo, or can't fork it):
+clone Darmio, create a new private repo of theirs
 (`gh repo create <name> --private`), point the clone's `origin` at it and
-push `main`, and keep Dharmify as `upstream`
-(`git remote add upstream https://github.com/alexbeltechi/dharmify.git`),
+push `main`, and keep Darmio as `upstream`
+(`git remote add upstream https://github.com/alexbeltechi/darmio.git`),
 so updates still come in with `git pull upstream main`.
 
 Check: `gh repo view <their-name>/<repo>` shows their copy. Tell them its
@@ -95,7 +95,7 @@ the CLI, walk them through it:
 
 1. Open vercel.com and sign up or log in, choosing **Continue with GitHub**.
 2. Click **Add New…**, then **Project**.
-3. Find their copy of Dharmify in the list and click **Import**.
+3. Find their copy of Darmio in the list and click **Import**.
 4. Leave the settings as they are (the repo's `vercel.json` tells Vercel
    it's a Next.js site). Don't click **Deploy** yet: tell them it needs
    its settings first, and stop at that screen.
@@ -138,7 +138,7 @@ The images (Vercel Blob):
 
 Check: `npx vercel env ls production` lists `MONGODB_URI`, and either
 `BLOB_STORE_ID` (newer Blob connections: Vercel signs the site in to
-Blob by itself) or `BLOB_READ_WRITE_TOKEN` (older ones). Then add `MONGODB_DB` = `dharmify` to
+Blob by itself) or `BLOB_READ_WRITE_TOKEN` (older ones). Then add `MONGODB_DB` = `darmio` to
 Production: the integration's connection string usually names no
 database, and you don't edit the string itself (Vercel manages it).
 
@@ -174,7 +174,7 @@ and choose their email and password **there** (never in this chat); that
 creates their account and a first project, and opens their admin. If they
 lose the link, give it to them again.
 
-**"Give me the setup link for my Dharmify site at <address>"**: that's the
+**"Give me the setup link for my Darmio site at <address>"**: that's the
 prompt the site shows when someone opens it without a working link. Find
 that site's `SETUP_CODE` (the Vercel project's Production environment, or
 `.env.local` for a site on this computer; `npx vercel env pull` fetches it)
@@ -191,7 +191,7 @@ settings into the clone (`npx vercel env pull .env.local`) and read
 
 ## A forgotten password
 
-**"Give me a password reset link for my Dharmify site at <address>"**:
+**"Give me a password reset link for my Darmio site at <address>"**:
 that's the prompt the sign-in page gives someone who's forgotten their
 password (the site can't email them yet). Pull that site's settings into
 the clone (`npx vercel env pull .env.local`, or use `.env.local` for a site
@@ -204,7 +204,7 @@ it holds another site's keys you don't need.
 ## If something goes wrong
 
 Say what failed in one line and what you'll do about it. Common ones: every page "not
-found" (the copy lacks `vercel.json`: pull Dharmify's latest); images
+found" (the copy lacks `vercel.json`: pull Darmio's latest); images
 failing with "Image storage isn't connected" (no Blob store connected to
 Production); `MONGODB_DB`
 missing (the site then uses a database called `test`); Atlas network access not open

@@ -25,7 +25,7 @@ const reason = (error: unknown) => ({ description: error instanceof Error ? erro
 /**
  * You, across the install (decisions, 2026-10-26), as two cards like a
  * project's settings: Account (your name, and the email you sign in with)
- * and Password. A new email asks for your password, since Dharmify can't
+ * and Password. A new email asks for your password, since Darmio can't
  * send a confirmation link yet; it says so under the field.
  */
 export function AccountSettings() {
@@ -114,7 +114,7 @@ function AccountCard({ account, onChange }: { account: Account | null; onChange:
       <form onSubmit={saveEmail} className="flex flex-col gap-5">
         <DsField
           label="Email"
-          description="You sign in with it. Dharmify can't email you yet, so there's no confirmation link: check it's right."
+          description="You sign in with it. Darmio can't email you yet, so there's no confirmation link: check it's right."
           error={badEmail ? "That doesn't look like an email" : undefined}
         >
           <DsInput type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" disabled={!account} />

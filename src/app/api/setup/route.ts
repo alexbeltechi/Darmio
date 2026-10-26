@@ -17,7 +17,7 @@ import { hasSetupCode, setupCodeMatches } from "@/lib/setup-code";
  */
 
 // The short version of INSTALL.md, for an AI that only has this install's address.
-const AGENT_GUIDE = `Set up this Dharmify install. You need its setup code (SETUP_CODE in its
+const AGENT_GUIDE = `Set up this Darmio install. You need its setup code (SETUP_CODE in its
 environment). Best: give the owner the link /admin/setup?code=<code> and let them finish there,
 so their password never passes through you. Or ask them for: their email and a password
 of at least ${PASSWORD_MIN} characters. Projects are optional: one called "My site" is made if you

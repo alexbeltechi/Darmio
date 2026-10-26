@@ -40,7 +40,7 @@ When a task changes an item, update this file in the same change.
       and runs `npm publish` from `packages/parabola` when a project
       outside the CMS needs it.
       Done: another project installs Parabola from npm and renders a block.
-   2. **Blank slate.** Done 2026-10-26 in `dharmify` (decisions,
+   2. **Blank slate.** Done 2026-10-26 in `darmio` (decisions,
       2026-10-26), with the first-run setup screen. Was: category groups and the nav come from categories (a
       group and a nav flag), not code; hero and intro copy, site name,
       footer and the rail mark come from settings; the nav appears as
@@ -65,8 +65,8 @@ When a task changes an item, update this file in the same change.
       Writing, Moments, About, Newsletter. Everything is marked as an
       example and removed in one action, which leaves the plain feed.
       In order:
-      - **a. V0 folder.** Done differently 2026-10-26: `dharmify`'s own
-        checkout, on its own empty `dharmify-dev` database, is the blank
+      - **a. V0 folder.** Done differently 2026-10-26: `darmio`'s own
+        checkout, on its own empty `darmio-dev` database, is the blank
         install; the Ilo seed goes there. Was: a second clone of this repo (not a fork) beside
         it, with its own `.env.local`: the same Atlas cluster but its own
         database in the URI (`/ilo-v0`), no Blob token (uploads stay in the
@@ -117,7 +117,7 @@ When a task changes an item, update this file in the same change.
    Started 2026-10-24: the site name setting (Settings › Site), the rail
    mark as the project menu, Settings › Account with change password, and
    `npm run reset-password` for lock-outs.
-   Named **Dharmify CMS** (decisions, 2026-10-26); the repo keeps
+   Named **Darmio CMS** (decisions, 2026-10-26); the repo keeps
    `beltechi-cms` for now.
    Replaces "Clean up for a first release": the walkthrough as "a
    photographer who wants to publish" is step 4's done test.

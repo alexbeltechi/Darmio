@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
 /**
  * Change the signed-in person's name, `{ name }` (optional, "" for none),
  * the email they sign in with, `{ newEmail, currentPassword }`, or their
- * password, `{ currentPassword, newPassword }`. Dharmify can't send email
+ * password, `{ currentPassword, newPassword }`. Darmio can't send email
  * yet, so a new email isn't confirmed by a link; the password stands in.
  */
 export async function PATCH(request: NextRequest) {

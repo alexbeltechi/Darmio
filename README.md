@@ -1,10 +1,10 @@
-# Dharmify
+# Darmio
 
-**Set up Dharmify:** paste this into your AI (Claude Code, Codex, or any AI
-that can run commands), and it puts your own Dharmify online:
+**Set up Darmio:** paste this into your AI (Claude Code, Codex, or any AI
+that can run commands), and it puts your own Darmio online:
 
 ```
-Set up Dharmify for me: https://github.com/alexbeltechi/dharmify. Follow its INSTALL.md.
+Set up Darmio for me: https://github.com/alexbeltechi/darmio. Follow its INSTALL.md.
 ```
 
 **Already set up?** Your admin, where you write, publish and change

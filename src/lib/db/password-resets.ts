@@ -1,5 +1,5 @@
 /**
- * One-time password reset links (decisions, 2026-10-26). Dharmify can't send
+ * One-time password reset links (decisions, 2026-10-26). Darmio can't send
  * email yet, so the owner's AI makes the link from a computer with the site's
  * settings (`npm run reset-link`) and hands it over; the owner chooses the
  * new password on the site itself, never in the chat. Kept in the hub, as

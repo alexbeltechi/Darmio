@@ -172,7 +172,15 @@ Give them one link: `<address>/admin/setup?code=<SETUP_CODE>`. Call it
 their setup link; don't explain the code inside it. Tell them to open it
 and choose their email and password **there** (never in this chat); that
 creates their account and a first project, and opens their admin. If they
-lose the link, give it to them again. Then tell them, plainly: **"Your
+lose the link, give it to them again.
+
+**"Give me the setup link for my Dharmify site at <address>"**: that's the
+prompt the site shows when someone opens it without a working link. Find
+that site's `SETUP_CODE` (the Vercel project's Production environment, or
+`.env.local` for a site on this computer; `npx vercel env pull` fetches it)
+and hand over `<address>/admin/setup?code=<SETUP_CODE>`. If the site has no
+`SETUP_CODE`, the install isn't finished: add it (step 4) and redeploy
+first. Then tell them, plainly: **"Your
 admin is always at `<address>/admin`. Bookmark it."** That's where they
 write, publish and change everything.
 

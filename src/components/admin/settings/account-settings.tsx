@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { DS_FIELDS_CLASS, DsButton, DsField, DsInput, dsToast } from "@beltechi/parabola";
+import { DsButton, DsField, DsInput, dsToast } from "@beltechi/parabola";
 import { PASSWORD_MIN } from "@/lib/cms/password";
 import { SettingsSection } from "./settings-section";
 
@@ -104,7 +104,8 @@ export function AccountSettings() {
       </form>
 
       <form onSubmit={change} className="flex flex-col gap-5">
-        <div className={DS_FIELDS_CLASS}>
+        {/* One under another: three passwords side by side read as a table. */}
+        <div className="flex flex-col gap-5">
           <DsField label="Current password">
             <DsInput
               type="password"

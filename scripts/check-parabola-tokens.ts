@@ -1,0 +1,84 @@
+/**
+ * Parabola drift check: the values the /parabola showcase and the accent list
+ * hold in TypeScript must match the tokens in tokens.css, the one source of
+ * truth. Run with `npm run check:parabola`; exits 1 on any mismatch.
+ *
+ * Checks that every themed colour token (one set in .dark) is shown on
+ * /parabola/colours/main with the same light and dark value; that every
+ * accent in accents.ts is a `--ds-accent-*` token with the same value and a
+ * Tailwind utility (`bg-ds-accent-*`), and vice versa; and that every spacing
+ * in spacing.ts is a `--ds-space-*` token with the same value and a utility
+ * (`gap-ds-*`), and vice versa.
+ */
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { DS_ACCENTS } from "../packages/parabola/accents";
+import { DS_SPACES } from "../packages/parabola/spacing";
+import { ROLES } from "../packages/parabola/showcase/colour-roles";
+
+const css = readFileSync(join(__dirname, "../packages/parabola/tokens.css"), "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
+
+/** The `--ds-*` declarations in the first top-level block opened by `selector {`. */
+function block(selector: string): Map<string, string> {
+  const start = css.search(new RegExp(`^${selector.replace(".", "\\.")}\\s*\\{`, "m"));
+  if (start < 0) throw new Error(`No ${selector} block in tokens.css`);
+  const body = css.slice(css.indexOf("{", start) + 1, css.indexOf("\n}", start));
+  const decls = new Map<string, string>();
+  for (const [, name, value] of body.matchAll(/(--[\w-]+)\s*:\s*([^;]+);/g)) decls.set(name, value.trim());
+  return decls;
+}
+
+const same = (a: string, b: string) => a.replace(/\s+/g, " ").toLowerCase() === b.replace(/\s+/g, " ").toLowerCase();
+
+const root = block(":root");
+const dark = block(".dark");
+const theme = block("@theme inline");
+const problems: string[] = [];
+
+// UI palette: /parabola/colours/main against :root and .dark.
+const shown = new Set<string>();
+for (const { colours } of ROLES) {
+  for (const { token, light, dark: darkValue } of colours) {
+    shown.add(token);
+    const cssLight = root.get(token);
+    const cssDark = dark.get(token) ?? cssLight;
+    if (!cssLight) problems.push(`${token} is on /parabola/colours/main but not in :root`);
+    else if (!same(cssLight, light.css)) problems.push(`${token} light: showcase ${light.css}, tokens.css ${cssLight}`);
+    if (cssDark && !same(cssDark, darkValue.css)) problems.push(`${token} dark: showcase ${darkValue.css}, tokens.css ${cssDark}`);
+  }
+}
+for (const [token, value] of dark) {
+  // Themed tokens that aren't colours (the shadow) are shown elsewhere.
+  if (token.startsWith("--ds-shadow")) continue;
+  if (!shown.has(token)) problems.push(`${token} (${value}) is themed in .dark but missing from /parabola/colours/main`);
+}
+
+// Accents: accents.ts against the --ds-accent-* tokens and their utilities.
+const accentTokens = new Set([...root.keys()].filter((t) => t.startsWith("--ds-accent-")));
+for (const { name, token, value } of DS_ACCENTS) {
+  const cssValue = root.get(token);
+  if (!cssValue) problems.push(`Accent ${name}: ${token} is not in :root`);
+  else if (!same(cssValue, value)) problems.push(`Accent ${name}: accents.ts ${value}, tokens.css ${cssValue}`);
+  const utility = `--color-ds-accent-${token.slice("--ds-accent-".length)}`;
+  if (!same(theme.get(utility) ?? "", `var(${token})`)) problems.push(`Accent ${name}: ${utility} is missing from @theme`);
+  accentTokens.delete(token);
+}
+for (const token of accentTokens) problems.push(`${token} is in tokens.css but not in accents.ts`);
+
+// Spacing: spacing.ts against the --ds-space-* tokens and their utilities.
+const spaceTokens = new Set([...root.keys()].filter((t) => t.startsWith("--ds-space-")));
+for (const px of DS_SPACES) {
+  const token = `--ds-space-${px}`;
+  const cssValue = root.get(token);
+  if (!cssValue) problems.push(`Spacing ${px}: ${token} is not in :root`);
+  else if (!same(cssValue, `${px}px`)) problems.push(`Spacing ${px}: ${token} is ${cssValue} in tokens.css`);
+  if (!same(theme.get(`--spacing-ds-${px}`) ?? "", `var(${token})`)) problems.push(`Spacing ${px}: --spacing-ds-${px} is missing from @theme`);
+  spaceTokens.delete(token);
+}
+for (const token of spaceTokens) problems.push(`${token} is in tokens.css but not in spacing.ts`);
+
+if (problems.length) {
+  console.error(`Parabola tokens out of sync (${problems.length}):\n${problems.map((p) => `  - ${p}`).join("\n")}`);
+  process.exit(1);
+}
+console.log(`Parabola tokens in sync: ${shown.size} UI tokens, ${DS_ACCENTS.length} accents, ${DS_SPACES.length} spacings.`);

@@ -1,0 +1,280 @@
+---
+reviewed: 2026-10-26
+owner: Alex
+---
+
+# Decisions
+
+Calls Alex has made, so they don't get reopened. Newest first. One line each,
+with the why. To change one, add a new line that overrides it.
+
+## Product
+
+- 2026-10-26 — The CMS is called **Dharmify CMS** (Alex, 2026-10-25, in his
+  brain; working title since 2026-10-21). **Parabola** stays the design
+  system's name and nothing else, which settles 2026-10-04's idea of
+  calling the whole project Parabola. The repo keeps `beltechi-cms` until
+  Alex renames it. beltechi.com is on Framer today and moves onto Dharmify
+  at the pre-release, 2026-11-25.
+
+- 2026-10-24 — The example site a fresh install ships with is **Ilo
+  Odena**, one of the Humans of Y3K (dragonfly-wing glasses; she made
+  Hollow in cohort 02). She writes and keeps **moments**, a few seconds of
+  light with whatever else was in the air, which her glasses keep; the site
+  never explains how, or when she lives. Categories Writing and Moments,
+  not Photography. Y3K Club appears plainly in About and Elsewhere, never
+  as an ad. Why: a seed that makes a maker think "I want a site like this",
+  and a soft way into Y3K.
+- 2026-10-24 — The V0 is a **second clone of this repo with its own
+  database**, not a fork or a copied folder: beltechi.com and the release
+  are the same code with different data, so a fix lands once.
+
+- 2026-10-24 — All of Alex's brands (beltechi.com, Y3K Club, Basaki…) run
+  on **one deployment, switched from the admin**: projects, as in Figma or
+  Slack. Each project is its own database and media store; a hub holds only
+  the wiring (name, domains, encrypted connection string, store, agent
+  token). No memberships: everyone with an account on an install sees all
+  its projects, and testers run their own install. Why: one login and one
+  admin without hosting other people's data or sharing one free tier.
+- 2026-10-24 — Out of the box the site is posts and one feed. There is no
+  nav until a category is marked for it or a page is published; the feed
+  sizes itself like a gallery. Seed content ships as examples (photos we
+  own), marked as such and removed in one action.
+- 2026-10-24 — Auth stays a username and password, kept simple: change it
+  under Settings › Account; locked out, `npm run reset-password` against the
+  database. No email reset until the CMS has an email provider (the
+  newsletter mission brings one).
+- 2026-10-24 — **Custom code pages**: a page kind whose body is a component
+  committed to the repo, visible and deletable in the admin like docs. A
+  named exception to "taste lives in the blocks" and "minimal dependencies",
+  for one-off editorial pages (a three.js case study) that shouldn't become
+  system blocks.
+
+- 2026-10-20 — Top-level groups: Design (design, brand, product),
+  Photography (photography, portrait, still-life, fashion, wedding, travel,
+  garments, lifestyle), Journal (journal only), and Bikes (bikes), a group of
+  its own that isn't in the nav yet. Lifestyle moved from Journal to
+  Photography and Bikes left Journal: those posts are photography and bikes,
+  not journal entries. A post page's "More" grid shows posts that share its
+  sub-category first, then the rest of its group, never another group.
+- 2026-10-07 — Open source first; no paid tiers. Alex doesn't want to run a
+  subscription business.
+- 2026-10-07 — Photography and art go up before design work.
+- 2026-10-04 — No public pricing anywhere on the site. Sprints first, then
+  long-term contracting, then y3k.club.
+- 2026-10-04 — Every Markdown file an agent stores is visible, attributed and
+  deletable in the admin. Nothing hidden on Alex's servers.
+- 2026-10-04 — Agent first, UI as backup; manual edits never need an agent.
+- 2026-10-04 — Taste lives in the blocks. Alex designs every block; agents
+  compose pages and propose gaps but don't invent blocks alone.
+
+## Design
+
+- 2026-10-24 — **Fields have one standard width**, 320px
+  (`--ds-field-width`), set by Parabola: a field dropped on a page is
+  already that size, and what `/parabola` shows is what a page gets. Forms
+  lay fields out left-aligned in a row that wraps (`DS_FIELDS_CLASS`),
+  never stretched to fill it. Only a field that holds long text or a list
+  (a document's contents, attached files, share toggles) fills its row
+  (`w-full`); search bars in toolbars fill theirs. Containers one field
+  wide (dialogs, side panels, the sign-in card) make fields fill them
+  (`ds-fields-fill`). Why: Alex didn't want fields stretched left and
+  right, with short and long ones side by side; 320px is a phone's width,
+  so one size works everywhere.
+- 2026-10-24 — **Media is the Library**, and documents live in it: images,
+  video and documents in one place, with documents as one more type in its
+  type filter (Library › Documents). Agent-made documents say "By your
+  agent". There is no Agent section; the rules agents read (documents of
+  kind guide) are listed under Settings › Agent. Admin URLs move
+  (`/admin/library`, `/admin/library/documents/<id>`) with no redirects, as
+  on 2026-10-20; the API paths (`/api/admin/media`, `/api/admin/docs`) stay.
+- 2026-10-24 — Settings are grouped by what they're about, in setup order:
+  Site, Library, Integrations, Agent, Account. A layout is a setting of the
+  page it shapes, so the homepage layout setting is gone (it no longer did
+  anything). The activity list, collections, storage and API endpoint
+  panels are gone from Settings: they were reference, not settings. The
+  activity log is still written, for agents and a later per-post history.
+  "Source line" is now **Original post link**, and every integration's name
+  links out to the account it's connected to.
+
+- 2026-10-24 — The admin rail's mark is the project's initial, from its site
+  name, and opens the **project menu** (the projects, add a project, view
+  site, account, sign out), the way Figma's logo does. The B was Alex's.
+
+- 2026-10-20 — The Classic gallery layout (rows of one, then two) is
+  replaced by **Stacked**: one image a row, each as large as it may be
+  (same sizing as Auto), whatever the count. Gallery layouts are Auto,
+  Stacked, Grid and Masonry; a gallery without a layout shows as Auto.
+- 2026-10-20 — Galleries size themselves by how many images they hold.
+  Width `auto` (the default) keeps a gallery inline (at most 1024px):
+  1 to 3 images stack, one large image a row, as a focus section; 4 to 19
+  go three a row (two on a phone). From 20 images, about four rows on a
+  laptop, it runs the page's whole width in rows of at most 2/3/4/5/6/7 as
+  the gallery passes 640/1024/1280/1680/2200px. To alternate focus and
+  overview, use several gallery blocks. `large` (always inline) and `full`
+  (always full width) override it. Every row fills the width unless that
+  would enlarge an image past its own pixels or pass the row height limit
+  (70% of the width on desktop, 820px at most); then it stops and sits
+  centred. Overrides 2026-10-08's 1280px inline width and target-height
+  rows. Why: fill the screen in a way that looks considered, without
+  choosing a layout per gallery.
+- 2026-10-20 — Spacing is a Parabola foundation: seven distances named by
+  their size, 4, 8, 16, 20, 40, 80 and 160 (no 24, no second 80), as
+  `--ds-space-*` tokens with `gap-ds-20` / `pt-ds-160` utilities, shown at
+  `/parabola/spacing/scale` with what each is typically for, and mirrored
+  in `spacing.ts` for layouts that do arithmetic. Every gallery and grid
+  uses 20 (the gutter), across and down. Names are sizes, not roles,
+  because roles read as arbitrary and two roles shared one value.
+  Why: the same gap should mean the same thing on every page.
+- 2026-10-08 — New galleries default to the **Auto** layout: justified rows
+  that read left to right, each image at its own shape, every full row
+  filling the width, like techistack's contact sheets (without their edge
+  text). One or two images, or a short last row, sit centred. Existing
+  galleries were moved to Auto too (2026-10-08, `scripts/migrate-gallery-layout-auto.ts`);
+  no size limits on what Auto takes.
+- 2026-10-07 — Parabola first. shadcn/ui is a fallback only when Parabola
+  lacks something; wrap it as a Parabola component rather than using it raw.
+- 2026-10-04 — Figma sketches are concepts: take structure and intent, not
+  the literal look. Parabola type tokens only; copy is never in a card.
+- 2026-10-04 — Given an md for a page: attach it as-is, then build the page
+  and wireframe in one go. Questions come after Alex sees the wireframe.
+- 2026-10-04 — Wireframes are built from the real Parabola components, never a
+  hand-written CSS kit.
+
+## Engineering
+
+- 2026-10-24 — **Every outside service is a connector.** Each job that
+  depends on a service (newsletter list, sending, media storage, cross-
+  posting, analytics, and in time the database and hosting) sits behind one
+  interface, and the install ships one connector for it, set up and working
+  (Kit for the list, Vercel Blob for media, MongoDB and Vercel for the
+  rest). Settings shows each one as "set up for X", with how to change it by
+  hand and a written recipe an agent can follow to swap it on the maker's
+  own copy. More connectors come with updates, like Claude's connectors.
+  Refines the MongoDB line below rather than overriding it: the install
+  still ships one database, not two side by side; what changes is that the
+  database, like every other service, must be swappable by an agent from
+  the recipe, so no code outside its interface may depend on it. Why: makers
+  who download it shouldn't be locked to Alex's choices (Kit, Vercel,
+  MongoDB), and an agent can only swap what has a clean seam.
+- 2026-10-24 — Projects are **separate databases**, not a project id on
+  documents. The data keeps the single-install shape, so any project can be
+  lifted to its own deployment by pointing a fresh install at its database.
+  Why: scoping is one lookup to get right, and portability is free.
+- 2026-10-24 — MongoDB is the only content store; no git or file backend
+  (file storage was removed 2026-10). Install is a Vercel Deploy button
+  (Atlas and Blob from the marketplace) and a first-run setup screen. Why:
+  live editing, media and several brands need a database; a second backend
+  is a second way.
+- 2026-10-24 — Media storage sits behind one interface. Vercel Blob is the
+  shipped implementation; S3-compatible (Cloudflare R2) is added when a
+  brand's volume needs it. Blob's free allowance is per Vercel account, not
+  per store, so separate stores don't multiply it.
+- 2026-10-24 — **Parabola is a package** in this repo's npm workspace,
+  published to npm by version. Other projects install it and pin a version,
+  never copy the folder, and nothing checks for a newer version at run time.
+  It may become its own repo once it has its own contributors; the
+  workspace makes that a history filter, not a rewrite. Why: Alex changes
+  Parabola and the CMS in one PR today.
+- 2026-10-24 — The middleware says who is calling: `x-cms-actor` and, for a
+  signed-in person, `x-cms-user-id`. Routes that need the person (account)
+  read the header, never the session.
+
+- 2026-10-20 — Posts are edited at `/admin/posts/<slug>`, beside
+  `/admin/pages/<slug>`. The old `/admin/content/...` level dated from when
+  it held two content types; there's one now, so posts and pages sit side
+  by side. No redirects from the old URLs: they were never public.
+- 2026-10-10 — One paved way per job, listed in `docs/conventions.md` and
+  enforced by lint where it can be. A second way is debt: it's listed there
+  and in one exceptions block in `eslint.config.mjs`, and that list only
+  shrinks. `npm run verify` must pass before a commit.
+- 2026-10-10 — Comments say why, not what; no history in comments.
+- 2026-10-10 — Posts and pages are one `Entry` type; `collection` says which.
+- 2026-10-10 — No carousel gallery layout. It was offered to agents but never
+  built; stored ones show in the default layout.
+- 2026-10-08 — Media items get two separate word fields. `keywords` come
+  from `/curate` (via `selection.json`, sent by `/post`), are never typed by
+  hand, and show in the media panel as attributed ("from /curate, <date>")
+  and deletable. `tags` are Alex's own, added by hand in the admin media tab.
+  The two never mix, so either can be cleared without losing the other.
+  Search matches both. Keywords go on new uploads only; existing items
+  aren't backfilled.
+- 2026-10-08 — Images are made once, at upload: AVIF at 640, 1280 and 1920px
+  wide plus the image itself at up to 2560px on its long edge (never
+  enlarged), and one 1280px JPEG (PNG when transparent) for browsers without
+  AVIF. Pages serve them as a `<picture>` srcset; Vercel's image service isn't
+  used for them (its free tier caps transformations, and cold ones are slow).
+  Originals aren't kept in Blob; they stay on Alex's disk. AVIF quality is a
+  setting (default 70): going down later works from the stored copy, going up
+  needs the originals. Uploads made before this keep their old files until
+  they're uploaded again.
+- 2026-10-04 — Minimal dependencies (no zod); third-party only when really
+  needed, like the rich text editor.
+- 2026-10-04 — The page editor reuses the post editor's components rather than
+  sharing one editor; drift is accepted.
+
+## Workflow
+
+- 2026-10-20 — Each folder `/post` works on keeps an activity log,
+  `_activity.md` beside the originals: one terse line per action on its
+  pictures in the CMS (create, update, publish, replace, delete), and under
+  it only the frames that changed (`+` added, `-` removed, `~` replaced),
+  each with file, media id, fingerprint and sha, written for an agent to
+  read quickly. Refining a post (swap, add, drop images) logs into the same
+  file. It travels with the folder,
+  so a copy on another drive carries its history, and `/post` reads it
+  before uploading and asks before posting the same frames twice. No
+  matching of a folder's images against the whole library: Alex chose the
+  local record over a shared fingerprint matcher. Refines 2026-10-08 (live
+  check, never stored state): the log is a history, not the truth, and
+  `status.ts` checks each post it names against the CMS, which wins when
+  they disagree. Every image also gets a title (its file name, slugified),
+  alt text and 10 to 25 keywords for search; quality over token cost.
+- 2026-10-20 — Every image `/post` uploads is findable by search. Its
+  `tags` are Alex's words (places, people, project, camera) that `/post`
+  proposes from what he said and he confirms; they go on the post and on
+  every image. Its `keywords` say what's in the picture, written by the
+  agent that looked at it (`/curate` in `selection.json`, else `/post`),
+  shown with who wrote them and clearable. Overrides 2026-10-08 on two
+  points: keywords can come from `/post` too, and tags can be set by an
+  agent once Alex confirms them. Why: searching the library for a place or
+  a subject should find every frame, not only the ones tagged by hand.
+- 2026-10-19 — Media goes with a post only when asked, and only after a
+  list. Deleting a post offers a checkbox (ticked) for the media only it
+  uses; ticked, a second step lists every item before anything is deleted.
+  Media other posts or pages use is never offered, just named as kept. The
+  API does the same: a dry run lists it, and the delete only removes ids the
+  caller confirmed. `/post` asks the same way, after deleting a post and
+  after a re-push drops frames. Deleting ticked blocks and gallery images
+  from the editor's ⋮ menu works the same, offering only media no other
+  post, page or block uses. Why: Alex goes back and forth on an archive
+  and wants no stale media, but nothing should vanish unseen.
+- 2026-10-08 — The CMS skill that turns a folder into a post is `/post`
+  (was `/upload`). It works on any folder but is built for a `/curate`
+  selection: the curator's order, title, description and captions become the
+  post, so the best route is `/curate` first, then `/post`.
+
+- 2026-10-08 — Archive vs CMS is a **live check, run on request**, never
+  stored state. Nothing in a local folder says "published": Alex can delete
+  from the CMS at any time, and a mark on disk would go stale. The check
+  works from any folder (not only ones the CMS came from), writes nothing,
+  and when it finds nothing new, nothing changes. Images are matched by what
+  they look like, not by file bytes or paths, so the match survives
+  re-exports, renames and the CMS re-compressing its own copies. A post's
+  source folder, where known, is only a hint.
+- 2026-10-08 — Keep Blob storage light enough to stay on the free tier. Upload
+  sizes and compression may go up or down later, so re-processing what's
+  already up must be a re-runnable script, not a one-off.
+- 2026-10-08 — Curation skills never delete anything, unless the user asks
+  for a specific deletion. No culling skill for now.
+- 2026-10-08 — techistack lives in its own repo (`~/Documents/Code/techistack`)
+  and is linked into `~/.claude/skills/`; the CMS only uses it. Alex's own
+  lessons stay local and git-ignored there, never published.
+
+- 2026-10-07 — The agent works only when Alex starts a session or a bounded
+  scheduled run. No open-ended loops. When work is ready for review, it stops
+  and notifies Alex; he checks in whenever he has time.
+- 2026-10-07 — Alex approves merges to `main`. The agent asks for a review
+  when direction matters, like a design engineer asking their stakeholder.
+- 2026-10-07 — Budget: well under €1000 a month; ideally a few hundred.
+  Prefer improving the manual process over running more agents.

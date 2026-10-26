@@ -1,0 +1,157 @@
+import fs from "fs/promises";
+import path from "path";
+import type { CollectionSchema } from "./types";
+
+const COLLECTIONS_DIR = path.join(process.cwd(), "content", "collections");
+
+// Cache for schemas (disabled in development to pick up changes)
+let schemaCache: Map<string, CollectionSchema> | null = null;
+
+export async function loadSchemas(): Promise<Map<string, CollectionSchema>> {
+  // Skip cache in development to pick up schema changes
+  if (schemaCache && process.env.NODE_ENV === "production") {
+    return schemaCache;
+  }
+
+  const cache = new Map<string, CollectionSchema>();
+
+  try {
+    const files = await fs.readdir(COLLECTIONS_DIR);
+    const schemaFiles = files.filter((f) => f.endsWith(".schema.json"));
+
+    for (const file of schemaFiles) {
+      const content = await fs.readFile(
+        path.join(COLLECTIONS_DIR, file),
+        "utf-8"
+      );
+      const schema = JSON.parse(content) as CollectionSchema;
+      cache.set(schema.slug, schema);
+    }
+
+    schemaCache = cache;
+    return cache;
+  } catch (error) {
+    console.error("Failed to load schemas:", error);
+    return cache;
+  }
+}
+
+export async function getCollection(
+  slug: string
+): Promise<CollectionSchema | null> {
+  const schemas = await loadSchemas();
+  return schemas.get(slug) || null;
+}
+
+export async function listCollections(): Promise<CollectionSchema[]> {
+  const schemas = await loadSchemas();
+  return Array.from(schemas.values());
+}
+
+/**
+ * Validate entry data against schema
+ * @param schema - The collection schema
+ * @param data - The entry data to validate
+ * @param status - The entry status. Required fields are only enforced for "published".
+ */
+export function validateEntryData(
+  schema: CollectionSchema,
+  data: Record<string, unknown>,
+  status: "draft" | "published" | "archived" = "published"
+): { valid: boolean; errors: string[] } {
+  const errors: string[] = [];
+
+  for (const field of schema.fields) {
+    const value = data[field.key];
+
+    // Check required fields - only enforce when publishing
+    if (field.required && status === "published") {
+      if (value === undefined || value === null || value === "") {
+        errors.push(`${field.label} is required`);
+        continue;
+      }
+
+      if (Array.isArray(value) && value.length === 0) {
+        errors.push(`${field.label} is required`);
+        continue;
+      }
+    }
+
+    if (value !== undefined && value !== null) {
+      switch (field.type) {
+        case "text":
+        case "textarea":
+        case "slug":
+          if (typeof value !== "string") {
+            errors.push(`${field.label} must be text`);
+          }
+          break;
+
+        case "number":
+          if (typeof value !== "number") {
+            errors.push(`${field.label} must be a number`);
+          }
+          break;
+
+        case "boolean":
+          if (typeof value !== "boolean") {
+            errors.push(`${field.label} must be true or false`);
+          }
+          break;
+
+        case "media":
+          if (typeof value !== "string") {
+            errors.push(`${field.label} must be a media ID`);
+          }
+          break;
+
+        case "media:list":
+          if (!Array.isArray(value)) {
+            errors.push(`${field.label} must be an array of media IDs`);
+          } else if (field.max && value.length > field.max) {
+            errors.push(`${field.label} can have at most ${field.max} items`);
+          }
+          break;
+
+        case "blocks":
+          if (!Array.isArray(value)) {
+            errors.push(`${field.label} must be an array of blocks`);
+          }
+          break;
+
+        case "select":
+          if (field.options) {
+            const validValues = field.options.map((o) => o.value);
+            if (!validValues.includes(value as string)) {
+              errors.push(`${field.label} must be one of: ${validValues.join(", ")}`);
+            }
+          }
+          break;
+
+        case "docs":
+          if (!Array.isArray(value) || !value.every((v) => typeof v === "string")) {
+            errors.push(`${field.label} must be a list of doc ids`);
+          }
+          break;
+
+        case "categories":
+          if (!Array.isArray(value)) {
+            errors.push(`${field.label} must be an array of category IDs`);
+          }
+          break;
+
+        case "datetime":
+          if (typeof value !== "string") {
+            errors.push(`${field.label} must be a date string`);
+          }
+          break;
+      }
+    }
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+  };
+}
+

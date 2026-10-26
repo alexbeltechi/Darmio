@@ -1,0 +1,66 @@
+# Dharmify
+
+An open-source publishing platform for makers, agent first: a headless CMS
+with an optional site built on the Parabola design system. This repo is the
+**core**. Installs (a maker's own copy) are built on top of it and pull its
+updates; Alex's own install is `alexbeltechi/beltechi`. Private until the
+pre-release on 2026-11-25, then public.
+
+**Only what every maker would want goes here.** Nothing about one person's
+site: no names, copy, categories or keys in code. A site's content and
+settings live in its database; its keys in its deployment's environment.
+
+## Read first
+
+- `docs/vision.md`: what this is, who it's for, principles.
+- `docs/roadmap.md`: what to work on, in order, with what done looks like.
+- `docs/decisions.md`: calls already made. Don't reopen them; flag a conflict
+  instead.
+- `docs/conventions.md`: the one way to do each common job (ids, slugs,
+  toasts, database access, comments…). Use it; don't write a second way.
+
+## Before you commit
+
+Run `npm run verify` (typecheck, lint with no warnings, Parabola tokens, a
+production build) and make it pass. A lint error usually means there's already a way to do that
+thing: the message names it. Don't silence a rule to get past it.
+
+## Keep the docs current
+
+Docs hold intent and decisions, not code structure (read the code for that).
+When a task changes direction, finishes a roadmap item or settles a decision,
+update `roadmap.md` or `decisions.md` in the same change and bump its
+`reviewed:` date. Don't save project facts only to private memory; put them
+here so Alex and other agents can see them.
+
+## Design system
+
+UI is built on **Parabola**, its own package in this workspace
+(`packages/parabola`, imported as `@beltechi/parabola`, showcase at
+`/parabola`). Read `packages/parabola/README.md` before adding or changing UI. In short:
+
+- Build screens from Parabola components and tokens. No raw Tailwind palette
+  classes, no hex colours.
+- Parabola first. shadcn/ui is a fallback only when Parabola lacks something:
+  wrap it as a Parabola component on top of Radix (as `DsSidePanel` does),
+  never use it raw in a screen.
+- Parabola holds tokens and primitives only. Page-specific layouts stay with
+  their page.
+- Code prefix is `ds` (`DsButton`, `--ds-*`, `bg-ds-*`); "Parabola" is the brand.
+- After changing a token, run `npm run check:parabola`.
+
+## Data
+
+Local dev (`.env.local`) points at a database of its own (`dharmify-dev`), never
+at a real install's. It starts empty: the first visit to `/admin` runs the
+setup. Test data is fine there. Dev server: `preview_start` with `dharmify-dev`
+(port 3010, so it runs beside an install on 3000).
+
+## Skills
+
+`/contactsheet` and `/curate` live in their own repo,
+`~/Documents/Code/techistack` (public at
+[alexbeltechi/techistack](https://github.com/alexbeltechi/techistack)), and
+are linked into `~/.claude/skills/`, so every project, this one included,
+uses them. Work on them there, not here. This repo keeps only CMS-specific
+skills (`landing-page`, `post`), which ship to every install.

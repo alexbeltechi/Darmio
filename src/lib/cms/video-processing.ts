@@ -1,0 +1,188 @@
+import path from "path";
+import os from "os";
+import fs from "fs/promises";
+
+// Check if we're in a serverless environment (Vercel)
+const isServerless = !!process.env.VERCEL || !!process.env.AWS_LAMBDA_FUNCTION_NAME;
+
+// Dynamically import ffmpeg to avoid bundling issues
+let ffmpeg: typeof import("fluent-ffmpeg") | null = null;
+let ffmpegReady = false;
+let ffmpegInitialized = false;
+
+async function initFfmpeg(): Promise<boolean> {
+  // Skip entirely in serverless environments - ffmpeg binaries don't work there
+  if (isServerless) {
+    return false;
+  }
+
+  if (ffmpegInitialized) return ffmpegReady;
+  ffmpegInitialized = true;
+
+  try {
+    // Dynamic imports to avoid Next.js bundling issues
+    const ffmpegModule = await import("fluent-ffmpeg");
+    ffmpeg = ffmpegModule.default || ffmpegModule;
+    
+    // Try to find ffmpeg in system PATH first
+    const { execSync } = await import("child_process");
+    try {
+      execSync("ffmpeg -version", { stdio: "ignore" });
+      ffmpegReady = true;
+      console.log("ffmpeg found in system PATH");
+    } catch {
+      // Try the installer package
+      try {
+        const installer = await import("@ffmpeg-installer/ffmpeg");
+        ffmpeg.setFfmpegPath(installer.path);
+        ffmpegReady = true;
+        console.log("ffmpeg loaded from installer package");
+      } catch {
+        console.warn("ffmpeg not available - video thumbnails will be skipped");
+        return false;
+      }
+    }
+  } catch (err) {
+    console.warn("Failed to initialize ffmpeg:", err);
+    return false;
+  }
+  
+  return ffmpegReady;
+}
+
+export interface VideoThumbnailResult {
+  buffer: Buffer;
+  width: number;
+  height: number;
+}
+
+export interface VideoMetadata {
+  width: number;
+  height: number;
+  duration: number;
+}
+
+/**
+ * Get video metadata (dimensions and duration)
+ * Returns null if ffmpeg is not available
+ */
+export async function getVideoMetadata(videoBuffer: Buffer): Promise<VideoMetadata | null> {
+  const ready = await initFfmpeg();
+  if (!ready || !ffmpeg) {
+    return null;
+  }
+
+  const tempDir = os.tmpdir();
+  const tempFile = path.join(tempDir, `video-${crypto.randomUUID()}.mp4`);
+  
+  try {
+    await fs.writeFile(tempFile, videoBuffer);
+    
+    const ffmpegInstance = ffmpeg;
+    return new Promise((resolve, reject) => {
+      ffmpegInstance.ffprobe(tempFile, (err, metadata) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+        
+        const videoStream = metadata.streams.find(s => s.codec_type === "video");
+        if (!videoStream) {
+          reject(new Error("No video stream found"));
+          return;
+        }
+        
+        resolve({
+          width: videoStream.width || 1920,
+          height: videoStream.height || 1080,
+          duration: metadata.format.duration || 0,
+        });
+      });
+    });
+  } finally {
+    await fs.unlink(tempFile).catch(() => {});
+  }
+}
+
+/**
+ * Extract a thumbnail from a video at a specific timestamp
+ * Returns a JPG buffer for maximum compatibility
+ * Returns null if ffmpeg is not available
+ */
+export async function extractVideoThumbnail(
+  videoBuffer: Buffer,
+  options: {
+    timestamp?: number; // seconds, default 0.5
+    maxWidth?: number; // default 768 (same as image thumb)
+    quality?: number; // 1-31, lower is better, default 5
+  } = {}
+): Promise<VideoThumbnailResult | null> {
+  const ready = await initFfmpeg();
+  if (!ready || !ffmpeg) {
+    return null;
+  }
+
+  const { timestamp = 0.5, maxWidth = 768, quality = 5 } = options;
+  
+  const tempDir = os.tmpdir();
+  const inputFile = path.join(tempDir, `video-${crypto.randomUUID()}.mp4`);
+  const outputFile = path.join(tempDir, `thumb-${crypto.randomUUID()}.jpg`);
+  
+  try {
+    await fs.writeFile(inputFile, videoBuffer);
+    
+    const metadata = await getVideoMetadata(videoBuffer);
+    if (!metadata) {
+      return null;
+    }
+    
+    let outputWidth = metadata.width;
+    let outputHeight = metadata.height;
+    
+    if (outputWidth > maxWidth) {
+      const scale = maxWidth / outputWidth;
+      outputWidth = maxWidth;
+      outputHeight = Math.round(metadata.height * scale);
+    }
+    
+    // Ensure even dimensions (required by most codecs)
+    outputWidth = Math.floor(outputWidth / 2) * 2;
+    outputHeight = Math.floor(outputHeight / 2) * 2;
+    
+    // Use a safe timestamp (don't exceed video duration)
+    const safeTimestamp = Math.min(timestamp, Math.max(0, metadata.duration - 0.1));
+    
+    const ffmpegInstance = ffmpeg;
+    return new Promise((resolve, reject) => {
+      ffmpegInstance(inputFile)
+        .seekInput(safeTimestamp)
+        .frames(1)
+        .outputOptions([
+          `-vf scale=${outputWidth}:${outputHeight}`,
+          `-q:v ${quality}`,
+        ])
+        .output(outputFile)
+        .on("end", async () => {
+          try {
+            const buffer = await fs.readFile(outputFile);
+            resolve({
+              buffer,
+              width: outputWidth,
+              height: outputHeight,
+            });
+          } catch (err) {
+            reject(err);
+          } finally {
+            await fs.unlink(outputFile).catch(() => {});
+          }
+        })
+        .on("error", (err) => {
+          reject(err);
+        })
+        .run();
+    });
+  } finally {
+    await fs.unlink(inputFile).catch(() => {});
+  }
+}
+

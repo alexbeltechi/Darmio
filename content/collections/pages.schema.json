@@ -1,0 +1,43 @@
+{
+  "slug": "pages",
+  "name": "Pages",
+  "description": "Pages that live at their own URL (/<slug>): a title, a description for search and sharing, stacked content blocks (the same as posts), and the docs that guide them.",
+  "fields": [
+    {
+      "key": "title",
+      "type": "text",
+      "required": true,
+      "label": "Title",
+      "placeholder": "Services, About, Contact…"
+    },
+    {
+      "key": "description",
+      "type": "textarea",
+      "required": false,
+      "label": "Description",
+      "placeholder": "One or two sentences for search results and sharing"
+    },
+    {
+      "key": "content",
+      "type": "blocks",
+      "required": false,
+      "label": "Content",
+      "blockTypes": ["text", "gallery", "video", "youtube", "quote", "divider"]
+    },
+    {
+      "key": "docs",
+      "type": "docs",
+      "required": false,
+      "label": "Docs",
+      "description": "Markdown briefs and sources that guide this page (admin › Agent)"
+    }
+  ],
+  "admin": {
+    "titleField": "title",
+    "subtitleField": "description",
+    "defaultSort": {
+      "field": "title",
+      "direction": "asc"
+    }
+  }
+}

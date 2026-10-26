@@ -1,75 +1,104 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Folder, Globe, Plus, Settings } from "lucide-react";
-import { DsButton, DsListRow, DsPill } from "@beltechi/parabola";
+import { DsButton, DsEmptyState, DsPill } from "@beltechi/parabola";
 import { AdminMenuButton } from "@/components/admin/layout";
-import { AccountSettings } from "@/components/admin/settings/account-settings";
 import { openProject } from "@/components/admin/projects/project-actions";
-import type { ProjectSummary } from "@/lib/cms/projects";
-
-type ProjectList = { projects: ProjectSummary[]; current: string | null };
+import { NEW_PROJECT_PATH } from "@/components/admin/home/home-routes";
+import { useProjects } from "@/components/admin/home/use-projects";
 
 /**
- * Home (decisions, 2026-10-26), the way Figma's and Framer's open: what's
- * yours across the install rather than one project's. Your projects (open one,
- * or its gear for its settings), New project, then you (name and password).
- * Signing in and setting up land here. No thumbnails: a row per project.
+ * Home (decisions, 2026-10-26), the way Framer's dashboard opens: every
+ * project as a card (no thumbnails: a name, where it's live, a gear for its
+ * settings) and New project. Signing in and setting up land here; the
+ * sidebar beside it holds the search, the projects stacked, and the install's
+ * settings. Nothing yet, or nothing matching the search: one line in the
+ * middle of the page.
  */
-export default function HomePage() {
-  const [list, setList] = useState<ProjectList | null>(null);
+function HomeProjects() {
+  const list = useProjects();
+  const query = (useSearchParams().get("q") ?? "").trim().toLowerCase();
   const [host, setHost] = useState("");
-
   useEffect(() => {
-    fetch("/api/admin/projects")
-      .then((res) => (res.ok ? res.json() : null))
-      .then((json) => {
-        setHost(window.location.host);
-        setList(json?.data ?? { projects: [], current: null });
-      })
-      .catch(() => setList({ projects: [], current: null }));
+    const id = window.setTimeout(() => setHost(window.location.host));
+    return () => window.clearTimeout(id);
   }, []);
 
   const current = list?.current ?? null;
+  // Keep each project's place: the public site shows the first one for now.
+  const cards = (list?.projects ?? [])
+    .map((project, index) => ({ project, onSite: index === 0 }))
+    .filter(({ project }) => !query || project.name.toLowerCase().includes(query));
+  const newProject = (
+    <DsButton href={NEW_PROJECT_PATH} variant="primary" iconLeft={Plus}>
+      New project
+    </DsButton>
+  );
 
   return (
     <div className="flex min-h-dvh flex-col">
       <div className="pointer-events-none sticky top-0 z-20 flex flex-col ds-nav-fade pb-5 [&>*]:pointer-events-auto">
         <div className="flex items-center gap-2 px-5 py-5">
-          <h1 className="min-w-0 flex-1 truncate text-p text-ds-fg">Projects</h1>
-          <DsButton href="/admin/projects/new" variant="primary" iconLeft={Plus}>
-            New project
-          </DsButton>
+          <h1 className="min-w-0 flex-1 truncate text-p text-ds-fg">{query ? "Search" : "All projects"}</h1>
+          {cards.length > 0 && newProject}
           <AdminMenuButton />
         </div>
       </div>
 
-      <div className="flex flex-col gap-ds-40 px-5 pb-5">
-        <ul className="flex flex-col">
-          {list?.projects.map((project, index) => (
-            <li key={project.slug}>
-              {/* The public site shows the first project for now; the others get theirs with domains. */}
-              <DsListRow
-                thumbnailIcon={index === 0 ? Globe : Folder}
-                title={project.name}
-                pill={project.slug === current ? <DsPill>Open</DsPill> : undefined}
-                detail={index === 0 ? `Live at ${host}` : "Not on the public site yet"}
-                onOpen={() => openProject(project.slug, current)}
-                actions={
-                  <DsButton
-                    variant="text"
-                    iconLeft={Settings}
-                    aria-label={`${project.name} settings`}
-                    onClick={() => openProject(project.slug, current, "/admin/settings")}
-                  />
-                }
+      {list === null ? null : cards.length === 0 ? (
+        query ? (
+          <DsEmptyState>No projects match that.</DsEmptyState>
+        ) : (
+          <DsEmptyState action={newProject}>No projects yet.</DsEmptyState>
+        )
+      ) : (
+        <ul className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-5 px-5 pb-5">
+          {cards.map(({ project, onSite }) => (
+            <li
+              key={project.slug}
+              className="relative flex min-h-44 flex-col justify-between gap-ds-40 rounded-ds-lg bg-ds-surface-subtle p-5 transition-colors hover:bg-ds-surface"
+            >
+              <div className="flex size-12 items-center justify-center rounded-ds-md bg-ds-surface/70 text-ds-fg-subtle [&_svg]:size-5">
+                {onSite ? <Globe aria-hidden /> : <Folder aria-hidden />}
+              </div>
+              <div className="flex min-w-0 flex-col gap-0.5">
+                <div className="flex min-w-0 items-center gap-1">
+                  {/* The name opens the project, stretched over the whole card. */}
+                  <button
+                    type="button"
+                    onClick={() => openProject(project.slug, current)}
+                    className="truncate text-left text-p text-ds-fg ds-focus-stretched after:absolute after:inset-0 after:rounded-ds-lg"
+                  >
+                    {project.name}
+                  </button>
+                  {project.slug === current && <DsPill>Open</DsPill>}
+                </div>
+                <p className="truncate text-small text-ds-fg-subtle">
+                  {onSite ? `Live at ${host}` : "Not on the public site yet"}
+                </p>
+              </div>
+              <DsButton
+                variant="text"
+                iconLeft={Settings}
+                aria-label={`${project.name} settings`}
+                onClick={() => openProject(project.slug, current, "/admin/settings")}
+                className="absolute top-3 right-3 z-10"
               />
             </li>
           ))}
         </ul>
-
-        <AccountSettings />
-      </div>
+      )}
     </div>
+  );
+}
+
+export default function HomePage() {
+  // The search comes from the address, which needs a Suspense boundary.
+  return (
+    <Suspense fallback={null}>
+      <HomeProjects />
+    </Suspense>
   );
 }

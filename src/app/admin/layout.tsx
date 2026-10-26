@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { AdminMobileNav, AdminRail, ADMIN_RAIL_WIDTH } from "@/components/admin/layout";
+import { HomeSidebar, HOME_SIDEBAR_WIDTH } from "@/components/admin/home/home-sidebar";
+import { isHomePath } from "@/components/admin/home/home-routes";
 import { DatabaseErrorHandler } from "@/components/admin/database-error-handler";
 import { DsToaster } from "@beltechi/parabola";
 import { cn } from "@/lib/utils";
@@ -31,9 +33,18 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   // The login and setup pages stand alone, without the navigation.
   if (pathname === "/admin/login" || pathname === "/admin/setup") return <>{children}</>;
 
+  // Home's pages (every project, the install's settings) get Home's sidebar; a project's, the rail.
+  const home = isHomePath(pathname);
   return (
-    <div className={cn("min-h-dvh bg-ds-bg text-ds-fg", ADMIN_RAIL_WIDTH)}>
-      <AdminRail />
+    <div className={cn("min-h-dvh bg-ds-bg text-ds-fg", home ? HOME_SIDEBAR_WIDTH : ADMIN_RAIL_WIDTH)}>
+      {home ? (
+        // The sidebar reads the search from the address, which needs a Suspense boundary.
+        <Suspense fallback={null}>
+          <HomeSidebar />
+        </Suspense>
+      ) : (
+        <AdminRail />
+      )}
       <AdminMobileNav>
         <main className="min-h-dvh">{children}</main>
       </AdminMobileNav>

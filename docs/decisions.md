@@ -138,7 +138,8 @@ with the why. To change one, add a new line that overrides it.
   unless pinned to the bottom of the screen. Overrides the field-width
   token's note that 320px needed no second size on phones.
 - 2026-10-26 — **Empty states are one line and an optional button,**
-  centred both ways in the section (`DsEmptyState`), in every section.
+  centred both ways in the section (`DsEmptyState`), in every section,
+  admin and public site alike (an empty page centres it in the page).
   Side notes go in an info card (`DsInfoCard`).
 - 2026-10-26 — The onboarding opens straight on its first step, titled by
   the step ("Set up Dharmify", then "Your projects"), with no outline;

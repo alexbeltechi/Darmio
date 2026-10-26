@@ -1,5 +1,6 @@
 "use client";
 
+import { DsEmptyState } from "@beltechi/parabola";
 import type { Entry, MediaItem } from "@/lib/cms/types";
 import { MasonryGrid } from "./masonry-grid";
 import { UniformGrid } from "./uniform-grid";
@@ -35,16 +36,7 @@ export function PostGrid({
   const categoryMap = new Map(categories.map((c) => [c.id, c]));
 
   if (posts.length === 0) {
-    return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <div className="text-center">
-          <p className="text-p text-ds-fg-muted">No posts yet</p>
-          <p className="text-small text-ds-fg-subtle mt-2">
-            Create your first post in the admin panel
-          </p>
-        </div>
-      </div>
-    );
+    return <DsEmptyState className="min-h-[50vh]">No posts yet.</DsEmptyState>;
   }
 
   if (layout === "grid") {

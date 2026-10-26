@@ -80,7 +80,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   };
 
   return (
-    <main className="w-full">
+    <main className="flex w-full flex-1 flex-col">
       <CategoryFeed
         layout={view.layout}
         sections={[{ intro: view.intro, posts: entries }]}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import { DsEmptyState } from "@beltechi/parabola";
 import type { Entry, MediaItem } from "@/lib/cms/types";
 import { FeedEntry } from "./feed-entry";
 import { IntroText } from "./intro-text";
@@ -35,6 +36,17 @@ export function CategoryFeed({ layout, sections, mediaItems, categories }: Categ
     [mediaItems]
   );
   const categoryMap = useMemo(() => new Map(categories.map((c) => [c.id, c])), [categories]);
+
+  // A category with nothing in it yet: its title, and one line in the middle of the page.
+  if (sections.every((section) => section.posts.length === 0)) {
+    const intro = sections[0]?.intro;
+    return (
+      <div className="flex flex-1 flex-col items-center">
+        {intro && <PageHero title={intro.title} description={intro.description} />}
+        <DsEmptyState>Nothing here yet.</DsEmptyState>
+      </div>
+    );
+  }
 
   if (layout === "wall") {
     return (

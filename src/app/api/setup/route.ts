@@ -5,6 +5,7 @@ import { isEmail } from "@/lib/cms/email";
 import { parseBrain, parseProjectName, PROJECTS_MAX } from "@/lib/cms/projects";
 import { createUser, hasUsers } from "@/lib/cms/users";
 import { createProject } from "@/lib/db/projects";
+import { DEFAULT_SETTINGS } from "@/lib/db/settings";
 import { hasSetupCode, setupCodeMatches } from "@/lib/setup-code";
 
 /**
@@ -19,7 +20,8 @@ import { hasSetupCode, setupCodeMatches } from "@/lib/setup-code";
 const AGENT_GUIDE = `Set up this Dharmify install. You need its setup code (SETUP_CODE in its
 environment). Best: give the owner the link /admin/setup?code=<code> and let them finish there,
 so their password never passes through you. Or ask them for: their email and a password
-of at least ${PASSWORD_MIN} characters, and their projects: a name
+of at least ${PASSWORD_MIN} characters. Projects are optional: one called "My site" is made if you
+send none, and they rename it under Settings › Site. If they told you their brand: a name
 each (a site, a newsletter, a brand), and, if they have one, a brain for it (a folder or link
 with what an agent should know first). Then POST /api/setup with JSON:
 
@@ -54,7 +56,11 @@ export async function GET(request: NextRequest) {
   }
 }
 
-/** Create the owner and the projects: `{ code, email, password, projects: [{ name, brain? }], name? }`. */
+/**
+ * Create the owner and their first project(s): `{ code, email, password,
+ * projects?: [{ name, brain? }], name? }`. No projects makes one called
+ * "My site", renamed later under Settings › Site.
+ */
 export async function POST(request: NextRequest) {
   try {
     if (await hasUsers()) {
@@ -79,11 +85,13 @@ export async function POST(request: NextRequest) {
     if (password.length < PASSWORD_MIN || password.length > 200) {
       return NextResponse.json({ error: `The password needs ${PASSWORD_MIN} to 200 characters` }, { status: 400 });
     }
-    if (projects.length < 1 || projects.length > PROJECTS_MAX) {
-      return NextResponse.json({ error: `Add between 1 and ${PROJECTS_MAX} projects` }, { status: 400 });
+    if (projects.length > PROJECTS_MAX) {
+      return NextResponse.json({ error: `At most ${PROJECTS_MAX} projects` }, { status: 400 });
     }
     // Check every project before creating anything, so a bad one doesn't leave half a setup.
-    const clean = projects.map((p: { name?: unknown; brain?: unknown }) => ({ name: parseProjectName(p?.name), brain: parseBrain(p?.brain) }));
+    const clean = projects.length
+      ? projects.map((p: { name?: unknown; brain?: unknown }) => ({ name: parseProjectName(p?.name), brain: parseBrain(p?.brain) }))
+      : [{ name: DEFAULT_SETTINGS.siteName }];
 
     const result = await createUser({ email, name, password, role: "owner" });
     if (result.error) return NextResponse.json({ error: result.error }, { status: 400 });

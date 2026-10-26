@@ -3,18 +3,13 @@
 import { useEffect, useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Check, Plus, X } from "lucide-react";
 import { DsButton, DsField, DsInput } from "@beltechi/parabola";
 import { PASSWORD_MIN } from "@/lib/cms/password";
 import { isEmail } from "@/lib/cms/email";
-import { PROJECTS_MAX } from "@/lib/cms/projects";
-import { ProjectFields, type ProjectDraft } from "@/components/admin/projects/project-fields";
 import { InstallProblemNotice } from "@/components/admin/install-problem";
 import { installProblem, type InstallProblem } from "@/lib/cms/install-problems";
 
-type Step = "code" | "you" | "projects";
-
-const emptyProject = (): ProjectDraft => ({ name: "", brain: "" });
+type Step = "code" | "you";
 
 /**
  * First-run onboarding (decisions, 2026-10-26). A fresh install has no users,
@@ -27,12 +22,11 @@ const emptyProject = (): ProjectDraft => ({ name: "", brain: "" });
  * without a good one the page asks for it and goes no further, so nobody
  * else can claim the install.
  *
- * 1. Your account, for the whole install: email and password. A name is
- *    optional, added later under Settings › Account.
- * 2. Your projects, as tabs: a name each, and maybe a brain.
- *
- * Nothing is saved until the last step; if the setup is finished elsewhere
- * meanwhile, the page moves on to sign-in by itself.
+ * Then one step: your account, for the whole install (email and password; a
+ * name is optional, under Settings › Account). Creating it also makes a
+ * first project and opens the admin; more projects come from the menu
+ * behind the letter, later (decisions, 2026-10-26). If the setup is
+ * finished elsewhere meanwhile, the page moves on to sign-in by itself.
  */
 export default function SetupPage() {
   const router = useRouter();
@@ -45,8 +39,6 @@ export default function SetupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [repeat, setRepeat] = useState("");
-  const [projects, setProjects] = useState<ProjectDraft[]>([emptyProject()]);
-  const [tab, setTab] = useState(0);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -79,19 +71,6 @@ export default function SetupPage() {
   const mismatch = repeat.length > 0 && password !== repeat;
   const badEmail = email.trim().length > 0 && !isEmail(email);
   const youReady = Boolean(isEmail(email) && password.length >= PASSWORD_MIN && password === repeat);
-  const projectsReady = projects.every((p) => p.name.trim());
-
-  const updateProject = (index: number, draft: ProjectDraft) =>
-    setProjects(projects.map((p, i) => (i === index ? draft : p)));
-  const addProject = () => {
-    setProjects([...projects, emptyProject()]);
-    setTab(projects.length);
-  };
-  const removeProject = (index: number) => {
-    setProjects(projects.filter((_, i) => i !== index));
-    setTab(Math.max(0, Math.min(tab, projects.length - 2)));
-  };
-
   async function checkCode() {
     if (!code.trim() || checkingCode) return;
     setCheckingCode(true);
@@ -119,14 +98,14 @@ export default function SetupPage() {
   }
 
   async function create() {
-    if (!youReady || !projectsReady || saving) return;
+    if (!youReady || saving) return;
     setSaving(true);
     setError(null);
     try {
       const res = await fetch("/api/setup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code: code.trim(), email, password, projects }),
+        body: JSON.stringify({ code: code.trim(), email, password }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error);
@@ -144,7 +123,7 @@ export default function SetupPage() {
   return (
     <div className="flex min-h-screen justify-center bg-ds-bg px-ds-20 py-ds-80 text-ds-fg">
       <div className="flex w-full max-w-[440px] flex-col gap-ds-40">
-        <h1 className="text-h2">{step === "projects" ? "Your projects" : "Set up Dharmify"}</h1>
+        <h1 className="text-h2">Set up Dharmify</h1>
 
         {step === "code" && (
           <form
@@ -174,7 +153,7 @@ export default function SetupPage() {
             className="flex flex-col gap-ds-40"
             onSubmit={(e) => {
               e.preventDefault();
-              if (youReady) setStep("projects");
+              create();
             }}
           >
             <div className="flex flex-col gap-ds-20">
@@ -188,56 +167,15 @@ export default function SetupPage() {
                 <DsInput type="password" value={repeat} onChange={(e) => setRepeat(e.target.value)} autoComplete="new-password" />
               </DsField>
             </div>
-            <div>
-              <DsButton variant="primary" type="submit" disabled={!youReady}>
-                Continue
-              </DsButton>
-            </div>
-          </form>
-        )}
-
-        {step === "projects" && (
-          <form
-            className="flex flex-col gap-ds-40"
-            onSubmit={(e) => {
-              e.preventDefault();
-              create();
-            }}
-          >
-            <div className="flex flex-wrap items-center gap-ds-4" role="tablist" aria-label="Projects">
-              {projects.map((p, i) => (
-                <DsButton key={i} type="button" role="tab" aria-selected={tab === i} pressed={tab === i} onClick={() => setTab(i)}>
-                  {p.name.trim() || `Project ${i + 1}`}
-                </DsButton>
-              ))}
-              {projects.length < PROJECTS_MAX && (
-                <DsButton type="button" iconLeft={Plus} variant="text" onClick={addProject}>
-                  Add project
-                </DsButton>
-              )}
-            </div>
-
-            <div className="flex flex-col gap-ds-20" role="tabpanel">
-              <ProjectFields key={tab} draft={projects[tab]} onChange={(draft) => updateProject(tab, draft)} autoFocus />
-              {projects.length > 1 && (
-                <DsButton type="button" iconLeft={X} variant="text" destructive className="self-start" onClick={() => removeProject(tab)}>
-                  Remove this project
-                </DsButton>
-              )}
-            </div>
-
             {error && <p className="text-p text-ds-error">{error}</p>}
-
-            <div className="flex flex-wrap items-center gap-ds-8">
-              <DsButton iconLeft={ArrowLeft} type="button" onClick={() => setStep("you")} disabled={saving}>
-                Back
-              </DsButton>
-              <DsButton variant="primary" type="submit" iconLeft={Check} loading={saving} disabled={!projectsReady}>
-                {projects.length === 1 ? "Create my project" : `Create ${projects.length} projects`}
+            <div>
+              <DsButton variant="primary" type="submit" loading={saving} disabled={!youReady}>
+                Create my account
               </DsButton>
             </div>
           </form>
         )}
+
       </div>
     </div>
   );

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSiteSettings, updateSiteSettings } from "@/lib/db/settings";
+import { getCurrentProject } from "@/lib/db/mongodb";
+import { updateProject } from "@/lib/db/projects";
 import { handleDatabaseError, isDatabaseError } from "@/lib/api/error-handler";
 
 export async function GET() {
@@ -31,6 +33,12 @@ export async function PATCH(request: NextRequest) {
       sourceLine: body.sourceLine,
       imageQuality: body.imageQuality,
     });
+
+    // One name: the site's name is also its project's name in the menu behind the letter.
+    if (body.siteName !== undefined) {
+      const project = await getCurrentProject();
+      if (project && project.name !== settings.siteName) await updateProject(project.slug, { name: settings.siteName });
+    }
 
     return NextResponse.json({ data: settings });
   } catch (error) {

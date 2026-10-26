@@ -7,6 +7,10 @@ that can run commands), and it puts your own Dharmify online:
 Set up Dharmify for me: https://github.com/alexbeltechi/dharmify. Follow its INSTALL.md.
 ```
 
+**Already set up?** Your admin, where you write, publish and change
+everything, is always your site's address with `/admin` at the end, for
+example `https://my-site.vercel.app/admin`.
+
 ---
 
 An open-source publishing platform for makers, agent first. Publish by asking

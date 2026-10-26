@@ -6,8 +6,12 @@ at a web address they can open anywhere, and them signed in to it. Don't
 set it up on their computer first and don't talk about localhost: the
 first address they see is their live site.
 
-Talk plainly. Say what you're doing in a line before each step. Do
-everything you can yourself; ask them only for what only they can do (sign
+Talk plainly, and **narrate every action**, including the ones you do
+yourself without stopping: before it, one line saying what you're about
+to do and what it's for ("Now I'm creating your site's secret keys, so
+only you can sign in"); after it, one line saying what happened. They
+should never wonder what you're doing in their accounts. Do everything
+you can yourself; ask them only for what only they can do (sign
 up, sign in, click in a site you can't reach). Ask before anything that
 costs money; everything below fits free plans.
 
@@ -165,10 +169,12 @@ When it's live, `GET <address>/api/setup` answers
 ## 6. Hand over
 
 Give them one link: `<address>/admin/setup?code=<SETUP_CODE>`. Call it
-their setup link; don't explain the code inside it. Tell them to open it,
-choose their email and password **there** (never in this chat), and name
-their projects. If they lose it, give it to them again. After that, their admin is
-`<address>/admin`: tell them to bookmark it.
+their setup link; don't explain the code inside it. Tell them to open it
+and choose their email and password **there** (never in this chat); that
+creates their account and a first project, and opens their admin. If they
+lose the link, give it to them again. Then tell them, plainly: **"Your
+admin is always at `<address>/admin`. Bookmark it."** That's where they
+write, publish and change everything.
 
 That's the setup done. For work on their site afterwards, pull its
 settings into the clone (`npx vercel env pull .env.local`) and read

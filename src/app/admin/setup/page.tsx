@@ -189,14 +189,19 @@ export default function SetupPage() {
   );
 }
 
-/** The same setup, done by an agent: a prompt to paste. GET /api/setup tells it the rest. */
+/**
+ * The same setup, done by an AI: a prompt to paste. It points at SETUP.md in
+ * the Dharmify folder, which says how to run it, what to ask and what to send;
+ * the AI works out the address itself.
+ */
+const AI_PROMPT = "Set up Dharmify for me. Follow SETUP.md in the Dharmify folder: it says what to ask me and what to do.";
+
 function AgentCard() {
-  const origin = typeof window === "undefined" ? "" : window.location.origin;
-  const prompt = `Set up my Dharmify at ${origin}. Read ${origin}/api/setup first: it says what to ask me and what to send.`;
+  const prompt = AI_PROMPT;
 
   return (
-    <DsInfoCard icon={Bot} title="Made for agents">
-      <p>Paste this into your agent. It does the rest.</p>
+    <DsInfoCard icon={Bot} title="Set up with AI">
+      <p>Rather have your AI do this? Paste this into its chat.</p>
       <p className="font-mono text-small break-words">{prompt}</p>
       <DsButton
         type="button"

@@ -12,6 +12,7 @@ import { createProject } from "@/lib/db/projects";
  * and the login page takes over. An agent can do the setup by reading GET.
  */
 
+// The short version of SETUP.md, for an AI that only has this install's address.
 const AGENT_GUIDE = `Set up this Dharmify install. Ask the owner for: their email and a password
 of at least ${PASSWORD_MIN} characters, and their projects: a name
 each (a site, a newsletter, a brand), and, if they have one, a brain for it (a folder or link

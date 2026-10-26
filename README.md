@@ -10,6 +10,9 @@ README is for working on Dharmify itself.
 
 ## Run it locally
 
+With an AI: paste "Set up Dharmify for me. Follow SETUP.md in the Dharmify
+folder" into its chat. By hand:
+
 ```bash
 npm install
 cp .env.example .env.local   # then fill in MONGODB_URI (its own database) and NEXTAUTH_SECRET

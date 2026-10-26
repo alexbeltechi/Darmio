@@ -94,12 +94,12 @@ export function AccountSettings() {
           : "Who's signed in, and a new password."
       }
     >
-      <form onSubmit={saveName} className="flex flex-col gap-5 sm:flex-row sm:items-end">
+      <form onSubmit={saveName} className="flex flex-col gap-5">
         <DsField label="Name (optional)" description="Shown where you're credited. Your email is enough to sign in.">
           <DsInput value={name} onChange={(e) => setName(e.target.value)} maxLength={80} autoComplete="name" />
         </DsField>
-        <DsButton type="submit" disabled={!nameChanged || savingName} loading={savingName} className="self-start sm:self-end">
-          Save
+        <DsButton type="submit" disabled={!nameChanged || savingName} loading={savingName} className="self-start">
+          Save name
         </DsButton>
       </form>
 
@@ -134,14 +134,12 @@ export function AccountSettings() {
             />
           </DsField>
         </div>
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-small text-ds-fg-muted">
-            Locked out? From the project folder, <code className="font-mono">npm run reset-password</code> sets a new one.
-          </p>
-          <DsButton type="submit" variant="primary" disabled={!ready || saving} loading={saving}>
-            Change password
-          </DsButton>
-        </div>
+        <DsButton type="submit" disabled={!ready || saving} loading={saving} className="self-start">
+          Change password
+        </DsButton>
+        <p className="text-small text-ds-fg-muted">
+          Locked out? From the project folder, <code className="font-mono">npm run reset-password</code> sets a new one.
+        </p>
       </form>
     </SettingsSection>
   );

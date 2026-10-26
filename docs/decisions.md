@@ -10,6 +10,16 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-26 — **Home, the way Figma and Framer open.** The rail's top
+  button is Home: a transparent icon button (inverse while you're on Home),
+  not the project's initial. Hovering it shows the projects menu (each
+  project with its gear, then New project); clicking it goes Home. Home
+  (`/admin`) lists the projects as plain rows, no thumbnails, with New
+  project, then you (name, password): what belongs to the install, not a
+  project. Signing in and setting up land on Home; opening a project goes
+  to its posts. Account is part of Home, so it has no page of its own. On
+  phones the menu opens on a tap and starts with Home. Overrides the same
+  day's project tile.
 - 2026-10-26 — **Without a working setup link, setup is a page, not a
   form:** "This site isn't set up yet", one line to open the link from the
   AI that installed it, and a prompt to copy that asks that AI for the link

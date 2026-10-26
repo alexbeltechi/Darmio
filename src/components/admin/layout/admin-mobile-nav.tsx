@@ -119,7 +119,7 @@ export function AdminMobileNav({ children }: { children: React.ReactNode }) {
 
       <DsMenu open={menuOpen} onClose={closeMenu} label="Admin menu" className="lg:hidden">
         <div className="absolute inset-x-5 top-5 flex items-center justify-between">
-          <ProjectMenu siteName={siteName}>
+          <ProjectMenu>
             <DsButton iconRight={ChevronDown} aria-label="Project menu">
               {siteName ?? "…"}
             </DsButton>

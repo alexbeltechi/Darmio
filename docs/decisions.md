@@ -10,6 +10,7 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-26 — **Parabola's text buttons show a surface on hover,** like every other button, and take the same padding to make room for it; text links that must line up with a field pull back with a negative margin.
 - 2026-10-26 — Library's icon is an image, though it holds documents too: it reads as the pictures.
 - 2026-10-26 — **Your Settings are two cards,** like a project's: Account
   (name, and the email you sign in with) and Password. Changing the email
@@ -39,9 +40,9 @@ with the why. To change one, add a new line that overrides it.
   any menu. Settings there (`/admin/account`, a gear) is yours across the
   install: name and password. Creating a project returns to Home, where its card appears;
   you open it from there. Inside a project the rail keeps its transparent
-  Home button: hover for the projects menu (projects, New project, Home,
-  Settings), click for Home; the avatar at its foot still opens Settings and
-  Sign out. Signing in and setting up land on Home; opening a project goes
+  Home button, a plain link to Home (no menu: Home shows every project); the
+  avatar at its foot still opens Settings and Sign out. On phones the
+  project name in the menu still opens a projects menu. Signing in and setting up land on Home; opening a project goes
   to its posts. Overrides the same day's Home page with rows.
 - 2026-10-26 — **Without a working setup link, setup is a page, not a
   form:** "Set up Dharmify", then "This site isn't set up yet. Paste this

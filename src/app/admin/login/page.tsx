@@ -40,7 +40,7 @@ function ForgotPassword() {
         iconRight={ChevronDown}
         aria-expanded={open}
         onClick={() => setOpen(!open)}
-        className="self-start text-ds-fg-muted [&_svg]:transition-transform aria-expanded:[&_svg]:rotate-180"
+        className="-ml-3 self-start text-ds-fg-muted [&_svg]:transition-transform aria-expanded:[&_svg]:rotate-180"
       >
         Forgot your password?
       </DsButton>

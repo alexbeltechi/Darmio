@@ -47,8 +47,7 @@ function ForgotPassword() {
       {open && (
         <div className="flex flex-col gap-ds-8">
           <p className="text-p text-ds-fg-muted">
-            Email isn&apos;t set up for this site yet, so a reset comes from your computer: by hand, or from the AI
-            that installed it. Paste this into it:
+            Email isn&apos;t set up for this site yet. You can reset it manually by code or through AI:
           </p>
           <DsCopyField wrap value={`Give me a password reset link for my Dharmify site at ${address}`} aria-label="Prompt for your AI" />
         </div>

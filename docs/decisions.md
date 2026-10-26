@@ -10,6 +10,11 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-26 — **Your Settings are two cards,** like a project's: Account
+  (name, and the email you sign in with) and Password. Changing the email
+  asks for your password instead of a confirmation email, since Dharmify
+  can't send email yet; the field says so. Confirmation by email comes
+  with email.
 - 2026-10-26 — Sign-in is titled **Sign in to Dharmify**, so you know where you are; setup, **Set up Dharmify**.
 - 2026-10-26 — **A forgotten password is a one-time link from your AI.**
   Dharmify can't send email yet. Sign-in has a quiet "Forgot your

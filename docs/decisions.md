@@ -10,6 +10,13 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-26 — From the first fresh install: the repo carries
+  `vercel.json` (`framework: nextjs`), so a Vercel project created before
+  the code arrived still builds as Next.js; Blob works with either
+  connection Vercel makes (`BLOB_STORE_ID` with Vercel's own sign-in, from
+  `@vercel/blob` 2.8, or the older `BLOB_READ_WRITE_TOKEN`); on Vercel
+  without either, uploads fail with a plain message instead of a disk
+  error.
 - 2026-10-26 — **Installing is one prompt to your AI.** The README opens
   with it; `INSTALL.md` is the one install guide, written for an AI: fork
   the repo, a Vercel project, MongoDB Atlas and Blob from Vercel's Storage

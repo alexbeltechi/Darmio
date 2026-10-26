@@ -57,8 +57,13 @@ the CLI, walk them through it:
 1. Open vercel.com and sign up or log in, choosing **Continue with GitHub**.
 2. Click **Add New…**, then **Project**.
 3. Find their copy of Dharmify in the list and click **Import**.
-4. Leave the settings as they are. Don't click **Deploy** yet: tell them
-   it needs its settings first, and stop at that screen.
+4. Leave the settings as they are (the repo's `vercel.json` tells Vercel
+   it's a Next.js site). Don't click **Deploy** yet: tell them it needs
+   its settings first, and stop at that screen.
+
+A push to the copy's `main` deploys by itself once the project is
+connected. A deploy before step 4 fails for lack of settings; that's
+expected, and the deploy in step 5 fixes it.
 
 Check: `npx vercel project ls` lists the project.
 
@@ -92,8 +97,9 @@ The images (Vercel Blob):
 2. Choose **Blob**, give it any name (the site's name is fine), **Create**.
 3. Connect it to the project, **Production** ticked.
 
-Check: `npx vercel env ls production` lists `MONGODB_URI` and
-`BLOB_READ_WRITE_TOKEN`. Then add `MONGODB_DB` = `dharmify` to
+Check: `npx vercel env ls production` lists `MONGODB_URI`, and either
+`BLOB_STORE_ID` (newer Blob connections: Vercel signs the site in to
+Blob by itself) or `BLOB_READ_WRITE_TOKEN` (older ones). Then add `MONGODB_DB` = `dharmify` to
 Production: the integration's connection string usually names no
 database, and you don't edit the string itself (Vercel manages it).
 
@@ -136,7 +142,10 @@ settings into the clone (`npx vercel env pull .env.local`) and read
 
 ## If something goes wrong
 
-Say what failed in one line and what you'll do about it. Common ones: `MONGODB_DB`
+Say what failed in one line and what you'll do about it. Common ones: every page "not
+found" (the copy lacks `vercel.json`: pull Dharmify's latest); images
+failing with "Image storage isn't connected" (no Blob store connected to
+Production); `MONGODB_DB`
 missing (the site then uses a database called `test`); Atlas network access not open
 to Vercel; a key added to Preview instead of Production; `NEXTAUTH_URL`
 not matching the address they use.

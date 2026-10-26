@@ -26,7 +26,8 @@ import { getSiteSettings } from "@/lib/db/settings";
 import { extractVideoThumbnail, getVideoMetadata } from "./video-processing";
 import { listEntries, updateEntry } from "@/lib/db/entries";
 import { 
-  shouldUseBlob, 
+  shouldUseBlob,
+  assertStorageAvailable,
   uploadToBlob, 
   deleteFromBlob,
   deleteMultipleFromBlob 
@@ -60,6 +61,7 @@ async function saveFile(
   folder: "originals" | "variants" | "",
   mime: string
 ): Promise<{ path: string; url: string }> {
+  assertStorageAvailable();
   if (shouldUseBlob()) {
     const blobFolder = folder ? `uploads/${folder}` : "uploads";
     const result = await uploadToBlob(buffer, filename, {

@@ -19,6 +19,8 @@ export type ProjectSummary = {
   name: string;
   /** A folder or link with what an agent should know first: who it's for, its voice, what's decided. */
   brain?: string;
+  /** When anything in it last changed (ISO), for Home's cards. Only in the project list. */
+  lastChange?: string;
 };
 
 /** A clean project name, or a thrown reason. */

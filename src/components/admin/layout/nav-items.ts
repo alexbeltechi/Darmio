@@ -1,4 +1,4 @@
-import { File, FileText, Library, Settings, Tag, type LucideIcon } from "lucide-react";
+import { File, FileText, Image, Settings, Tag, type LucideIcon } from "lucide-react";
 
 export type AdminNavKey = "posts" | "pages" | "categories" | "library" | "settings";
 
@@ -15,7 +15,8 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { key: "pages", href: "/admin/pages", label: "Pages", icon: File },
   { key: "categories", href: "/admin/categories", label: "Categories", icon: Tag },
   // Images, video and documents (agent-made ones included): decisions, 2026-10-24.
-  { key: "library", href: "/admin/library", label: "Library", icon: Library },
+  // An image for its icon, though it holds documents too: it reads as the pictures.
+  { key: "library", href: "/admin/library", label: "Library", icon: Image },
   { key: "settings", href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 

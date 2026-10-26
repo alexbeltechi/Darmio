@@ -12,6 +12,32 @@ import { slugify } from "@/lib/slug";
 
 export const toSummary = ({ slug, name, brain }: ProjectRow): ProjectSummary => ({ slug, name, ...(brain ? { brain } : {}) });
 
+/** Where a project's changes are dated: posts and pages, the library, documents, categories, settings. */
+const DATED = [Collections.ENTRIES, Collections.MEDIA, Collections.DOCS, Collections.CATEGORIES, Collections.SETTINGS];
+
+/**
+ * When anything in a project last changed: the newest `updatedAt` across its
+ * content (or a media item's `createdAt`), else when the project was made.
+ * A handful of one-row reads per project, for Home's cards.
+ */
+export async function lastChangeOf(row: ProjectRow): Promise<string> {
+  const db = (await getMongoClient()).db(row.dbName);
+  const newest = await Promise.all(
+    DATED.flatMap((name) =>
+      ["updatedAt", "createdAt"].map((field) =>
+        db
+          .collection(name)
+          .find({ [field]: { $type: "string" } }, { projection: { [field]: 1 } })
+          .sort({ [field]: -1 })
+          .limit(1)
+          .next()
+          .then((doc) => (doc?.[field] as string | undefined) ?? "")
+      )
+    )
+  );
+  return newest.reduce((latest, at) => (at > latest ? at : latest), row.createdAt);
+}
+
 // Atlas allows database names up to 64 characters.
 const DB_NAME_MAX = 60;
 

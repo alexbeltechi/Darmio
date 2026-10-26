@@ -89,12 +89,21 @@ export default function SetupPage() {
     if (!code.trim() || checkingCode) return;
     setCheckingCode(true);
     setCodeError(null);
+    // A pasted link works as well as the code on its own.
+    const pasted = code.trim();
+    let value = pasted;
     try {
-      const res = await fetch(`/api/setup?code=${encodeURIComponent(code.trim())}`);
+      value = new URL(pasted).searchParams.get("code") ?? pasted;
+    } catch {
+      // Not a link: the code itself.
+    }
+    setCode(value);
+    try {
+      const res = await fetch(`/api/setup?code=${encodeURIComponent(value)}`);
       const json = await res.json();
       if (json.data?.codeOk) setStep("you");
-      else if (json.data?.hasCode === false) setCodeError("This install has no setup code yet. Your installer sets one (INSTALL.md).");
-      else setCodeError("That code isn't right. Check the setup link you were given.");
+      else if (json.data?.hasCode === false) setCodeError("This site isn't ready to set up yet. Ask your AI to finish the install.");
+      else setCodeError("That's not this site's setup link. Ask your AI for it again.");
     } catch {
       setCodeError("Couldn't reach the server. Try again.");
     } finally {
@@ -137,12 +146,12 @@ export default function SetupPage() {
               checkCode();
             }}
           >
-            <DsField
-              label="Setup code"
-              description="It's in the setup link you were given. Opening that link fills this in."
-              error={codeError ?? undefined}
-            >
-              <DsInput value={code} onChange={(e) => setCode(e.target.value)} autoComplete="off" autoFocus />
+            <p className="text-p text-ds-fg-muted">
+              Open the setup link your AI gave you when it installed this site. Lost it? Ask your AI for
+              your Dharmify setup link, or paste it here.
+            </p>
+            <DsField label="Setup link" error={codeError ?? undefined}>
+              <DsInput value={code} onChange={(e) => setCode(e.target.value)} autoComplete="off" placeholder="https://…/admin/setup?code=…" />
             </DsField>
             <div>
               <DsButton variant="primary" type="submit" loading={checkingCode} disabled={!code.trim()}>

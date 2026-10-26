@@ -77,9 +77,10 @@ When it's live, `GET <address>/api/setup` answers
 
 ## 6. Hand over
 
-Give them one link: `<address>/admin/setup?code=<SETUP_CODE>`. Tell them
-to open it, choose their email and password **there** (never in this
-chat), and name their projects. After that, their admin is
+Give them one link: `<address>/admin/setup?code=<SETUP_CODE>`. Call it
+their setup link; don't explain the code inside it. Tell them to open it,
+choose their email and password **there** (never in this chat), and name
+their projects. If they lose it, give it to them again. After that, their admin is
 `<address>/admin`: tell them to bookmark it.
 
 That's the setup done. For work on their site afterwards, pull its

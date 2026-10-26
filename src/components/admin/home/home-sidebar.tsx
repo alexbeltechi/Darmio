@@ -11,9 +11,9 @@ export const HOME_SIDEBAR_WIDTH = "lg:pl-[260px]";
 
 /**
  * Home's sidebar (decisions, 2026-10-26): Projects (the cards beside it,
- * which list every project and hold New project) and Settings (yours), then
- * Sign out as a plain button, so it doesn't read as one more place to go.
- * The theme sits at the foot. Full width rather than the rail's icons: Home
+ * which list every project and hold New project) and Settings (yours). At
+ * the foot, Sign out as a plain button, so it doesn't read as one more place
+ * to go, with the theme beside it. Full width rather than the rail's icons: Home
  * is about every project, the rail about one. Hidden below `lg`, where the
  * admin menu carries the same.
  */
@@ -29,12 +29,10 @@ export function HomeSidebar() {
         <DsNavItem href={ACCOUNT_PATH} iconLeft={Settings} selected={pathname === ACCOUNT_PATH}>
           Settings
         </DsNavItem>
-        <DsButton onClick={() => signOut({ callbackUrl: "/admin/login" })} className="mt-4">
-          Sign out
-        </DsButton>
       </nav>
 
-      <div>
+      <div className="flex items-center gap-2">
+        <DsButton onClick={() => signOut({ callbackUrl: "/admin/login" })}>Sign out</DsButton>
         <DsThemeToggle />
       </div>
     </aside>

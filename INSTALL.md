@@ -27,13 +27,40 @@ Assume they've never seen the site you're sending them to. Each time:
 Then **check it yourself** instead of asking whether they did it (each step
 says how), and say what you found.
 
+**Ask before creating anything in their accounts,** even when their tools
+are already signed in and you could just do it. Say what and where, and
+wait for a yes: "I'll create a private repo called `my-site` in your
+GitHub account `their-name`, and a Vercel project with the same name.
+OK?" Use the name they choose.
+
 ## What they'll need
 
 Three free accounts. They create each one themselves when you get there:
 GitHub (their copy of the code), Vercel (where the site runs), MongoDB
-Atlas (the database; Vercel can create it for them).
+Atlas (the database; Vercel creates it for them). GitHub isn't optional:
+Vercel builds the site from it, and Dharmify's updates reach them through
+it.
 
 ## 1. Their copy
+
+Tell them: "GitHub keeps your own copy of Dharmify's code. Your site is
+built from it, and updates come in through it."
+
+**Signed in?** Check with `gh auth status` (the GitHub command-line tool;
+if it's missing, ask before installing it, for example `brew install gh`
+on a Mac). If it names an account, tell them which, and ask before
+creating anything (see above). If not:
+
+- **No GitHub account yet:** send them to github.com/signup: an email, a
+  password, a username (it appears in their copy's address), then the
+  code GitHub emails them. Free plan.
+- **Sign the tool in:** run `gh auth login` and walk them through it:
+  choose **GitHub.com**, then **HTTPS**, then **Login with a web
+  browser**. It shows a one-time code: they copy it and press Enter; a
+  browser page opens (github.com/login/device), they paste the code and
+  click **Authorize**. Check with `gh auth status`.
+
+**Then make the copy.**
 
 Fork `alexbeltechi/dharmify` into their GitHub account, so updates can
 come in later (GitHub's "Sync fork"). With the GitHub CLI:
@@ -47,10 +74,18 @@ push `main`, and keep Dharmify as `upstream`
 (`git remote add upstream https://github.com/alexbeltechi/dharmify.git`),
 so updates still come in with `git pull upstream main`.
 
+Check: `gh repo view <their-name>/<repo>` shows their copy. Tell them its
+address.
+
 ## 2. The site on Vercel
 
-Vercel is where the site runs. Create a Vercel project from their copy.
-With the CLI in the clone: `npx vercel link` (it opens a browser for them
+Vercel is where the site runs. **Signed in?** `npx vercel whoami` names
+the account: tell them which, and ask before creating the project. If
+not, `npx vercel login` and they choose **Continue with GitHub** in the
+browser page it opens (that also creates their Vercel account if they
+have none; free Hobby plan).
+
+Create a Vercel project from their copy. With the CLI in the clone: `npx vercel link` (it opens a browser for them
 to sign in or sign up: say so first) and `npx vercel git connect`. Without
 the CLI, walk them through it:
 

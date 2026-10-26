@@ -24,6 +24,13 @@ come in later (GitHub's "Sync fork"). With the GitHub CLI:
 `gh repo fork alexbeltechi/dharmify --clone`, after `gh auth login` if
 needed. Without it, send them to the repo page to click **Fork**.
 
+If GitHub won't fork it (they own Dharmify's repo, or can't fork it):
+clone Dharmify, create a new private repo of theirs
+(`gh repo create <name> --private`), point the clone's `origin` at it and
+push `main`, and keep Dharmify as `upstream`
+(`git remote add upstream https://github.com/alexbeltechi/dharmify.git`),
+so updates still come in with `git pull upstream main`.
+
 ## 2. The site on Vercel
 
 Create a Vercel project from their fork: on vercel.com, **Add New →

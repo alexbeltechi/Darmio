@@ -47,7 +47,7 @@ function HomeProjects() {
     <div className="flex min-h-dvh flex-col">
       <div className="pointer-events-none sticky top-0 z-20 flex flex-col ds-nav-fade pb-5 [&>*]:pointer-events-auto">
         <div className="flex flex-wrap items-center gap-2 px-5 py-5">
-          <h1 className="min-w-0 flex-1 truncate text-p text-ds-fg">All projects</h1>
+          <h1 className="min-w-0 flex-1 truncate text-p text-ds-fg">Projects</h1>
           {/* Phones put the search on its own row below. */}
           <DsSearch
             value={search}

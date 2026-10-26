@@ -9,9 +9,7 @@ import { cn } from "@/lib/utils";
 import { useSiteName } from "@/components/admin/use-site-settings";
 import { ADMIN_NAV_ITEMS, activeNavItem, type AdminNavKey } from "./nav-items";
 import { ProjectMenu } from "./project-menu";
-import { HOME_PATH, ACCOUNT_PATH, NEW_PROJECT_PATH, isHomePath } from "@/components/admin/home/home-routes";
-import { useProjects } from "@/components/admin/home/use-projects";
-import { openProject } from "@/components/admin/projects/project-actions";
+import { HOME_PATH, ACCOUNT_PATH, isHomePath } from "@/components/admin/home/home-routes";
 import { AccountMenu } from "./account-menu";
 
 const OPEN_EVENT = "admin-menu:open";
@@ -86,7 +84,6 @@ export function AdminMobileNav({ children }: { children: React.ReactNode }) {
   const [menuOpen, setMenuOpen] = React.useState(false);
   const siteName = useSiteName();
   const home = isHomePath(pathname);
-  const projects = useProjects();
   const counts = useNavCounts(menuOpen);
   const closeMenu = React.useCallback(() => setMenuOpen(false), []);
 
@@ -142,18 +139,10 @@ export function AdminMobileNav({ children }: { children: React.ReactNode }) {
         </div>
 
         {home ? (
-          // Home's sidebar, as pills: every project, each one, New project, your settings, sign out.
-          <nav aria-label="Projects" className="flex flex-col items-center gap-1">
+          // Home's sidebar, as pills: Projects, your Settings, Sign out.
+          <nav aria-label="Home" className="flex flex-col items-center gap-1">
             {[
-              { key: "all", href: HOME_PATH, icon: LayoutGrid, label: "All projects", current: pathname === HOME_PATH },
-              ...(projects?.projects ?? []).map((project) => ({
-                key: project.slug,
-                onClick: () => openProject(project.slug, projects?.current ?? null),
-                icon: undefined,
-                label: project.name,
-                current: false,
-              })),
-              { key: "new", href: NEW_PROJECT_PATH, icon: undefined, label: "New project", current: pathname === NEW_PROJECT_PATH },
+              { key: "projects", href: HOME_PATH, icon: LayoutGrid, label: "Projects", current: pathname === HOME_PATH },
               { key: "settings", href: ACCOUNT_PATH, icon: Settings, label: "Settings", current: pathname === ACCOUNT_PATH },
               { key: "sign-out", onClick: () => signOut({ callbackUrl: "/admin/login" }), icon: LogOut, label: "Sign out", current: false },
             ].map((item, i) => (

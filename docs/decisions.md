@@ -10,7 +10,8 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
-- 2026-10-26 — **Parabola's text buttons show a surface on hover,** like every other button, and take the same padding to make room for it; text links that must line up with a field pull back with a negative margin.
+- 2026-10-26 — **Parabola's text buttons hover like a default button** (its surface plus the hover tint, so it shows even on a hovered card), and take the same padding to make room for it; text links that must line up with a field pull back with a negative margin.
+- 2026-10-26 — **A project's database name fits in 38 bytes,** MongoDB Atlas's limit (found when a long project name failed): the hub's name and the slug, cut short with a bit of the project's id when needed. The database is made before the project is listed, and a project whose database can't be read still lists.
 - 2026-10-26 — Library's icon is an image, though it holds documents too: it reads as the pictures.
 - 2026-10-26 — **Your Settings are two cards,** like a project's: Account
   (name, and the email you sign in with) and Password. Changing the email
@@ -31,10 +32,12 @@ with the why. To change one, add a new line that overrides it.
   New project, your Settings) get their own full sidebar instead of the
   rail, with just Projects and Settings; at the foot, Sign out as a plain
   button (not one more place to go) with the theme beside it. The projects
-  themselves are the cards beside it, so the sidebar doesn't list them. The main area shows the projects as cards with no
-  thumbnails or icons (the name and a gear at the top; "Live at …" or "Not
-  published" and "Changed 6 minutes ago", or the date after a week, at the
-  bottom), with
+  themselves are the cards beside it, so the sidebar doesn't list them. A
+  small "Home" label sits 8px over Projects. The main area shows the
+  projects as cards with no thumbnails or icons: the name with a Published
+  or Not published pill beside it (a long name wraps and the pill follows),
+  then at the bottom the address when it's published and "Changed 6 minutes
+  ago" (the date after a week), with the gear at the bottom right; with
   a search and New project at the top right, and one centred line when
   there are none or none match. Projects and New project carry no icons in
   any menu. Settings there (`/admin/account`, a gear) is yours across the

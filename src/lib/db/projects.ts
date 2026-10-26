@@ -21,6 +21,15 @@ const DATED = [Collections.ENTRIES, Collections.MEDIA, Collections.DOCS, Collect
  * A handful of one-row reads per project, for Home's cards.
  */
 export async function lastChangeOf(row: ProjectRow): Promise<string> {
+  // A project whose database can't be read still lists, dated when it was made.
+  try {
+    return await newestChange(row);
+  } catch {
+    return row.createdAt;
+  }
+}
+
+async function newestChange(row: ProjectRow): Promise<string> {
   const db = (await getMongoClient()).db(row.dbName);
   const newest = await Promise.all(
     DATED.flatMap((name) =>
@@ -38,8 +47,21 @@ export async function lastChangeOf(row: ProjectRow): Promise<string> {
   return newest.reduce((latest, at) => (at > latest ? at : latest), row.createdAt);
 }
 
-// Atlas allows database names up to 64 characters.
-const DB_NAME_MAX = 60;
+// MongoDB Atlas refuses database names over 38 bytes (it said so when a long
+// project name was tried, 2026-10-26).
+const DB_NAME_MAX = 38;
+
+/**
+ * A project's database: the hub's name and the project's slug
+ * (`dharmify-y3k-club`), cut short with a bit of the project's id when that
+ * runs past Atlas's limit, so it stays unique.
+ */
+function projectDbName(hubName: string, slug: string, id: string): string {
+  const full = `${hubName}-${slug}`;
+  if (full.length <= DB_NAME_MAX) return full;
+  const suffix = `-${id.replace(/-/g, "").slice(0, 6)}`;
+  return `${full.slice(0, DB_NAME_MAX - suffix.length).replace(/-+$/, "")}${suffix}`;
+}
 
 async function freeSlug(name: string, taken: Set<string>): Promise<string> {
   const base = slugify(name).slice(0, 40) || "project";
@@ -60,12 +82,11 @@ export async function createProject(input: { name: unknown; brain?: unknown }): 
 
   const hub = await getHubDb();
   const slug = await freeSlug(name, new Set(existing.map((p) => p.slug)));
-  const dbName = existing.length === 0 ? hub.databaseName : `${hub.databaseName}-${slug}`.slice(0, DB_NAME_MAX);
+  const id = crypto.randomUUID();
+  const dbName = existing.length === 0 ? hub.databaseName : projectDbName(hub.databaseName, slug, id);
+  const row: ProjectRow = { id, slug, name, dbName, ...(brain ? { brain } : {}), createdAt: new Date().toISOString() };
 
-  const row: ProjectRow = { id: crypto.randomUUID(), slug, name, dbName, ...(brain ? { brain } : {}), createdAt: new Date().toISOString() };
-  await hub.collection(Collections.PROJECTS).insertOne({ ...row });
-  forgetProjects();
-
+  // Its database first: if the server refuses it, no project is listed that can't open.
   const client = await getMongoClient();
   await client
     .db(dbName)
@@ -75,6 +96,8 @@ export async function createProject(input: { name: unknown; brain?: unknown }): 
       { $setOnInsert: { key: SETTINGS_KEY, siteName: name, updatedAt: row.createdAt } },
       { upsert: true }
     );
+  await hub.collection(Collections.PROJECTS).insertOne({ ...row });
+  forgetProjects();
   return row;
 }
 

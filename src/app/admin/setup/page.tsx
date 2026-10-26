@@ -3,14 +3,14 @@
 import { useEffect, useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Bot, Check, Plus, X } from "lucide-react";
-import { DsButton, DsCopyField, DsField, DsInfoCard, DsInput } from "@beltechi/parabola";
+import { ArrowLeft, Check, Plus, X } from "lucide-react";
+import { DsButton, DsField, DsInput } from "@beltechi/parabola";
 import { PASSWORD_MIN } from "@/lib/cms/password";
 import { isEmail } from "@/lib/cms/email";
 import { PROJECTS_MAX } from "@/lib/cms/projects";
 import { ProjectFields, type ProjectDraft } from "@/components/admin/projects/project-fields";
 
-type Step = "you" | "projects";
+type Step = "code" | "you" | "projects";
 
 const emptyProject = (): ProjectDraft => ({ name: "", brain: "" });
 
@@ -20,18 +20,25 @@ const emptyProject = (): ProjectDraft => ({ name: "", brain: "" });
  * No window around it: the fields float on the page, and buttons keep their
  * own width.
  *
+ * You arrive by the setup link your installer (usually your AI, following
+ * INSTALL.md) hands you: `/admin/setup?code=…`. The code is checked first;
+ * without a good one the page asks for it and goes no further, so nobody
+ * else can claim the install.
+ *
  * 1. Your account, for the whole install: email and password. A name is
  *    optional, added later under Settings › Account.
  * 2. Your projects, as tabs: a name each, and maybe a brain.
  *
- * An info card offers the same through an agent. Nothing is saved until the
- * last step; if an agent finishes the setup meanwhile, the page moves on to
- * sign-in by itself.
+ * Nothing is saved until the last step; if the setup is finished elsewhere
+ * meanwhile, the page moves on to sign-in by itself.
  */
 export default function SetupPage() {
   const router = useRouter();
   const [checking, setChecking] = useState(true);
-  const [step, setStep] = useState<Step>("you");
+  const [step, setStep] = useState<Step>("code");
+  const [code, setCode] = useState("");
+  const [codeError, setCodeError] = useState<string | null>(null);
+  const [checkingCode, setCheckingCode] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [repeat, setRepeat] = useState("");
@@ -42,12 +49,19 @@ export default function SetupPage() {
 
   useEffect(() => {
     document.title = "Set up Dharmify";
+    const fromLink = new URLSearchParams(window.location.search).get("code") ?? "";
     const check = (first: boolean) =>
-      fetch("/api/setup")
+      fetch(first && fromLink ? `/api/setup?code=${encodeURIComponent(fromLink)}` : "/api/setup")
         .then((res) => res.json())
         .then((json) => {
-          if (json.data?.needed === false) router.replace("/admin/login");
-          else if (first) setChecking(false);
+          if (json.data?.needed === false) return router.replace("/admin/login");
+          if (!first) return;
+          // A good code in the link goes straight to the account step.
+          if (json.data?.codeOk) {
+            setCode(fromLink);
+            setStep("you");
+          }
+          setChecking(false);
         })
         .catch(() => first && setChecking(false));
     check(true);
@@ -71,6 +85,23 @@ export default function SetupPage() {
     setTab(Math.max(0, Math.min(tab, projects.length - 2)));
   };
 
+  async function checkCode() {
+    if (!code.trim() || checkingCode) return;
+    setCheckingCode(true);
+    setCodeError(null);
+    try {
+      const res = await fetch(`/api/setup?code=${encodeURIComponent(code.trim())}`);
+      const json = await res.json();
+      if (json.data?.codeOk) setStep("you");
+      else if (json.data?.hasCode === false) setCodeError("This install has no setup code yet. Your installer sets one (INSTALL.md).");
+      else setCodeError("That code isn't right. Check the setup link you were given.");
+    } catch {
+      setCodeError("Couldn't reach the server. Try again.");
+    } finally {
+      setCheckingCode(false);
+    }
+  }
+
   async function create() {
     if (!youReady || !projectsReady || saving) return;
     setSaving(true);
@@ -79,7 +110,7 @@ export default function SetupPage() {
       const res = await fetch("/api/setup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, projects }),
+        body: JSON.stringify({ code: code.trim(), email, password, projects }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error);
@@ -96,7 +127,30 @@ export default function SetupPage() {
   return (
     <div className="flex min-h-screen justify-center bg-ds-bg px-ds-20 py-ds-80 text-ds-fg">
       <div className="flex w-full max-w-[440px] flex-col gap-ds-40">
-        <h1 className="text-h2">{step === "you" ? "Set up Dharmify" : "Your projects"}</h1>
+        <h1 className="text-h2">{step === "projects" ? "Your projects" : "Set up Dharmify"}</h1>
+
+        {step === "code" && (
+          <form
+            className="flex flex-col gap-ds-40"
+            onSubmit={(e) => {
+              e.preventDefault();
+              checkCode();
+            }}
+          >
+            <DsField
+              label="Setup code"
+              description="It's in the setup link you were given. Opening that link fills this in."
+              error={codeError ?? undefined}
+            >
+              <DsInput value={code} onChange={(e) => setCode(e.target.value)} autoComplete="off" autoFocus />
+            </DsField>
+            <div>
+              <DsButton variant="primary" type="submit" loading={checkingCode} disabled={!code.trim()}>
+                Continue
+              </DsButton>
+            </div>
+          </form>
+        )}
 
         {step === "you" && (
           <form
@@ -122,7 +176,6 @@ export default function SetupPage() {
                 Continue
               </DsButton>
             </div>
-            <AgentCard />
           </form>
         )}
 
@@ -170,23 +223,5 @@ export default function SetupPage() {
         )}
       </div>
     </div>
-  );
-}
-
-/**
- * The same setup, done by an AI: a prompt to paste. It points at SETUP.md in
- * the Dharmify folder, which says how to run it, what to ask and what to send;
- * the AI works out the address itself.
- */
-const AI_PROMPT = "Set up Dharmify for me. Follow SETUP.md in the Dharmify folder: it says what to ask me and what to do.";
-
-function AgentCard() {
-  const prompt = AI_PROMPT;
-
-  return (
-    <DsInfoCard icon={Bot} title="Set up with AI">
-      <p>Paste this into Claude Code, Codex, or any AI that can work in your Dharmify folder.</p>
-      <DsCopyField value={prompt} aria-label="Prompt for your AI" className="w-full" />
-    </DsInfoCard>
   );
 }

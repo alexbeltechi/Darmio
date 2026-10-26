@@ -5,20 +5,26 @@ import { isEmail } from "@/lib/cms/email";
 import { parseBrain, parseProjectName, PROJECTS_MAX } from "@/lib/cms/projects";
 import { createUser, hasUsers } from "@/lib/cms/users";
 import { createProject } from "@/lib/db/projects";
+import { hasSetupCode, setupCodeMatches } from "@/lib/setup-code";
 
 /**
  * First-run setup, public by design: it only works while the install has no
- * users, so it can create the owner exactly once. After that it answers 409
- * and the login page takes over. An agent can do the setup by reading GET.
+ * users, and only with the install's one-time setup code (SETUP_CODE, in the
+ * setup link the installer hands over), so it creates the owner exactly once
+ * and only for whoever holds the link. After that it answers 409 and the
+ * login page takes over. INSTALL.md is the full guide for an AI.
  */
 
-// The short version of SETUP.md, for an AI that only has this install's address.
-const AGENT_GUIDE = `Set up this Dharmify install. Ask the owner for: their email and a password
+// The short version of INSTALL.md, for an AI that only has this install's address.
+const AGENT_GUIDE = `Set up this Dharmify install. You need its setup code (SETUP_CODE in its
+environment). Best: give the owner the link /admin/setup?code=<code> and let them finish there,
+so their password never passes through you. Or ask them for: their email and a password
 of at least ${PASSWORD_MIN} characters, and their projects: a name
 each (a site, a newsletter, a brand), and, if they have one, a brain for it (a folder or link
 with what an agent should know first). Then POST /api/setup with JSON:
 
 {
+  "code": "<SETUP_CODE>",
   "email": "them@example.com",
   "password": "…",
   "projects": [{ "name": "First project", "brain": "optional folder or link" }]
@@ -27,17 +33,28 @@ with what an agent should know first). Then POST /api/setup with JSON:
 The first project opens first. It works once, while the install has no users; afterwards they
 sign in at /admin/login and add more projects from the menu behind the letter in the admin.`;
 
-/** Whether this install still needs its owner, and how an agent sets it up. */
-export async function GET() {
+/**
+ * Whether this install still needs its owner, whether it has a setup code at
+ * all, whether `?code=` is it, and how an agent sets it up.
+ */
+export async function GET(request: NextRequest) {
   try {
-    return NextResponse.json({ data: { needed: !(await hasUsers()), guide: AGENT_GUIDE } });
+    const code = request.nextUrl.searchParams.get("code");
+    return NextResponse.json({
+      data: {
+        needed: !(await hasUsers()),
+        hasCode: hasSetupCode(),
+        ...(code !== null ? { codeOk: setupCodeMatches(code) } : {}),
+        guide: AGENT_GUIDE,
+      },
+    });
   } catch (error) {
     if (isDatabaseError(error)) return handleDatabaseError(error);
     return NextResponse.json({ error: "Couldn't check the setup" }, { status: 500 });
   }
 }
 
-/** Create the owner and the projects: `{ email, password, projects: [{ name, brain? }], name? }`. */
+/** Create the owner and the projects: `{ code, email, password, projects: [{ name, brain? }], name? }`. */
 export async function POST(request: NextRequest) {
   try {
     if (await hasUsers()) {
@@ -45,6 +62,12 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
+    if (!hasSetupCode()) {
+      return NextResponse.json({ error: "This install has no setup code yet (SETUP_CODE). See INSTALL.md." }, { status: 403 });
+    }
+    if (!setupCodeMatches(body.code)) {
+      return NextResponse.json({ error: "That setup code isn't right. Open the setup link you were given." }, { status: 403 });
+    }
     const name = typeof body.name === "string" ? body.name.trim() : "";
     const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
     const password = typeof body.password === "string" ? body.password : "";

@@ -85,9 +85,10 @@ When a task changes an item, update this file in the same change.
       - **e. Media:** six moments (three stills, three 3–5s loops, first
         person, never her face; briefs in each post's placeholder line) and
         Alex's OK to ship the Y3K Ilo images in an open-source repo.
-      - **f. Setup code, then the Deploy button** (decisions, 2026-10-26:
-        the deploy makes a one-time code the setup screen asks for). Setup
-        screen done 2026-10-26. Was: **Setup screen and Deploy button,** README for testers, an
+      - **f. Install by AI** (decisions, 2026-10-26): `INSTALL.md`, the
+        README's one prompt, the setup code. Done 2026-10-26; next, Alex
+        runs it from scratch with a fresh AI chat. A deploy button and a
+        start page only if testers get stuck. Was: **Setup screen and Deploy button,** README for testers, an
         install skill. The V0 doesn't need these (the seed script makes the
         owner), so they come after it.
       Done: a non-technical maker deploys and sees Ilo's site without a

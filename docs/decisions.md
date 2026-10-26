@@ -10,6 +10,17 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-26 — **Installing is one prompt to your AI.** The README opens
+  with it; `INSTALL.md` is the one install guide, written for an AI: fork
+  the repo, a Vercel project, MongoDB Atlas and Blob from Vercel's Storage
+  tab, the keys and a one-time `SETUP_CODE`, deploy, then hand the owner a
+  single link to the live site's setup (`/admin/setup?code=…`), where they
+  choose their own email and password. Online from the start: no local
+  install first, no localhost for the maker. No npx package, start page,
+  hosting picker or deploy button yet; those come if testers get stuck.
+  Setup refuses without the code, which closes "whoever visits first
+  claims it". Developers run it locally from the same file's last section.
+
 - 2026-10-26 — **An account is an email.** Setup asks only for email and
   password; a name is optional, added under Settings › Account. Accounts
   belong to the install, not a project, so more people with roles (a
@@ -116,7 +127,7 @@ with the why. To change one, add a new line that overrides it.
 - 2026-10-26 — The onboarding opens straight on its first step, titled by
   the step ("Set up Dharmify", then "Your projects"), with no outline;
   doing it with an AI is an info card with a prompt to copy (it points at
-  `SETUP.md`), not a choice up front. Refines the same day's onboarding
+  `INSTALL.md`), not a choice up front. Refines the same day's onboarding
   decision.
 
 - 2026-10-24 — **Fields have one standard width**, 320px

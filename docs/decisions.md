@@ -15,11 +15,14 @@ with the why. To change one, add a new line that overrides it.
   the rail: a search over the projects, then Projects (All projects, each
   project stacked, New project), and at the foot Settings, you (avatar and
   email: Account settings, Sign out) and the theme. The main area shows the
-  projects as cards with no thumbnails (name, where it's live, a gear), New
-  project at the top right, and one centred line when there are none or
-  none match. Home › Settings is the install's, for now your name and
+  projects as cards with no thumbnails or icons (name, "Live at …" or "Not
+  published", a gear), New project at the top right, and one centred line
+  when there are none or none match. Projects and New project carry no
+  icons in any menu. Creating a project returns to Home, where its card
+  appears; you open it from there. Home › Settings is the install's, for now your name and
   password. Inside a project the rail keeps its transparent Home button:
-  hover for the projects menu, click for Home. Signing in and setting up
+  hover for the projects menu (Home's sidebar in short: projects, New
+  project, Home, Settings), click for Home. Signing in and setting up
   land on Home; opening a project goes to its posts. Overrides the same
   day's Home page with rows.
 - 2026-10-26 — **Without a working setup link, setup is a page, not a

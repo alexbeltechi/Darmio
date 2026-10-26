@@ -97,14 +97,14 @@ export default function SetupPage() {
           <div className="flex flex-col gap-ds-8">
             <h1 className="text-h2">This site isn&apos;t set up yet</h1>
             {badLink && <p className="text-p text-ds-error">That setup link didn&apos;t work.</p>}
-            <p className="text-p text-ds-fg-muted">If it&apos;s yours, open the setup link from the AI that installed it.</p>
           </div>
           <div className="flex flex-col gap-ds-8">
+            <p className="text-p text-ds-fg-muted">If it&apos;s yours, paste this into the AI that installed it:</p>
             <DsCopyField
+              wrap
               value={`Give me the setup link for my Dharmify site at ${address}`}
               aria-label="Prompt for your AI"
             />
-            <p className="text-small text-ds-fg-muted">Paste it into the AI that installed it: Claude Code, Codex or another.</p>
           </div>
         </div>
       </div>

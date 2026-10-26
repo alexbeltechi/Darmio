@@ -113,10 +113,11 @@ with the why. To change one, add a new line that overrides it.
 - 2026-10-26 — **Empty states are one line and an optional button,**
   centred both ways in the section (`DsEmptyState`), in every section.
   Side notes go in an info card (`DsInfoCard`).
-- 2026-10-26 — The onboarding opens straight on its first step under a
-  three-line outline (you, your projects, start creating) that marks where
-  you are; doing it with an agent is an info card with a prompt to copy,
-  not a choice up front. Refines the same day's onboarding decision.
+- 2026-10-26 — The onboarding opens straight on its first step, titled by
+  the step ("Set up Dharmify", then "Your projects"), with no outline;
+  doing it with an AI is an info card with a prompt to copy (it points at
+  `SETUP.md`), not a choice up front. Refines the same day's onboarding
+  decision.
 
 - 2026-10-24 — **Fields have one standard width**, 320px
   (`--ds-field-width`), set by Parabola: a field dropped on a page is

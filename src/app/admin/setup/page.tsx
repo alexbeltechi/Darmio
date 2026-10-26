@@ -9,23 +9,16 @@ import { PASSWORD_MIN } from "@/lib/cms/password";
 import { isEmail } from "@/lib/cms/email";
 import { PROJECTS_MAX } from "@/lib/cms/projects";
 import { ProjectFields, type ProjectDraft } from "@/components/admin/projects/project-fields";
-import { cn } from "@/lib/utils";
 
 type Step = "you" | "projects";
 
 const emptyProject = (): ProjectDraft => ({ name: "", brain: "" });
 
-/** The outline at the top, which is also where you are. */
-const OUTLINE: { step: Step | "publish"; label: string }[] = [
-  { step: "you", label: "Create your account" },
-  { step: "projects", label: "Create your projects" },
-  { step: "publish", label: "Start publishing" },
-];
-
 /**
  * First-run onboarding (decisions, 2026-10-26). A fresh install has no users,
- * so the admin opens here, straight on the first step. No window around it:
- * the fields float on the page, and buttons keep their own width.
+ * so the admin opens here, straight on the first step, titled by the step.
+ * No window around it: the fields float on the page, and buttons keep their
+ * own width.
  *
  * 1. Your account, for the whole install: email and password. A name is
  *    optional, added later under Settings › Account.
@@ -103,16 +96,7 @@ export default function SetupPage() {
   return (
     <div className="flex min-h-screen justify-center bg-ds-bg px-ds-20 py-ds-80 text-ds-fg">
       <div className="flex w-full max-w-[440px] flex-col gap-ds-40">
-        <div className="flex flex-col gap-ds-16">
-          <h1 className="text-h2">Set up Dharmify</h1>
-          <ol className="flex flex-col gap-ds-4 text-p">
-            {OUTLINE.map((item, i) => (
-              <li key={item.step} className={cn(item.step === step ? "text-ds-fg" : "text-ds-fg-muted")}>
-                {i + 1}. {item.label}
-              </li>
-            ))}
-          </ol>
-        </div>
+        <h1 className="text-h2">{step === "you" ? "Set up Dharmify" : "Your projects"}</h1>
 
         {step === "you" && (
           <form
@@ -201,7 +185,7 @@ function AgentCard() {
 
   return (
     <DsInfoCard icon={Bot} title="Set up with AI">
-      <p>Paste this into Claude Code, or any AI that can work in your Dharmify folder.</p>
+      <p>Paste this into Claude Code, Codex, or any AI that can work in your Dharmify folder.</p>
       <DsCopyField value={prompt} aria-label="Prompt for your AI" className="w-full" />
     </DsInfoCard>
   );

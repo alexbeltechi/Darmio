@@ -3,14 +3,15 @@ import { ScrollToTop } from "@/components/site/scroll-to-top";
 import { SiteNav } from "@/components/site/site-nav";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { getNavCounts } from "@/lib/db/nav-counts";
-import { getSiteSettings } from "@/lib/db/settings";
+import { DEFAULT_SETTINGS, getSiteSettings } from "@/lib/db/settings";
 import { listCategories } from "@/lib/db/categories";
 import { categoryGroups } from "@/lib/cms/category-groups";
 
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
   const [navCounts, { siteName }, categories] = await Promise.all([
     getNavCounts(),
-    getSiteSettings(),
+    // Without its database the page below fails into error.tsx; the frame around it still renders.
+    getSiteSettings().catch(() => DEFAULT_SETTINGS),
     listCategories().catch(() => []),
   ]);
   // The nav grows with the site: each top-level category marked for it (decisions, 2026-10-26).

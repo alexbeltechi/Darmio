@@ -9,6 +9,8 @@ import { PASSWORD_MIN } from "@/lib/cms/password";
 import { isEmail } from "@/lib/cms/email";
 import { PROJECTS_MAX } from "@/lib/cms/projects";
 import { ProjectFields, type ProjectDraft } from "@/components/admin/projects/project-fields";
+import { InstallProblemNotice } from "@/components/admin/install-problem";
+import { installProblem, type InstallProblem } from "@/lib/cms/install-problems";
 
 type Step = "code" | "you" | "projects";
 
@@ -39,6 +41,7 @@ export default function SetupPage() {
   const [code, setCode] = useState("");
   const [codeError, setCodeError] = useState<string | null>(null);
   const [checkingCode, setCheckingCode] = useState(false);
+  const [problem, setProblem] = useState<InstallProblem | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [repeat, setRepeat] = useState("");
@@ -54,6 +57,10 @@ export default function SetupPage() {
       fetch(first && fromLink ? `/api/setup?code=${encodeURIComponent(fromLink)}` : "/api/setup")
         .then((res) => res.json())
         .then((json) => {
+          // The install can't do its job yet (no database, say): say so, and keep checking.
+          const found = installProblem(json.code);
+          setProblem(found);
+          if (found) return first && setChecking(false);
           if (json.data?.needed === false) return router.replace("/admin/login");
           if (!first) return;
           // A good code in the link goes straight to the account step.
@@ -132,6 +139,7 @@ export default function SetupPage() {
   }
 
   if (checking) return <div className="min-h-screen bg-ds-bg" />;
+  if (problem) return <InstallProblemNotice problem={problem} />;
 
   return (
     <div className="flex min-h-screen justify-center bg-ds-bg px-ds-20 py-ds-80 text-ds-fg">

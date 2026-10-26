@@ -13,6 +13,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2, Eye, EyeOff } from "lucide-react";
 import { DsButton, DsField, DsInput } from "@beltechi/parabola";
 import { LOCKED_PREFIX } from "@/lib/cms/password";
+import { installProblem, type InstallProblem } from "@/lib/cms/install-problems";
+import { InstallProblemNotice } from "@/components/admin/install-problem";
 
 const WRONG = "Wrong email or password";
 
@@ -27,11 +29,17 @@ function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [problem, setProblem] = useState<InstallProblem | null>(null);
 
   useEffect(() => {
     fetch("/api/setup")
       .then((res) => res.json())
-      .then((json) => json.data?.needed && router.replace("/admin/setup"))
+      .then((json) => {
+        // Signing in can't work on an install without its database: say why instead.
+        const found = installProblem(json.code);
+        if (found) setProblem(found);
+        else if (json.data?.needed) router.replace("/admin/setup");
+      })
       .catch(() => {});
   }, [router]);
 
@@ -59,6 +67,8 @@ function LoginForm() {
       setLoading(false);
     }
   };
+
+  if (problem) return <InstallProblemNotice problem={problem} />;
 
   const message = formError || (errorParam ? (errorParam === "CredentialsSignin" ? WRONG : "Couldn't sign in") : null);
 

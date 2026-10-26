@@ -34,7 +34,8 @@ export function handleDatabaseError(error: unknown): NextResponse<ErrorResponse>
       );
     }
 
-    if (error.message.includes("Authentication failed")) {
+    // Atlas says "bad auth : authentication failed"; other servers capitalise it.
+    if (/authentication failed|bad auth/i.test(error.message)) {
       return NextResponse.json(
         {
           error: "Database Authentication Failed",

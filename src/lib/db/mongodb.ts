@@ -30,7 +30,8 @@ const globalWithMongo = global as typeof globalThis & {
 
 function getMongoURI(): string {
   if (!process.env.MONGODB_URI) {
-    throw new Error("Please add your MongoDB URI to .env.local");
+    // Worded so isDatabaseError and handleDatabaseError recognise it (lib/api/error-handler.ts).
+    throw new Error("MONGODB_URI is required: this install has no database yet");
   }
   return process.env.MONGODB_URI;
 }

@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Plus, Settings } from "lucide-react";
+import { Loader2, Plus, Settings } from "lucide-react";
 import { DsButton, DsEmptyState, DsPill, DsSearch } from "@beltechi/parabola";
 import { AdminMenuButton } from "@/components/admin/layout";
 import { openProject } from "@/components/admin/projects/project-actions";
@@ -63,7 +63,12 @@ function HomeProjects() {
         </div>
       </div>
 
-      {list === null ? null : cards.length === 0 ? (
+      {list === null ? (
+        // Loading: the posts list's spinner, in the middle of the page like the empty states.
+        <div className="flex flex-1 items-center justify-center">
+          <Loader2 aria-label="Loading projects" className="size-6 animate-spin text-ds-fg-subtle" />
+        </div>
+      ) : cards.length === 0 ? (
         query ? (
           <DsEmptyState>No projects match that.</DsEmptyState>
         ) : (

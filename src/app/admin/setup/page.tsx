@@ -99,7 +99,7 @@ export default function SetupPage() {
             {badLink && <p className="text-p text-ds-error">That setup link didn&apos;t work.</p>}
           </div>
           <div className="flex flex-col gap-ds-8">
-            <p className="text-p text-ds-fg-muted">If it&apos;s yours, paste this into the AI that installed it:</p>
+            <p className="text-p text-ds-fg-muted">Paste this into the AI that installed it:</p>
             <DsCopyField
               wrap
               value={`Give me the setup link for my Dharmify site at ${address}`}

@@ -3,7 +3,27 @@
 export { cn } from "@beltechi/parabola"
 
 /**
- * Format a date string to relative time (e.g., "2 hours ago")
+ * When something changed, in words: "just now", "6 minutes ago", "3 hours
+ * ago", "1 day ago" for the last week, then the date ("24 February", with
+ * the year when it isn't this one).
+ */
+export function formatChangedAt(dateString: string, now = new Date()): string {
+  const date = new Date(dateString);
+  const minutes = Math.floor((now.getTime() - date.getTime()) / 60_000);
+  const ago = (n: number, unit: string) => `${n} ${unit}${n === 1 ? "" : "s"} ago`;
+  if (minutes < 1) return "just now";
+  if (minutes < 60) return ago(minutes, "minute");
+  if (minutes < 24 * 60) return ago(Math.floor(minutes / 60), "hour");
+  if (minutes < 7 * 24 * 60) return ago(Math.floor(minutes / (24 * 60)), "day");
+  return date.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "long",
+    ...(date.getFullYear() === now.getFullYear() ? {} : { year: "numeric" }),
+  });
+}
+
+/**
+ * Format a date string to relative time, short (e.g., "2h ago")
  */
 export function formatRelativeTime(dateString: string): string {
   const date = new Date(dateString);

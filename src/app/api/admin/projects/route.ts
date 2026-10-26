@@ -1,13 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { handleDatabaseError, isDatabaseError } from "@/lib/api/error-handler";
 import { getCurrentProject, hubProjects } from "@/lib/db/mongodb";
-import { createProject, ensureFirstProject, toSummary } from "@/lib/db/projects";
+import { createProject, ensureFirstProject, lastChangeOf, toSummary } from "@/lib/db/projects";
 
-/** Every project, and the one this request is in. */
+/** Every project, when each last changed, and the one this request is in. */
 export async function GET() {
   try {
     const [projects, current] = await Promise.all([hubProjects({ fresh: true }), getCurrentProject()]);
-    return NextResponse.json({ data: { projects: projects.map(toSummary), current: current?.slug ?? null } });
+    const summaries = await Promise.all(
+      projects.map(async (row) => ({ ...toSummary(row), lastChange: await lastChangeOf(row) }))
+    );
+    return NextResponse.json({ data: { projects: summaries, current: current?.slug ?? null } });
   } catch (error) {
     if (isDatabaseError(error)) return handleDatabaseError(error);
     return NextResponse.json({ error: "Couldn't list the projects" }, { status: 500 });

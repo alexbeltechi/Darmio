@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Bot, Check, Copy, Plus, X } from "lucide-react";
-import { DsButton, DsField, DsInfoCard, DsInput, dsToast } from "@beltechi/parabola";
+import { ArrowLeft, Bot, Check, Plus, X } from "lucide-react";
+import { DsButton, DsCopyField, DsField, DsInfoCard, DsInput } from "@beltechi/parabola";
 import { PASSWORD_MIN } from "@/lib/cms/password";
 import { isEmail } from "@/lib/cms/email";
 import { PROJECTS_MAX } from "@/lib/cms/projects";
@@ -201,17 +201,7 @@ function AgentCard() {
 
   return (
     <DsInfoCard icon={Bot} title="Set up with AI">
-      <p>Rather have your AI do this? Paste this into its chat.</p>
-      <p className="font-mono text-small break-words">{prompt}</p>
-      <DsButton
-        type="button"
-        size="small"
-        iconLeft={Copy}
-        className="self-start"
-        onClick={() => navigator.clipboard.writeText(prompt).then(() => dsToast("Copied"))}
-      >
-        Copy
-      </DsButton>
+      <DsCopyField value={prompt} aria-label="Prompt for your AI" className="w-full" />
     </DsInfoCard>
   );
 }

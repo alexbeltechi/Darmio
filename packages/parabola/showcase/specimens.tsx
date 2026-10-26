@@ -56,6 +56,7 @@ import { DsNewsletterBlock } from "../blocks/newsletter";
 import { DsPlaceholder } from "../components/placeholder";
 import { DsEmptyState } from "../components/empty-state";
 import { DsInfoCard } from "../components/info-card";
+import { DsCopyField } from "../primitives/copy-field";
 import { useDsOptionsSlot } from "./ds-shell";
 
 const CATEGORIES = ["Design", "Product", "Design Systems", "Photography", "Portrait", "Still life"].map((label) => ({
@@ -1044,14 +1045,26 @@ export function EmptyState() {
 export function InfoCard() {
   return (
     <div className="flex w-full max-w-md flex-col gap-4">
-      <DsInfoCard title="Made for agents">
-        <p>Paste this into your agent. It does the rest.</p>
-        <p className="font-mono text-small break-words">Set up my site at https://example.com.</p>
-        <DsButton size="small" className="self-start">Copy</DsButton>
+      <DsInfoCard title="Set up with AI">
+        <DsCopyField className="w-full" value="Set up Dharmify for me. Follow SETUP.md in the Dharmify folder." />
       </DsInfoCard>
       <DsInfoCard title="Not live yet">
         <p>Changes to a published post wait until you publish them.</p>
       </DsInfoCard>
+    </div>
+  );
+}
+
+/** Fields › Copy: a read-only value, cut short, with a copy button inside. */
+export function CopyField() {
+  return (
+    <div className={DS_FIELDS_CLASS}>
+      <DsField label="Prompt">
+        <DsCopyField value="Set up Dharmify for me. Follow SETUP.md in the Dharmify folder: it says what to ask me and what to do." />
+      </DsField>
+      <DsField label="Command">
+        <DsCopyField mono value="npm run reset-password -- you@example.com" />
+      </DsField>
     </div>
   );
 }

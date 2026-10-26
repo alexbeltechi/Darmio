@@ -58,6 +58,7 @@ export { DsSidePanel } from "./primitives/side-panel";
 export { DsSwitch } from "./primitives/switch";
 export { DsThemeToggle } from "./primitives/theme-toggle";
 export { DsToaster, DsToast, DsToastAction, dsToast } from "./primitives/toast";
+export { DsCopyField } from "./primitives/copy-field";
 export { DsTooltip } from "./primitives/tooltip";
 export {
   DsTray,

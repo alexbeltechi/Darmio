@@ -144,6 +144,7 @@ export const DS_TIERS: DsTier[] = [
             component: S.MultiSelectField,
           },
           { slug: "date-picker", label: "Date picker", component: S.DateField },
+          { slug: "copy", label: "Copy", component: S.CopyField },
           { slug: "form", label: "Form", component: S.FieldsForm },
         ],
       },

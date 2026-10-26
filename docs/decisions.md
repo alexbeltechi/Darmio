@@ -21,9 +21,9 @@ with the why. To change one, add a new line that overrides it.
   phones the menu opens on a tap and starts with Home. Overrides the same
   day's project tile.
 - 2026-10-26 — **Without a working setup link, setup is a page, not a
-  form:** "This site isn't set up yet", one line to open the link from the
-  AI that installed it, and a prompt to copy that asks that AI for the link
-  (it carries the site's address). A wrong link adds "That setup link
+  form:** "This site isn't set up yet", then "Paste this into the AI that
+  installed it:" over a prompt that asks that AI for the link (it carries
+  the site's address). No "if it's yours": a stranger can't use the prompt. A wrong link adds "That setup link
   didn't work." The paste-your-link field is gone: whoever has the link
   just opens it.
 - 2026-10-26 — **The project is at the top of the rail, you are at the

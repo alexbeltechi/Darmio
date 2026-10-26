@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { Folder, Globe, Plus, Settings } from "lucide-react";
+import { Plus, Settings } from "lucide-react";
 import { DsButton, DsEmptyState, DsPill } from "@beltechi/parabola";
 import { AdminMenuButton } from "@/components/admin/layout";
 import { openProject } from "@/components/admin/projects/project-actions";
@@ -11,8 +11,8 @@ import { useProjects } from "@/components/admin/home/use-projects";
 
 /**
  * Home (decisions, 2026-10-26), the way Framer's dashboard opens: every
- * project as a card (no thumbnails: a name, where it's live, a gear for its
- * settings) and New project. Signing in and setting up land here; the
+ * project as a card (no thumbnails or icons: a name, where it's live or
+ * "Not published", a gear for its settings) and New project. Signing in and setting up land here; the
  * sidebar beside it holds the search, the projects stacked, and the install's
  * settings. Nothing yet, or nothing matching the search: one line in the
  * middle of the page.
@@ -58,11 +58,8 @@ function HomeProjects() {
           {cards.map(({ project, onSite }) => (
             <li
               key={project.slug}
-              className="relative flex min-h-44 flex-col justify-between gap-ds-40 rounded-ds-lg bg-ds-surface-subtle p-5 transition-colors hover:bg-ds-surface"
+              className="relative flex min-h-44 flex-col justify-end rounded-ds-lg bg-ds-surface-subtle p-5 transition-colors hover:bg-ds-surface"
             >
-              <div className="flex size-12 items-center justify-center rounded-ds-md bg-ds-surface/70 text-ds-fg-subtle [&_svg]:size-5">
-                {onSite ? <Globe aria-hidden /> : <Folder aria-hidden />}
-              </div>
               <div className="flex min-w-0 flex-col gap-0.5">
                 <div className="flex min-w-0 items-center gap-1">
                   {/* The name opens the project, stretched over the whole card. */}
@@ -76,7 +73,7 @@ function HomeProjects() {
                   {project.slug === current && <DsPill>Open</DsPill>}
                 </div>
                 <p className="truncate text-small text-ds-fg-subtle">
-                  {onSite ? `Live at ${host}` : "Not on the public site yet"}
+                  {onSite ? `Live at ${host}` : "Not published"}
                 </p>
               </div>
               <DsButton

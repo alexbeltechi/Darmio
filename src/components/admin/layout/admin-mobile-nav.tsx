@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { usePathname } from "next/navigation";
-import { ChevronDown, Folder, Globe, LayoutGrid, Menu, Plus, Settings, X } from "lucide-react";
+import { ChevronDown, LayoutGrid, Menu, Settings, X } from "lucide-react";
 import { DsButton, DsMenu, DsThemeToggle } from "@beltechi/parabola";
 import { cn } from "@/lib/utils";
 import { useSiteName } from "@/components/admin/use-site-settings";
@@ -145,14 +145,14 @@ export function AdminMobileNav({ children }: { children: React.ReactNode }) {
           <nav aria-label="Projects" className="flex flex-col items-center gap-1">
             {[
               { key: "all", href: HOME_PATH, icon: LayoutGrid, label: "All projects", current: pathname === HOME_PATH },
-              ...(projects?.projects ?? []).map((project, index) => ({
+              ...(projects?.projects ?? []).map((project) => ({
                 key: project.slug,
                 onClick: () => openProject(project.slug, projects?.current ?? null),
-                icon: index === 0 ? Globe : Folder,
+                icon: undefined,
                 label: project.name,
                 current: false,
               })),
-              { key: "new", href: NEW_PROJECT_PATH, icon: Plus, label: "New project", current: pathname === NEW_PROJECT_PATH },
+              { key: "new", href: NEW_PROJECT_PATH, icon: undefined, label: "New project", current: pathname === NEW_PROJECT_PATH },
               { key: "settings", href: HOME_SETTINGS_PATH, icon: Settings, label: "Settings", current: pathname === HOME_SETTINGS_PATH },
             ].map((item, i) => (
               <DsButton

@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { Check, Home, Plus, Settings } from "lucide-react";
+import { Check, Home, Settings } from "lucide-react";
 import {
   DsDropdown,
   DsDropdownContent,
@@ -13,6 +13,7 @@ import {
 } from "@beltechi/parabola";
 import type { ProjectSummary } from "@/lib/cms/projects";
 import { openProject } from "@/components/admin/projects/project-actions";
+import { HOME_PATH, HOME_SETTINGS_PATH, NEW_PROJECT_PATH } from "@/components/admin/home/home-routes";
 
 type ProjectList = { projects: ProjectSummary[]; current: string | null };
 
@@ -20,15 +21,14 @@ type ProjectList = { projects: ProjectSummary[]; current: string | null };
 const CLOSE_DELAY_MS = 150;
 
 /**
- * The projects menu (decisions, 2026-10-26): your projects, the current one
- * ticked, each with a gear for its settings, then New project. Picking a
- * project opens it.
+ * The projects menu (decisions, 2026-10-26), Home's sidebar in short: your
+ * projects, the current one ticked, each with a gear for its settings, New
+ * project, then Home and the install's Settings. Picking a project opens it.
  *
  * `hover`: the rail's Home button. The menu opens while the pointer is on the
  * button or the menu, and a click on the button goes Home instead of
  * toggling the menu (Enter too; arrow down opens the menu from the
- * keyboard). Without it (the mobile menu, on touch) a tap opens the menu,
- * which then starts with Home.
+ * keyboard). Without it (the mobile menu, on touch) a tap opens the menu.
  *
  * `children` is the trigger.
  */
@@ -76,7 +76,7 @@ export function ProjectMenu({
         onKeyDown: (e: React.KeyboardEvent) => {
           if (e.key !== "Enter") return;
           e.preventDefault();
-          router.push("/admin");
+          router.push(HOME_PATH);
         },
       }
     : {};
@@ -93,14 +93,6 @@ export function ProjectMenu({
         {children}
       </DsDropdownTrigger>
       <DsDropdownContent align={align} sideOffset={8} className="min-w-64" {...hoverContent}>
-        {!hover && (
-          <>
-            <DsDropdownItem iconLeft={Home} onSelect={() => router.push("/admin")}>
-              Home
-            </DsDropdownItem>
-            <DsDropdownSeparator />
-          </>
-        )}
         <DsDropdownLabel>{projects.length === 1 ? "Project" : "Projects"}</DsDropdownLabel>
         {projects.map((project) => (
           <div key={project.slug} className="flex items-center gap-1">
@@ -121,8 +113,15 @@ export function ProjectMenu({
             </DsDropdownItem>
           </div>
         ))}
-        <DsDropdownItem iconLeft={Plus} tone="subtle" onSelect={() => router.push("/admin/projects/new")}>
+        <DsDropdownItem tone="subtle" onSelect={() => router.push(NEW_PROJECT_PATH)}>
           New project
+        </DsDropdownItem>
+        <DsDropdownSeparator />
+        <DsDropdownItem iconLeft={Home} onSelect={() => router.push(HOME_PATH)}>
+          Home
+        </DsDropdownItem>
+        <DsDropdownItem iconLeft={Settings} onSelect={() => router.push(HOME_SETTINGS_PATH)}>
+          Settings
         </DsDropdownItem>
       </DsDropdownContent>
     </DsDropdown>

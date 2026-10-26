@@ -5,12 +5,12 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { DsButton, DsField, DsInput, dsToast } from "@beltechi/parabola";
 import { PROJECT_NAME_MAX } from "@/lib/cms/projects";
-import { PROJECT_START } from "@/components/admin/projects/project-actions";
+import { HOME_PATH } from "@/components/admin/home/home-routes";
 
 /**
  * New project: one field, its name (decisions, 2026-10-26). It gets its own
- * database, the admin switches to it and opens on its empty posts; the rest
- * is set later from its settings.
+ * database, and you're back on Home with its card there; the rest is set
+ * later from its settings.
  */
 export default function NewProjectPage() {
   const router = useRouter();
@@ -29,12 +29,8 @@ export default function NewProjectPage() {
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error);
-      await fetch("/api/admin/projects/current", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slug: json.data.slug }),
-      });
-      window.location.assign(PROJECT_START);
+      // Back to Home, where its card now shows; you open it from there (decisions, 2026-10-26).
+      window.location.assign(HOME_PATH);
     } catch (error) {
       dsToast.error("Couldn't create the project", { description: error instanceof Error ? error.message : undefined });
       setSaving(false);

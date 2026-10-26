@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Folder, Globe, LayoutGrid, Plus, Settings } from "lucide-react";
+import { LayoutGrid, Settings } from "lucide-react";
 import { DsNavItem, DsSearch, DsThemeToggle } from "@beltechi/parabola";
 import { AccountMenu } from "@/components/admin/layout/account-menu";
 import { openProject } from "@/components/admin/projects/project-actions";
@@ -37,17 +37,16 @@ export function HomeSidebar() {
         <DsNavItem href={HOME_PATH} iconLeft={LayoutGrid} selected={pathname === HOME_PATH}>
           All projects
         </DsNavItem>
-        {list?.projects.map((project, index) => (
+        {list?.projects.map((project) => (
           <DsNavItem
             key={project.slug}
-            iconLeft={index === 0 ? Globe : Folder}
             meta={project.slug === list.current ? "Open" : undefined}
             onClick={() => openProject(project.slug, list.current)}
           >
             {project.name}
           </DsNavItem>
         ))}
-        <DsNavItem href={NEW_PROJECT_PATH} iconLeft={Plus} selected={pathname === NEW_PROJECT_PATH} className="text-ds-fg-muted">
+        <DsNavItem href={NEW_PROJECT_PATH} selected={pathname === NEW_PROJECT_PATH} className="text-ds-fg-muted">
           New project
         </DsNavItem>
       </nav>

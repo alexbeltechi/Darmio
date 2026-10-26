@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { Check, Home, Settings } from "lucide-react";
+import { Check, Home, Settings, UserRound } from "lucide-react";
 import {
   DsDropdown,
   DsDropdownContent,
@@ -13,7 +13,7 @@ import {
 } from "@beltechi/parabola";
 import type { ProjectSummary } from "@/lib/cms/projects";
 import { openProject } from "@/components/admin/projects/project-actions";
-import { HOME_PATH, HOME_SETTINGS_PATH, NEW_PROJECT_PATH } from "@/components/admin/home/home-routes";
+import { HOME_PATH, ACCOUNT_PATH, NEW_PROJECT_PATH } from "@/components/admin/home/home-routes";
 
 type ProjectList = { projects: ProjectSummary[]; current: string | null };
 
@@ -23,7 +23,7 @@ const CLOSE_DELAY_MS = 150;
 /**
  * The projects menu (decisions, 2026-10-26), Home's sidebar in short: your
  * projects, the current one ticked, each with a gear for its settings, New
- * project, then Home and the install's Settings. Picking a project opens it.
+ * project, then Home and your Account. Picking a project opens it.
  *
  * `hover`: the rail's Home button. The menu opens while the pointer is on the
  * button or the menu, and a click on the button goes Home instead of
@@ -120,8 +120,8 @@ export function ProjectMenu({
         <DsDropdownItem iconLeft={Home} onSelect={() => router.push(HOME_PATH)}>
           Home
         </DsDropdownItem>
-        <DsDropdownItem iconLeft={Settings} onSelect={() => router.push(HOME_SETTINGS_PATH)}>
-          Settings
+        <DsDropdownItem iconLeft={UserRound} onSelect={() => router.push(ACCOUNT_PATH)}>
+          Account
         </DsDropdownItem>
       </DsDropdownContent>
     </DsDropdown>

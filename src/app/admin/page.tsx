@@ -1,25 +1,30 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Plus, Settings } from "lucide-react";
-import { DsButton, DsEmptyState, DsPill } from "@beltechi/parabola";
+import { DsButton, DsEmptyState, DsPill, DsSearch } from "@beltechi/parabola";
 import { AdminMenuButton } from "@/components/admin/layout";
 import { openProject } from "@/components/admin/projects/project-actions";
-import { NEW_PROJECT_PATH } from "@/components/admin/home/home-routes";
+import { HOME_PATH, NEW_PROJECT_PATH } from "@/components/admin/home/home-routes";
 import { useProjects } from "@/components/admin/home/use-projects";
 
 /**
  * Home (decisions, 2026-10-26), the way Framer's dashboard opens: every
  * project as a card (no thumbnails or icons: a name, where it's live or
- * "Not published", a gear for its settings) and New project. Signing in and setting up land here; the
- * sidebar beside it holds the search, the projects stacked, and the install's
- * settings. Nothing yet, or nothing matching the search: one line in the
- * middle of the page.
+ * "Not published", a gear for its settings), with a search over them and New
+ * project at the top right. Signing in and setting up land here; the sidebar
+ * beside it holds the projects stacked and your account. Nothing yet, or
+ * nothing matching the search: one line in the middle of the page.
  */
 function HomeProjects() {
   const list = useProjects();
-  const query = (useSearchParams().get("q") ?? "").trim().toLowerCase();
+  const router = useRouter();
+  const search = useSearchParams().get("q") ?? "";
+  const query = search.trim().toLowerCase();
+  // The search lives in the address, so a filtered Home can be reloaded or shared.
+  const setSearch = (value: string) =>
+    router.replace(value ? `${HOME_PATH}?q=${encodeURIComponent(value)}` : HOME_PATH, { scroll: false });
   const [host, setHost] = useState("");
   useEffect(() => {
     const id = window.setTimeout(() => setHost(window.location.host));
@@ -40,9 +45,17 @@ function HomeProjects() {
   return (
     <div className="flex min-h-dvh flex-col">
       <div className="pointer-events-none sticky top-0 z-20 flex flex-col ds-nav-fade pb-5 [&>*]:pointer-events-auto">
-        <div className="flex items-center gap-2 px-5 py-5">
-          <h1 className="min-w-0 flex-1 truncate text-p text-ds-fg">{query ? "Search" : "All projects"}</h1>
-          {cards.length > 0 && newProject}
+        <div className="flex flex-wrap items-center gap-2 px-5 py-5">
+          <h1 className="min-w-0 flex-1 truncate text-p text-ds-fg">All projects</h1>
+          {/* Phones put the search on its own row below. */}
+          <DsSearch
+            value={search}
+            onValueChange={setSearch}
+            placeholder="Search projects"
+            aria-label="Search projects"
+            className="order-last w-full sm:order-none sm:w-60"
+          />
+          {(cards.length > 0 || query) && newProject}
           <AdminMenuButton />
         </div>
       </div>

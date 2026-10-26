@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { LogOut, Settings, UserRound } from "lucide-react";
+import { LogOut, UserRound } from "lucide-react";
 import {
   DsDropdown,
   DsDropdownContent,
@@ -12,9 +12,8 @@ import {
   DsDropdownSeparator,
   DsDropdownTrigger,
 } from "@beltechi/parabola";
-import { cn } from "@/lib/utils";
 import { siteInitial } from "@/lib/cms/site";
-import { HOME_SETTINGS_PATH } from "@/components/admin/home/home-routes";
+import { ACCOUNT_PATH } from "@/components/admin/home/home-routes";
 
 type Me = { name?: string; email: string };
 
@@ -31,20 +30,11 @@ function useMe(): Me | null {
 }
 
 /**
- * You, at the foot of the admin's rail and of Home's sidebar (decisions,
- * 2026-10-26): a round avatar with your initial (and your email beside it,
- * with `withEmail`) that opens your email, Account settings (Home ›
- * Settings, the install's, not a project's) and Sign out.
+ * You, at the foot of a project's rail (decisions, 2026-10-26): a round
+ * avatar with your initial that opens your email, Account (the install's,
+ * not a project's) and Sign out. Home's sidebar lists the same as items.
  */
-export function AccountMenu({
-  align = "end",
-  side = "right",
-  withEmail = false,
-}: {
-  align?: "start" | "end";
-  side?: "right" | "bottom" | "top";
-  withEmail?: boolean;
-}) {
+export function AccountMenu({ align = "end", side = "right" }: { align?: "start" | "end"; side?: "right" | "bottom" }) {
   const router = useRouter();
   const me = useMe();
   const initial = me ? siteInitial(me.name || me.email) : "";
@@ -56,21 +46,15 @@ export function AccountMenu({
           type="button"
           aria-label="Your account"
           title={me?.email}
-          className={cn(
-            "flex min-w-0 shrink-0 items-center gap-2 rounded-full text-p text-ds-fg ds-focus",
-            withEmail && "flex-1 pr-3 hover:bg-ds-surface/70"
-          )}
+          className="flex size-9 shrink-0 items-center justify-center rounded-full bg-ds-surface text-p text-ds-fg ds-focus"
         >
-          <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-ds-surface">
-            {initial || <UserRound aria-hidden className="size-4" />}
-          </span>
-          {withEmail && <span className="min-w-0 truncate text-small text-ds-fg-muted">{me?.email}</span>}
+          {initial || <UserRound aria-hidden className="size-4" />}
         </button>
       </DsDropdownTrigger>
       <DsDropdownContent side={side} align={align} sideOffset={8} className="min-w-56">
         {me && <DsDropdownLabel className="truncate">{me.email}</DsDropdownLabel>}
-        <DsDropdownItem iconLeft={Settings} onSelect={() => router.push(HOME_SETTINGS_PATH)}>
-          Account settings
+        <DsDropdownItem iconLeft={UserRound} onSelect={() => router.push(ACCOUNT_PATH)}>
+          Account
         </DsDropdownItem>
         <DsDropdownSeparator />
         <DsDropdownItem iconLeft={LogOut} onSelect={() => signOut({ callbackUrl: "/admin/login" })}>

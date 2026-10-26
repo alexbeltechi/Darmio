@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect } from "react";
+import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { ThemeProvider } from "@/components/providers/theme-provider";
@@ -37,14 +37,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   const home = isHomePath(pathname);
   return (
     <div className={cn("min-h-dvh bg-ds-bg text-ds-fg", home ? HOME_SIDEBAR_WIDTH : ADMIN_RAIL_WIDTH)}>
-      {home ? (
-        // The sidebar reads the search from the address, which needs a Suspense boundary.
-        <Suspense fallback={null}>
-          <HomeSidebar />
-        </Suspense>
-      ) : (
-        <AdminRail />
-      )}
+      {home ? <HomeSidebar /> : <AdminRail />}
       <AdminMobileNav>
         <main className="min-h-dvh">{children}</main>
       </AdminMobileNav>

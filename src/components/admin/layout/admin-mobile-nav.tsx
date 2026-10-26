@@ -2,13 +2,14 @@
 
 import * as React from "react";
 import { usePathname } from "next/navigation";
-import { ChevronDown, LayoutGrid, Menu, Settings, X } from "lucide-react";
+import { ChevronDown, LayoutGrid, LogOut, Menu, UserRound, X } from "lucide-react";
+import { signOut } from "next-auth/react";
 import { DsButton, DsMenu, DsThemeToggle } from "@beltechi/parabola";
 import { cn } from "@/lib/utils";
 import { useSiteName } from "@/components/admin/use-site-settings";
 import { ADMIN_NAV_ITEMS, activeNavItem, type AdminNavKey } from "./nav-items";
 import { ProjectMenu } from "./project-menu";
-import { HOME_PATH, HOME_SETTINGS_PATH, NEW_PROJECT_PATH, isHomePath } from "@/components/admin/home/home-routes";
+import { HOME_PATH, ACCOUNT_PATH, NEW_PROJECT_PATH, isHomePath } from "@/components/admin/home/home-routes";
 import { useProjects } from "@/components/admin/home/use-projects";
 import { openProject } from "@/components/admin/projects/project-actions";
 import { AccountMenu } from "./account-menu";
@@ -135,13 +136,13 @@ export function AdminMobileNav({ children }: { children: React.ReactNode }) {
           )}
           <div className="flex items-center gap-2">
             <DsThemeToggle />
-            <AccountMenu side="bottom" align="end" />
+            {!home && <AccountMenu side="bottom" align="end" />}
             <DsButton iconLeft={X} aria-label="Close menu" onClick={closeMenu} />
           </div>
         </div>
 
         {home ? (
-          // Home's sidebar, as pills: every project, each one, New project, the install's settings.
+          // Home's sidebar, as pills: every project, each one, New project, your account, sign out.
           <nav aria-label="Projects" className="flex flex-col items-center gap-1">
             {[
               { key: "all", href: HOME_PATH, icon: LayoutGrid, label: "All projects", current: pathname === HOME_PATH },
@@ -153,7 +154,8 @@ export function AdminMobileNav({ children }: { children: React.ReactNode }) {
                 current: false,
               })),
               { key: "new", href: NEW_PROJECT_PATH, icon: undefined, label: "New project", current: pathname === NEW_PROJECT_PATH },
-              { key: "settings", href: HOME_SETTINGS_PATH, icon: Settings, label: "Settings", current: pathname === HOME_SETTINGS_PATH },
+              { key: "account", href: ACCOUNT_PATH, icon: UserRound, label: "Account", current: pathname === ACCOUNT_PATH },
+              { key: "sign-out", onClick: () => signOut({ callbackUrl: "/admin/login" }), icon: LogOut, label: "Sign out", current: false },
             ].map((item, i) => (
               <DsButton
                 key={item.key}

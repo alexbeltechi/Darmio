@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getUserId } from "@/lib/agent/actor";
 import { handleDatabaseError, isDatabaseError } from "@/lib/api/error-handler";
 import { PASSWORD_MIN } from "@/lib/cms/password";
+import { isEmail } from "@/lib/cms/email";
 import { getUserByEmail, getUserById, updateUser, verifyPassword } from "@/lib/cms/users";
 
 /** The signed-in person's account. Agents (a bearer token) have none. */
@@ -22,8 +23,10 @@ export async function GET(request: NextRequest) {
 }
 
 /**
- * Change the signed-in person's name, `{ name }` (optional, "" for none), or
- * their password, `{ currentPassword, newPassword }`.
+ * Change the signed-in person's name, `{ name }` (optional, "" for none),
+ * the email they sign in with, `{ newEmail, currentPassword }`, or their
+ * password, `{ currentPassword, newPassword }`. Dharmify can't send email
+ * yet, so a new email isn't confirmed by a link; the password stands in.
  */
 export async function PATCH(request: NextRequest) {
   const userId = getUserId(request);
@@ -31,6 +34,20 @@ export async function PATCH(request: NextRequest) {
 
   try {
     const body = await request.json();
+
+    if (typeof body.newEmail === "string") {
+      const newEmail = body.newEmail.trim().toLowerCase();
+      if (!isEmail(newEmail)) return NextResponse.json({ error: "That doesn't look like an email" }, { status: 400 });
+      const safe = await getUserById(userId);
+      const user = safe && (await getUserByEmail(safe.email));
+      if (!user) return NextResponse.json({ error: "Account not found" }, { status: 404 });
+      if (!(await verifyPassword(user, typeof body.currentPassword === "string" ? body.currentPassword : ""))) {
+        return NextResponse.json({ error: "The password is wrong" }, { status: 400 });
+      }
+      const result = await updateUser(user.id, { email: newEmail });
+      if (result.error) return NextResponse.json({ error: result.error }, { status: 400 });
+      return NextResponse.json({ data: { email: newEmail } });
+    }
 
     if (typeof body.name === "string" && body.newPassword === undefined) {
       const name = body.name.trim();
@@ -61,8 +78,8 @@ export async function PATCH(request: NextRequest) {
     if (result.error) return NextResponse.json({ error: result.error }, { status: 400 });
     return NextResponse.json({ data: { updatedAt: result.user?.updatedAt } });
   } catch (error) {
-    console.error("Failed to change password:", error);
+    console.error("Failed to update the account:", error);
     if (isDatabaseError(error)) return handleDatabaseError(error);
-    return NextResponse.json({ error: "Failed to change password" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to update the account" }, { status: 500 });
   }
 }

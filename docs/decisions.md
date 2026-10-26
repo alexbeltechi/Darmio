@@ -10,6 +10,16 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-26 — **A fresh install is a blank slate.** Nothing about one site
+  is in code. A site's sections are its top-level categories: each has a
+  page, and is in the nav unless switched off, so the nav grows as sections
+  are added. A category can sit inside one top-level category (one level),
+  and rolls up into its page. A top-level category carries its page's
+  headline and layout (`CATEGORY_LAYOUTS`). The home headline and its button
+  are in Settings › Site; without one the homepage is just the posts. An
+  install with no users opens `/admin/setup` (name the site, make the
+  owner); `/api/setup` only works while there are no users.
+
 - 2026-10-26 — The CMS is called **Dharmify CMS** (Alex, 2026-10-25, in his
   brain; working title since 2026-10-21). **Parabola** stays the design
   system's name and nothing else, which settles 2026-10-04's idea of
@@ -142,6 +152,15 @@ with the why. To change one, add a new line that overrides it.
   hand-written CSS kit.
 
 ## Engineering
+
+- 2026-10-26 — **Two repos: the core and installs on top.** `dharmify` is the
+  core (private until the pre-release, then public). A maker's site is an
+  install: a copy that tracks `dharmify` as its upstream and pulls updates.
+  Alex's is `alexbeltechi/beltechi` (beltechi.com, y3k.club). Core features
+  are built here, never in an install, so updates flow one way. An install
+  keeps its brands, site-specific code and its own docs; its content lives
+  in its database and its keys in its deployment's environment. Why: one
+  core everyone shares, and Alex takes updates the way every maker will.
 
 - 2026-10-24 — **Every outside service is a connector.** Each job that
   depends on a service (newsletter list, sending, media storage, cross-

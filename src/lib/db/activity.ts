@@ -2,7 +2,7 @@ import { getDb, Collections } from "@/lib/db/mongodb";
 import type { Actor } from "@/lib/agent/actor";
 
 /**
- * The activity log: one line per change to posts and media, by Alex or an
+ * The activity log: one line per change to posts and media, by the owner or an
  * agent. Read-only history (nothing here undoes anything); it answers "what
  * changed, when, and who did it". Writing to it never fails the change
  * itself.

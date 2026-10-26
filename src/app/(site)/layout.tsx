@@ -4,9 +4,19 @@ import { SiteNav } from "@/components/site/site-nav";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { getNavCounts } from "@/lib/db/nav-counts";
 import { getSiteSettings } from "@/lib/db/settings";
+import { listCategories } from "@/lib/db/categories";
+import { categoryGroups } from "@/lib/cms/category-groups";
 
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
-  const [navCounts, { siteName }] = await Promise.all([getNavCounts(), getSiteSettings()]);
+  const [navCounts, { siteName }, categories] = await Promise.all([
+    getNavCounts(),
+    getSiteSettings(),
+    listCategories().catch(() => []),
+  ]);
+  // The nav grows with the site: each top-level category marked for it (decisions, 2026-10-26).
+  const sections = categoryGroups(categories)
+    .filter((g) => g.nav)
+    .map(({ slug, label, members }) => ({ slug, label, members }));
 
   return (
     <ThemeProvider
@@ -18,7 +28,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       <div className="site-root min-h-screen bg-ds-bg flex flex-col">
         {/* Rendered once here, not per-page, so it never unmounts (and never
             flickers) when navigating between views. */}
-        <SiteNav counts={navCounts} siteName={siteName} />
+        <SiteNav counts={navCounts} siteName={siteName} sections={sections} />
 
         {/* Full width by default: the homepage and category grids run edge to
             edge. Pages that need a reading measure (article/post detail) apply

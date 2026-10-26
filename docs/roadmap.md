@@ -40,7 +40,8 @@ When a task changes an item, update this file in the same change.
       and runs `npm publish` from `packages/parabola` when a project
       outside the CMS needs it.
       Done: another project installs Parabola from npm and renders a block.
-   2. **Blank slate.** Category groups and the nav come from categories (a
+   2. **Blank slate.** Done 2026-10-26 in `dharmify` (decisions,
+      2026-10-26), with the first-run setup screen. Was: category groups and the nav come from categories (a
       group and a nav flag), not code; hero and intro copy, site name,
       footer and the rail mark come from settings; the nav appears as
       categories are marked for it or pages are published; the feed sizes
@@ -64,7 +65,9 @@ When a task changes an item, update this file in the same change.
       Writing, Moments, About, Newsletter. Everything is marked as an
       example and removed in one action, which leaves the plain feed.
       In order:
-      - **a. V0 folder.** A second clone of this repo (not a fork) beside
+      - **a. V0 folder.** Done differently 2026-10-26: `dharmify`'s own
+        checkout, on its own empty `dharmify-dev` database, is the blank
+        install; the Ilo seed goes there. Was: a second clone of this repo (not a fork) beside
         it, with its own `.env.local`: the same Atlas cluster but its own
         database in the URI (`/ilo-v0`), no Blob token (uploads stay in the
         folder), its own `NEXTAUTH_SECRET` and agent token. It is what a
@@ -97,7 +100,10 @@ When a task changes an item, update this file in the same change.
       (R2) when a brand's volume needs it.
    7. **Custom code pages.** A page kind whose body is a component in the
       repo, listed and deletable in the admin, for one-off editorial pages.
-   8. **Pre-release tag** on 2026-11-25, the end of Alex's Y3K cohort 2;
+   8. **Release pass:** the docs still name Alex as the maintainer and his
+      sites in examples; go through them, add a leak check to `verify`, and
+      neutral package scope (`@beltechi/parabola` today). Then the
+      **pre-release tag** on 2026-11-25, the end of Alex's Y3K cohort 2;
       beltechi.com moves from Framer onto it, and Y3K testers install it.
 
    Started 2026-10-24: the site name setting (Settings › Site), the rail

@@ -1014,7 +1014,7 @@ export function Newsletter() {
             heading="Get new work by email"
             text={o.text ? "A note when something new goes up: a series, a case study, a journal entry. A few a year, no more." : undefined}
             buttonLabel="Subscribe"
-            list="beltechi"
+            list="news"
             source="/parabola"
           />
         </div>

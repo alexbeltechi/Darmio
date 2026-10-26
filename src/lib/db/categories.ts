@@ -7,6 +7,7 @@
 
 import { getDb, Collections, withoutId } from "@/lib/db/mongodb";
 import { normalizeCategoryColor, toStoredCategoryColor } from "@/lib/cms/category-colors";
+import { CATEGORY_LAYOUTS, type CategoryLayout } from "@/lib/cms/types";
 import { slugify } from "@/lib/slug";
 
 export interface Category {
@@ -16,10 +17,16 @@ export interface Category {
   label: string; // For backward compatibility
   color: string;
   description?: string;
-  parentId?: string; // For hierarchical categories (future)
+  /** The top-level category this one sits inside; none means it's top-level (see category-groups.ts). */
+  parentId?: string | null;
   image?: string;
   order?: number;
-  showOnHomepage?: boolean; // Whether to show in homepage category tabs
+  /** Top-level only: in the site's nav. Defaults to true, so a new section shows up by itself. */
+  nav?: boolean;
+  /** Top-level only: the big line on its page; the label when empty. */
+  headline?: string;
+  /** Top-level only: how its page sets the intro. */
+  layout?: CategoryLayout;
   seo?: {
     title?: string;
     description?: string;
@@ -28,9 +35,36 @@ export interface Category {
   updatedAt: string;
 }
 
-/** Draw a stored colour as its current swatch (see normalizeCategoryColor). */
-function withColor(category: Category): Category {
-  return { ...category, color: normalizeCategoryColor(category.color) };
+/**
+ * A stored category as the app sees it: its colour as the current swatch (see
+ * normalizeCategoryColor), and `nav` read from the field it replaced.
+ */
+function withColor(category: Category & { showOnHomepage?: boolean }): Category {
+  const { showOnHomepage, ...rest } = category;
+  return { ...rest, nav: rest.nav ?? showOnHomepage ?? true, color: normalizeCategoryColor(rest.color) };
+}
+
+/** Throws unless `layout` is one of CATEGORY_LAYOUTS (or empty, for the default). */
+export function parseCategoryLayout(value: unknown): CategoryLayout | undefined {
+  if (value === undefined || value === null || value === "") return undefined;
+  if (!CATEGORY_LAYOUTS.includes(value as CategoryLayout)) {
+    throw new Error(`layout must be one of: ${CATEGORY_LAYOUTS.join(", ")}`);
+  }
+  return value as CategoryLayout;
+}
+
+/** Throws unless `parentId` names a top-level category other than `id`, and `id` has nothing inside it. */
+async function checkParent(id: string | undefined, parentId: string | null | undefined) {
+  if (!parentId) return;
+  if (parentId === id) throw new Error("A category can't sit inside itself");
+  const db = await getDb();
+  const collection = db.collection(Collections.CATEGORIES);
+  const parent = await collection.findOne({ id: parentId });
+  if (!parent) throw new Error(`No category "${parentId}" to put it inside`);
+  if (parent.parentId) throw new Error(`"${parent.label}" is inside another category; categories go one level deep`);
+  if (id && (await collection.findOne({ parentId: id }))) {
+    throw new Error("This category has categories inside it, so it has to stay top-level");
+  }
 }
 
 export async function listCategories(): Promise<Category[]> {
@@ -64,6 +98,7 @@ export async function createCategory(
     slug?: string;
   }
 ): Promise<Category> {
+  await checkParent(data.id, data.parentId);
   const db = await getDb();
   const collection = db.collection(Collections.CATEGORIES);
 
@@ -95,10 +130,12 @@ export async function createCategory(
     label: data.label || data.name || baseName,
     color: toStoredCategoryColor(data.color) ?? data.color,
     description: data.description,
-    parentId: data.parentId,
+    parentId: data.parentId || null,
     image: data.image,
     order: data.order ?? nextOrder,
-    showOnHomepage: data.showOnHomepage ?? true,
+    nav: data.nav ?? true,
+    headline: data.headline,
+    layout: data.layout,
     seo: data.seo,
     createdAt: now,
     updatedAt: now,
@@ -120,9 +157,12 @@ export async function updateCategory(
   if (!existing) {
     throw new Error(`Category "${id}" not found`);
   }
+  if (updates.parentId !== undefined) await checkParent(id, updates.parentId);
 
+  // Fields left out of the update stay as they are (undefined would be stored as null).
+  const given = Object.fromEntries(Object.entries(updates).filter(([, v]) => v !== undefined));
   const updatedData = {
-    ...updates,
+    ...given,
     ...(updates.color !== undefined && { color: toStoredCategoryColor(updates.color) }),
     // Keep name and label in sync
     name: updates.name || updates.label || existing.name,

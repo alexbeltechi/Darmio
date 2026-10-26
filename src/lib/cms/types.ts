@@ -176,6 +176,14 @@ export interface ImageBlock {
   alt?: string;
 }
 
+/**
+ * How a top-level category's page sets its intro: `hero` (a big headline over
+ * the feed, the default), `left` (a sticky text column beside it), `wall` (no
+ * intro, just the grid).
+ */
+export const CATEGORY_LAYOUTS = ["hero", "left", "wall"] as const;
+export type CategoryLayout = (typeof CATEGORY_LAYOUTS)[number];
+
 export const GALLERY_LAYOUTS = ["auto", "stack", "grid", "masonry"] as const;
 export const GALLERY_WIDTHS = ["auto", "normal", "large", "full"] as const;
 
@@ -276,7 +284,7 @@ export interface NewsletterBlock {
   heading?: string;
   text?: string;
   buttonLabel?: string;
-  /** List slug ("beltechi", "y3k"). */
+  /** List slug ("news", "studio"). */
   list?: string;
   /** Where the sign-up came from; the page's path when unset. */
   source?: string;

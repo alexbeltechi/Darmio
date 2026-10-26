@@ -216,7 +216,7 @@ export function ContentBlockEditor({
                 bare
                 value={block.list || ""}
                 onChange={(e) => onUpdate({ list: e.target.value })}
-                placeholder="List (beltechi)"
+                placeholder="List (news)"
                 aria-label="List slug"
                 className="text-small sm:max-w-[200px]"
               />

@@ -3,6 +3,7 @@ import {
   listCategories,
   createCategory,
   reorderCategories,
+  parseCategoryLayout,
 } from "@/lib/db/categories";
 import { handleDatabaseError, isDatabaseError } from "@/lib/api/error-handler";
 import { DEFAULT_CATEGORY_COLOR } from "@/lib/cms/category-colors";
@@ -40,7 +41,10 @@ export async function POST(request: NextRequest) {
       label: body.label || body.name,
       color: body.color || DEFAULT_CATEGORY_COLOR,
       description: body.description,
-      showOnHomepage: body.showOnHomepage ?? true,
+      parentId: body.parentId || null,
+      nav: typeof body.nav === "boolean" ? body.nav : true,
+      headline: typeof body.headline === "string" ? body.headline.trim() || undefined : undefined,
+      layout: parseCategoryLayout(body.layout),
     });
 
     return NextResponse.json({ data: category }, { status: 201 });

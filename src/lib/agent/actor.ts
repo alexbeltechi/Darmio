@@ -1,4 +1,4 @@
-/** Who made an admin API request: an agent (bearer token) or Alex (signed in). Set by the middleware. */
+/** Who made an admin API request: an agent (bearer token) or the owner (signed in). Set by the middleware. */
 export type Actor = "agent" | "user";
 
 export function getActor(request: Request): Actor {

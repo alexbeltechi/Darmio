@@ -11,7 +11,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   // The login page stands alone, without the navigation.
-  if (pathname === "/admin/login") return <>{children}</>;
+  if (pathname === "/admin/login" || pathname === "/admin/setup") return <>{children}</>;
 
   return (
     <div className={cn("min-h-dvh bg-ds-bg text-ds-fg", ADMIN_RAIL_WIDTH)}>

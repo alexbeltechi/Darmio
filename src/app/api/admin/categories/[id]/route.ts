@@ -3,6 +3,7 @@ import {
   getCategory,
   updateCategory,
   deleteCategory,
+  parseCategoryLayout,
 } from "@/lib/db/categories";
 import { handleDatabaseError, isDatabaseError } from "@/lib/api/error-handler";
 
@@ -44,7 +45,11 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       label: body.label,
       color: body.color,
       description: body.description,
-      showOnHomepage: body.showOnHomepage,
+      // null or "" makes it top-level again.
+      parentId: body.parentId === undefined ? undefined : body.parentId || null,
+      nav: typeof body.nav === "boolean" ? body.nav : undefined,
+      headline: typeof body.headline === "string" ? body.headline.trim() : undefined,
+      layout: body.layout === undefined ? undefined : parseCategoryLayout(body.layout),
     });
 
     return NextResponse.json({ data: category });

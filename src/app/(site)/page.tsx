@@ -1,10 +1,10 @@
 import { HomeFeed } from "@/components/site/home-feed";
-import { HOME_HERO } from "@/components/site/site-views";
 import { getPublishedEntries, getEntry } from "@/lib/db/entries";
 import { getMediaByIds } from "@/lib/cms/media";
 import { listCategories } from "@/lib/db/categories";
 import { PageView } from "@/components/site/page-view";
-import { getPreviewCandidateIds } from "@/components/site/post-grid-shared";
+import { feedCategory, getPreviewCandidateIds } from "@/components/site/post-grid-shared";
+import { getSiteSettings } from "@/lib/db/settings";
 import type { Entry } from "@/lib/cms/types";
 
 // Use ISR - the feed is chronological, so the same output serves everyone.
@@ -30,15 +30,19 @@ export default async function HomePage() {
   // Only each post's preview media is needed for the feed.
   const mediaIds = new Set(allEntries.flatMap(getPreviewCandidateIds));
 
-  const [mediaItems, categories] = await Promise.all([getMediaByIds(Array.from(mediaIds)), listCategories()]);
+  const [mediaItems, categories, { homeHero }] = await Promise.all([
+    getMediaByIds(Array.from(mediaIds)),
+    listCategories(),
+    getSiteSettings(),
+  ]);
 
   return (
     <main className="w-full">
       <HomeFeed
         posts={allEntries}
         mediaItems={mediaItems}
-        categories={categories.map(({ id, slug, label }) => ({ id, slug, label }))}
-        hero={HOME_HERO}
+        categories={categories.map(feedCategory)}
+        hero={homeHero}
       />
     </main>
   );

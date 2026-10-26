@@ -50,6 +50,7 @@ export async function middleware(request: NextRequest) {
   // Always allow these routes without authentication
   if (
     pathname === "/admin/login" ||
+    pathname === "/admin/setup" ||
     pathname.startsWith("/api/auth")
   ) {
     return NextResponse.next();

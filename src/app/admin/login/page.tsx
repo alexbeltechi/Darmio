@@ -4,10 +4,10 @@
  * Admin Login Page
  * 
  * Simple username/password login form.
- * Default credentials: admin / kombucha
+ * A fresh install has no users yet, so this sends you to /admin/setup.
  */
 
-import { useState, Suspense } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2, Eye, EyeOff } from "lucide-react";
@@ -24,6 +24,13 @@ function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/setup")
+      .then((res) => res.json())
+      .then((json) => json.data?.needed && router.replace("/admin/setup"))
+      .catch(() => {});
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

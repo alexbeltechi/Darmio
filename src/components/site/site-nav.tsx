@@ -5,7 +5,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { DsButton, DsMenu, DsThemeToggle } from "@beltechi/parabola";
-import { MAIN_CATEGORIES } from "./post-grid-shared";
+
+/** A section in the nav: a top-level category and the slugs that light it. */
+export type NavSection = { slug: string; label: string; members: string[] };
 
 // Pages whose URL doesn't name a category (a post) can light a pill anyway.
 let highlightOverride: string | null = null;
@@ -30,21 +32,13 @@ export function NavHighlight({ slug }: { slug: string | null }) {
   return null;
 }
 
-const NAV_ITEMS = [
-  { slug: "home", label: "Home", href: "/" },
-  ...MAIN_CATEGORIES.filter((c) => c.nav).map((c) => ({ slug: c.slug, label: c.label, href: `/${c.slug}` })),
-];
-
-/** The nav pill lit for a given path: home, a main category, or a main
- * category's own sub-category (e.g. /portrait lights up Photography). */
-function activeSlugForPath(pathname: string): string {
+/** The nav pill lit for a given path: home, a section, or a category inside
+ * one (e.g. /portrait lights up Photography). */
+function activeSlugForPath(pathname: string, sections: NavSection[]): string {
   if (pathname === "/") return "home";
 
   const segment = pathname.split("/")[1] ?? "";
-  const main = MAIN_CATEGORIES.find(
-    (c) => c.slug === segment || (c.members as readonly string[]).includes(segment)
-  );
-  return main?.slug ?? "";
+  return sections.find((c) => c.members.includes(segment))?.slug ?? "";
 }
 
 // Distance above the logo's bottom edge over which it fades out as the page
@@ -111,10 +105,23 @@ const LOGO_CLASS = "text-h3 text-ds-fg";
  * out as the page content scrolls up to it) and an "Explore" button top-right
  * that opens the Parabola `DsMenu`, which also holds the theme switch.
  */
-export function SiteNav({ counts = {}, siteName }: { counts?: Record<string, number>; siteName: string }) {
+export function SiteNav({
+  counts = {},
+  siteName,
+  sections,
+}: {
+  counts?: Record<string, number>;
+  siteName: string;
+  /** The top-level categories marked for the nav; none means no nav, just the name. */
+  sections: NavSection[];
+}) {
   const pathname = usePathname();
   const override = useSyncExternalStore(subscribe, () => highlightOverride, () => null);
-  const active = override ?? activeSlugForPath(pathname);
+  const active = override ?? activeSlugForPath(pathname, sections);
+  const NAV_ITEMS = [
+    { slug: "home", label: "Home", href: "/" },
+    ...sections.map((c) => ({ slug: c.slug, label: c.label, href: `/${c.slug}` })),
+  ];
   const [mobileOpen, setMobileOpen] = useState(false);
   const closeMobile = useCallback(() => setMobileOpen(false), []);
   const logoRef = useRef<HTMLAnchorElement>(null);
@@ -126,7 +133,7 @@ export function SiteNav({ counts = {}, siteName }: { counts?: Record<string, num
   // clicking it should open that section.
   const handleClick = (slug: string) => (e: React.MouseEvent) => {
     setMobileOpen(false);
-    if (slug !== activeSlugForPath(pathname)) return;
+    if (slug !== activeSlugForPath(pathname, sections)) return;
     e.preventDefault();
     window.scrollTo({ top: 0, behavior: "smooth" });
   };

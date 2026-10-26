@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { useSiteName } from "@/components/admin/use-site-settings";
 import { ADMIN_NAV_ITEMS, activeNavItem, type AdminNavKey } from "./nav-items";
 import { ProjectMenu } from "./project-menu";
+import { AccountMenu } from "./account-menu";
 
 const OPEN_EVENT = "admin-menu:open";
 
@@ -125,6 +126,7 @@ export function AdminMobileNav({ children }: { children: React.ReactNode }) {
           </ProjectMenu>
           <div className="flex items-center gap-2">
             <DsThemeToggle />
+            <AccountMenu side="bottom" align="end" />
             <DsButton iconLeft={X} aria-label="Close menu" onClick={closeMenu} />
           </div>
         </div>

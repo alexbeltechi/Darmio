@@ -6,7 +6,7 @@ import { createProject, ensureFirstProject, toSummary } from "@/lib/db/projects"
 /** Every project, and the one this request is in. */
 export async function GET() {
   try {
-    const [projects, current] = await Promise.all([hubProjects(), getCurrentProject()]);
+    const [projects, current] = await Promise.all([hubProjects({ fresh: true }), getCurrentProject()]);
     return NextResponse.json({ data: { projects: projects.map(toSummary), current: current?.slug ?? null } });
   } catch (error) {
     if (isDatabaseError(error)) return handleDatabaseError(error);

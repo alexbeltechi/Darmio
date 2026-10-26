@@ -78,7 +78,9 @@ export async function getHubDb(): Promise<Db> {
 /** A project as the hub stores it; `dbName` is where its content lives. */
 export type ProjectRow = { id: string; slug: string; name: string; dbName: string; brain?: string; createdAt: string };
 
-const PROJECTS_TTL_MS = 30_000;
+// Short, because each server instance (and, in dev, each route) keeps its own copy:
+// a project added through one is seen by the others within seconds.
+const PROJECTS_TTL_MS = 5_000;
 let projectsCache: { at: number; rows: ProjectRow[] } | null = null;
 
 /** Forget the cached project list, after one is added or changed. */
@@ -86,9 +88,13 @@ export function forgetProjects() {
   projectsCache = null;
 }
 
-/** Every project, oldest first (the first is the default). Empty for an install from before projects. */
-export async function hubProjects(): Promise<ProjectRow[]> {
-  if (projectsCache && Date.now() - projectsCache.at < PROJECTS_TTL_MS) return projectsCache.rows;
+/**
+ * Every project, oldest first (the first is the default). Empty for an
+ * install from before projects. `fresh` skips the cache, for anything that
+ * lists, switches or changes projects.
+ */
+export async function hubProjects({ fresh = false }: { fresh?: boolean } = {}): Promise<ProjectRow[]> {
+  if (!fresh && projectsCache && Date.now() - projectsCache.at < PROJECTS_TTL_MS) return projectsCache.rows;
   const db = await getHubDb();
   const docs = await db.collection(Collections.PROJECTS).find({}).sort({ createdAt: 1 }).toArray();
   const rows = docs.map((doc) => withoutId<ProjectRow>(doc));

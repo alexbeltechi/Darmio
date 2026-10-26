@@ -87,7 +87,7 @@ export function AccountSettings() {
   return (
     <SettingsSection
       id="account"
-      title="Account"
+      title="You"
       description={
         account
           ? `Signed in as ${account.email}, ${account.role}.`

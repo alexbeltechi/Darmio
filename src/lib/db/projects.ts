@@ -29,7 +29,7 @@ async function freeSlug(name: string, taken: Set<string>): Promise<string> {
 export async function createProject(input: { name: unknown; brain?: unknown }): Promise<ProjectRow> {
   const name = parseProjectName(input.name);
   const brain = parseBrain(input.brain);
-  const existing = await hubProjects();
+  const existing = await hubProjects({ fresh: true });
   if (existing.length >= PROJECTS_MAX) throw new Error(`An install holds at most ${PROJECTS_MAX} projects`);
 
   const hub = await getHubDb();
@@ -58,7 +58,7 @@ export async function createProject(input: { name: unknown; brain?: unknown }): 
  * its site), so a second can be added beside it.
  */
 export async function ensureFirstProject(): Promise<void> {
-  if ((await hubProjects()).length > 0) return;
+  if ((await hubProjects({ fresh: true })).length > 0) return;
   const hub = await getHubDb();
   const settings = await hub.collection(Collections.SETTINGS).findOne({ key: SETTINGS_KEY });
   await createProject({ name: (settings?.siteName as string) || "My site" });
@@ -76,7 +76,7 @@ export async function updateProject(slug: string, updates: { name?: unknown; bra
   }
   const hub = await getHubDb();
   if (Object.keys(set).length === 0 && Object.keys(unset).length === 0) {
-    const row = (await hubProjects()).find((p) => p.slug === slug);
+    const row = (await hubProjects({ fresh: true })).find((p) => p.slug === slug);
     if (!row) throw new Error(`No project "${slug}"`);
     return row;
   }

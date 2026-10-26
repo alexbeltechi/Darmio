@@ -28,10 +28,9 @@ with the why. To change one, add a new line that overrides it.
   reset-password` stays for developers. Email resets come with email.
 - 2026-10-26 — **Home is Framer's dashboard.** Home pages (all projects,
   New project, your Settings) get their own full sidebar instead of the
-  rail: plain items in titled sections 20px apart, Projects (All projects,
-  each project stacked, New project) and More (Settings, then Sign out as a
-  small grey button, so it doesn't read as one more place to go), with the
-  theme at the foot. The main area shows the projects as cards with no
+  rail, with just Projects and Settings, then Sign out as a plain button
+  (not one more place to go), and the theme at the foot. The projects
+  themselves are the cards beside it, so the sidebar doesn't list them. The main area shows the projects as cards with no
   thumbnails or icons (the name and a gear at the top; "Live at …" or "Not
   published" and "Changed 6 minutes ago", or the date after a week, at the
   bottom), with

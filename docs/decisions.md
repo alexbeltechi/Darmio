@@ -12,9 +12,9 @@ with the why. To change one, add a new line that overrides it.
 
 - 2026-10-26 — **A forgotten password is a one-time link from your AI.**
   Dharmify can't send email yet. Sign-in has a quiet "Forgot your
-  password?" that opens in place: one line on why (no email yet, so a reset
-  comes from the computer, by hand or from your AI) and a prompt to paste
-  into the AI that installed the site. The AI runs `npm run reset-link`,
+  password?" that opens in place: "Email isn't set up for this site yet.
+  You can reset it manually by code or through AI:" over a prompt for the
+  AI that installed the site. The AI runs `npm run reset-link`,
   which makes a link that works once, for an hour (only its hash is
   stored, in the hub); the owner chooses the new password on the site at
   `/admin/reset`, never in the chat, and is signed in. `npm run

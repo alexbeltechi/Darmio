@@ -10,6 +10,7 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-26 — Library's icon is an image, though it holds documents too: it reads as the pictures.
 - 2026-10-26 — **Your Settings are two cards,** like a project's: Account
   (name, and the email you sign in with) and Password. Changing the email
   asks for your password instead of a confirmation email, since Dharmify
@@ -31,7 +32,9 @@ with the why. To change one, add a new line that overrides it.
   each project stacked, New project) and More (Settings, then Sign out as a
   small grey button, so it doesn't read as one more place to go), with the
   theme at the foot. The main area shows the projects as cards with no
-  thumbnails or icons (name, "Live at …" or "Not published", a gear), with
+  thumbnails or icons (the name and a gear at the top; "Live at …" or "Not
+  published" and "Changed 6 minutes ago", or the date after a week, at the
+  bottom), with
   a search and New project at the top right, and one centred line when
   there are none or none match. Projects and New project carry no icons in
   any menu. Settings there (`/admin/account`, a gear) is yours across the

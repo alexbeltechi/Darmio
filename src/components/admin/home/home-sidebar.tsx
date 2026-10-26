@@ -2,8 +2,8 @@
 
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { LayoutGrid, LogOut, UserRound } from "lucide-react";
-import { DsNavItem, DsThemeToggle } from "@beltechi/parabola";
+import { LayoutGrid, Settings } from "lucide-react";
+import { DsButton, DsNavItem, DsThemeToggle } from "@beltechi/parabola";
 import { openProject } from "@/components/admin/projects/project-actions";
 import { ACCOUNT_PATH, HOME_PATH, NEW_PROJECT_PATH } from "./home-routes";
 import { useProjects } from "./use-projects";
@@ -18,9 +18,10 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 /**
  * Home's sidebar (decisions, 2026-10-26), the way Framer's dashboard has one:
- * plain items in titled sections. Projects (all of them, each one stacked,
- * New project), then Settings (your Account, Sign out), and the theme at the
- * foot. The search sits by New project in the page's header. Full width
+ * plain items in titled sections, 20px apart like the sidebar's own edge.
+ * Projects (all of them, each one stacked, New project), then More: Settings
+ * (your account) and Sign out, a small grey button so it doesn't read as one
+ * more place to go. The theme sits at the foot. The search sits by New project in the page's header. Full width
  * rather than the rail's icons: Home is about every project, the rail about
  * one. Hidden below `lg`, where the admin menu carries the same.
  */
@@ -29,8 +30,8 @@ export function HomeSidebar() {
   const list = useProjects();
 
   return (
-    <aside className="fixed inset-y-0 left-0 z-(--ds-z-nav) hidden w-[260px] flex-col gap-ds-40 border-r border-ds-border bg-ds-bg p-5 lg:flex">
-      <nav aria-label="Home" className="flex min-h-0 flex-1 flex-col gap-ds-40 overflow-y-auto">
+    <aside className="fixed inset-y-0 left-0 z-(--ds-z-nav) hidden w-[260px] flex-col gap-5 border-r border-ds-border bg-ds-bg p-5 lg:flex">
+      <nav aria-label="Home" className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto">
         <div className="flex flex-col gap-1">
           <SectionLabel>Projects</SectionLabel>
           <DsNavItem href={HOME_PATH} iconLeft={LayoutGrid} selected={pathname === HOME_PATH}>
@@ -51,13 +52,13 @@ export function HomeSidebar() {
         </div>
 
         <div className="flex flex-col gap-1">
-          <SectionLabel>Settings</SectionLabel>
-          <DsNavItem href={ACCOUNT_PATH} iconLeft={UserRound} selected={pathname === ACCOUNT_PATH}>
-            Account
+          <SectionLabel>More</SectionLabel>
+          <DsNavItem href={ACCOUNT_PATH} iconLeft={Settings} selected={pathname === ACCOUNT_PATH}>
+            Settings
           </DsNavItem>
-          <DsNavItem iconLeft={LogOut} onClick={() => signOut({ callbackUrl: "/admin/login" })}>
+          <DsButton size="small" onClick={() => signOut({ callbackUrl: "/admin/login" })} className="mt-2 self-start">
             Sign out
-          </DsNavItem>
+          </DsButton>
         </div>
       </nav>
 

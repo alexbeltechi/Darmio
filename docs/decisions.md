@@ -11,20 +11,20 @@ with the why. To change one, add a new line that overrides it.
 ## Product
 
 - 2026-10-26 — **Home is Framer's dashboard.** Home pages (all projects,
-  New project, the install's Settings) get their own full sidebar instead of
-  the rail: a search over the projects, then Projects (All projects, each
-  project stacked, New project), and at the foot Settings, you (avatar and
-  email: Account settings, Sign out) and the theme. The main area shows the
-  projects as cards with no thumbnails or icons (name, "Live at …" or "Not
-  published", a gear), New project at the top right, and one centred line
-  when there are none or none match. Projects and New project carry no
-  icons in any menu. Creating a project returns to Home, where its card
-  appears; you open it from there. Home › Settings is the install's, for now your name and
-  password. Inside a project the rail keeps its transparent Home button:
-  hover for the projects menu (Home's sidebar in short: projects, New
-  project, Home, Settings), click for Home. Signing in and setting up
-  land on Home; opening a project goes to its posts. Overrides the same
-  day's Home page with rows.
+  New project, your Account) get their own full sidebar instead of the
+  rail: plain items in titled sections, Projects (All projects, each
+  project stacked, New project) and Settings (Account, Sign out), with the
+  theme at the foot. The main area shows the projects as cards with no
+  thumbnails or icons (name, "Live at …" or "Not published", a gear), with
+  a search and New project at the top right, and one centred line when
+  there are none or none match. Projects and New project carry no icons in
+  any menu. Account (`/admin/account`) is yours across the install: name
+  and password. Creating a project returns to Home, where its card appears;
+  you open it from there. Inside a project the rail keeps its transparent
+  Home button: hover for the projects menu (projects, New project, Home,
+  Account), click for Home; the avatar at its foot still opens Account and
+  Sign out. Signing in and setting up land on Home; opening a project goes
+  to its posts. Overrides the same day's Home page with rows.
 - 2026-10-26 — **Without a working setup link, setup is a page, not a
   form:** "This site isn't set up yet", then "Paste this into the AI that
   installed it:" over a prompt that asks that AI for the link (it carries

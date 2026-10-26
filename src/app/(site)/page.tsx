@@ -37,7 +37,7 @@ export default async function HomePage() {
   ]);
 
   return (
-    <main className="w-full">
+    <main className="flex w-full flex-1 flex-col">
       <HomeFeed
         posts={allEntries}
         mediaItems={mediaItems}

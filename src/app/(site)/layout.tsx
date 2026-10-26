@@ -36,7 +36,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
             their own `mx-auto max-w-5xl` to the content only, so sticky
             controls like the close button stay at the viewport edge. */}
         <div className="flex w-full flex-1 flex-col">
-          <div className="flex-1">{children}</div>
+          <div className="flex flex-1 flex-col">{children}</div>
           <Footer siteName={siteName} />
         </div>
         <ScrollToTop />

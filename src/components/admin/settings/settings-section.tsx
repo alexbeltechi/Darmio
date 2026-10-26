@@ -13,7 +13,7 @@ export function SettingsSection({
   className,
   children,
 }: {
-  /** An anchor, e.g. "account" for /admin/settings#account. */
+  /** An anchor, e.g. "site" for /admin/settings#site. */
   id?: string;
   title: React.ReactNode;
   description?: React.ReactNode;

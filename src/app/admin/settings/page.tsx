@@ -5,13 +5,14 @@ import { SiteSettings } from "@/components/admin/settings/site-settings";
 import { LibrarySettings } from "@/components/admin/settings/library-settings";
 import { IntegrationsSettings } from "@/components/admin/settings/integrations-settings";
 import { AgentSettings } from "@/components/admin/settings/agent-settings";
-import { AccountSettings } from "@/components/admin/settings/account-settings";
 
 /**
- * Settings, one section per thing a project can vary, in the order you'd set
- * them up: the site, its library, the accounts it works with, the agent's
- * rules, then you (decisions, 2026-10-24). Each section has an anchor
- * (`#site`, `#library`, `#integrations`, `#agent`, `#account`).
+ * The current project's settings, one section per thing a project can vary,
+ * in the order you'd set them up: the site, its library, the accounts it
+ * works with, the agent's brain and rules (decisions, 2026-10-24). Your own
+ * account is at /admin/account, for the whole install (decisions,
+ * 2026-10-26). Each section has an anchor (`#site`, `#library`,
+ * `#integrations`, `#agent`).
  */
 export default function SettingsPage() {
   return (
@@ -30,7 +31,6 @@ export default function SettingsPage() {
         <LibrarySettings />
         <IntegrationsSettings />
         <AgentSettings />
-        <AccountSettings />
       </div>
     </div>
   );

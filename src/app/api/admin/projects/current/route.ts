@@ -5,7 +5,7 @@ import { PROJECT_COOKIE } from "@/lib/cms/projects";
 /** Switch the admin to another project: `{ slug }`. Remembered in this browser. */
 export async function POST(request: NextRequest) {
   const { slug } = await request.json();
-  const project = (await hubProjects()).find((p) => p.slug === slug);
+  const project = (await hubProjects({ fresh: true })).find((p) => p.slug === slug);
   if (!project) return NextResponse.json({ error: `No project "${slug}"` }, { status: 404 });
 
   const response = NextResponse.json({ data: { current: project.slug } });

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { DsButton, DsField, DsInput, dsToast } from "@beltechi/parabola";
 import { SITE_NAME_MAX, siteInitial, type HomeHero } from "@/lib/cms/site";
 import { announceSiteSettingsChanged } from "@/components/admin/use-site-settings";
+import { useCurrentProject } from "@/components/admin/use-current-project";
 import { SettingsSection } from "./settings-section";
 
 type Form = { siteName: string; title: string; ctaLabel: string; ctaHref: string };
@@ -16,10 +17,14 @@ const toForm = (siteName: string, hero: HomeHero | null): Form => ({
 });
 
 /**
- * The site's name (the admin's mark, the site's logo, the footer, browser
- * titles) and the homepage's headline over the feed, with an optional button.
+ * The project: its name (the admin's tile, the project menu, the site's logo,
+ * the footer, browser titles), where its site is live, and the homepage's
+ * headline over the feed, with an optional button.
  */
 export function SiteSettings() {
+  const { current } = useCurrentProject();
+  const [address, setAddress] = useState("");
+  useEffect(() => setAddress(window.location.host), []);
   const [saved, setSaved] = useState<Form | null>(null);
   const [form, setForm] = useState<Form>(toForm("", null));
   const [saving, setSaving] = useState(false);
@@ -57,9 +62,9 @@ export function SiteSettings() {
       setSaved(next);
       setForm(next);
       announceSiteSettingsChanged();
-      dsToast.success("Site saved");
+      dsToast.success("Project saved");
     } catch (error) {
-      dsToast.error("Couldn't save the site", {
+      dsToast.error("Couldn't save the project", {
         description: error instanceof Error ? error.message : undefined,
       });
     } finally {
@@ -68,11 +73,26 @@ export function SiteSettings() {
   }
 
   return (
-    <SettingsSection id="site" title="Site" description="Its name, and what the homepage says above your posts.">
+    <SettingsSection
+      id="site"
+      title="Project"
+      description={
+        current?.onSite && address ? (
+          <>
+            Live at{" "}
+            <a href="/" target="_blank" rel="noopener noreferrer" className="text-ds-fg underline underline-offset-4">
+              {address}
+            </a>
+          </>
+        ) : (
+          "Its name, and what the homepage says above your posts."
+        )
+      }
+    >
       <form onSubmit={save} className="flex flex-col gap-5">
         <DsField
-          label="Site name"
-          description={form.siteName.trim() ? `Its initial, ${siteInitial(form.siteName)}, is the mark in the admin.` : undefined}
+          label="Name"
+          description={form.siteName.trim() ? `The site's name. Its initial, ${siteInitial(form.siteName)}, is the project's tile.` : undefined}
         >
           <DsInput
             value={form.siteName}

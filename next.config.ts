@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // The admin's account avatar sits bottom left, where the dev badge would cover it.
+  devIndicators: { position: "bottom-right" },
   // Parabola (packages/parabola) ships TypeScript source; Next compiles it.
   transpilePackages: ["@beltechi/parabola"],
   images: {

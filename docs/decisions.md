@@ -10,12 +10,23 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-26 — **The project is at the top of the rail, you are at the
+  foot,** the way Slack splits a workspace from its user. The project's
+  tile (its initial on a solid square, a chevron on hover) opens the
+  projects, the current one ticked and each with a gear for its settings,
+  then New project. View site, Account and Sign out left that menu. A round
+  avatar at the foot opens your email, Account (a page of its own: you are
+  the whole install's, not a project's) and Sign out. The rail's gear is
+  the current project's settings, which show where its site is live and
+  hold its brain. New project asks for a name only, then switches to it.
+  No Figma-style home screen until people run many projects. Overrides the
+  2026-10-24 project menu.
 - 2026-10-26 — **Setup is the account only.** The setup link asks for
   email and password, then creates the account and a first project ("My
   site") and opens the admin. Projects are added later from the menu
   behind the letter (wayfinding cards to point there: Alex designs them
   later). The site's name and its project's name are one: renaming the
-  site in Settings › Site renames the project. Overrides the same day's
+  site in Settings › Project renames the project. Overrides the same day's
   projects-as-tabs step. The README and the AI's hand-over say the admin
   is always at `/admin`; the AI narrates every action it takes, what and
   why, before and after.

@@ -12,8 +12,10 @@ import { formatChangedAt } from "@/lib/utils";
 
 /**
  * Home (decisions, 2026-10-26), the way Framer's dashboard opens: every
- * project as a card (no thumbnails or icons: its name and a gear at the top,
- * then where it's live or "Not published" and when it last changed), with a search over them and New
+ * project as a card (no thumbnails or icons): its name with a Published or
+ * Not published pill beside it, then at the bottom its address when it's
+ * published and when it last changed, with a gear for its settings at the
+ * bottom right; with a search over them and New
  * project at the top right. Signing in and setting up land here; the sidebar
  * beside it holds the projects stacked and your account. Nothing yet, or
  * nothing matching the search: one line in the middle of the page.
@@ -74,28 +76,31 @@ function HomeProjects() {
               key={project.slug}
               className="relative flex min-h-44 flex-col justify-between gap-ds-40 rounded-ds-lg bg-ds-surface-subtle p-5 transition-colors hover:bg-ds-surface"
             >
-              {/* The name at the top, level with the gear (pulled into the corner). */}
-              <div className="-mt-2 -mr-2 flex min-w-0 items-center gap-1">
+              {/* The name and its status; a long name wraps, and the pill follows it. */}
+              <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
                 {/* The name opens the project, stretched over the whole card. */}
                 <button
                   type="button"
                   onClick={() => openProject(project.slug, current)}
-                  className="min-w-0 truncate text-left text-p text-ds-fg ds-focus-stretched after:absolute after:inset-0 after:rounded-ds-lg"
+                  className="min-w-0 break-words text-left text-p text-ds-fg ds-focus-stretched after:absolute after:inset-0 after:rounded-ds-lg"
                 >
                   {project.name}
                 </button>
-                {project.slug === current && <DsPill>Open</DsPill>}
+                <DsPill>{onSite ? "Published" : "Not published"}</DsPill>
+              </div>
+              {/* Where it lives and when it changed; the gear at the bottom right (pulled into the corner). */}
+              <div className="flex min-w-0 items-end justify-between gap-2">
+                <div className="flex min-w-0 flex-col gap-0.5 text-small text-ds-fg-subtle">
+                  {onSite && <p className="truncate">{host}</p>}
+                  {project.lastChange && <p className="truncate">Changed {formatChangedAt(project.lastChange)}</p>}
+                </div>
                 <DsButton
                   variant="text"
                   iconLeft={Settings}
                   aria-label={`${project.name} settings`}
                   onClick={() => openProject(project.slug, current, "/admin/settings")}
-                  className="relative z-10 ml-auto"
+                  className="relative z-10 -mr-2 -mb-2 shrink-0"
                 />
-              </div>
-              <div className="flex min-w-0 flex-col gap-0.5 text-small text-ds-fg-subtle">
-                <p className="truncate">{onSite ? `Live at ${host}` : "Not published"}</p>
-                {project.lastChange && <p className="truncate">Changed {formatChangedAt(project.lastChange)}</p>}
               </div>
             </li>
           ))}

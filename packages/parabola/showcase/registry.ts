@@ -5,6 +5,7 @@ import {
   LayoutPanelTop,
   House,
   Image as ImageIcon,
+  Info,
   ListTree,
   Mail,
   Ruler,
@@ -189,6 +190,15 @@ export const DS_TIERS: DsTier[] = [
         pages: [
           { slug: "media-tile", label: "Media tile", component: S.MediaTile },
           { slug: "placeholder", label: "Placeholder", component: S.Placeholder },
+        ],
+      },
+      {
+        slug: "states",
+        label: "States",
+        icon: Info,
+        pages: [
+          { slug: "empty-state", label: "Empty state", component: S.EmptyState },
+          { slug: "info-card", label: "Info card", component: S.InfoCard },
         ],
       },
     ],

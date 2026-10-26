@@ -15,7 +15,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import {
+import { DsEmptyState,
   DS_ACCENTS,
   DsButton,
   DsCheckbox,
@@ -513,24 +513,27 @@ export default function CategoriesPage() {
             <Loader2 aria-label="Loading categories" className="size-6 animate-spin text-ds-fg-subtle" />
           </div>
         ) : categories.length === 0 ? (
-          <div className="flex flex-col items-center gap-4 py-16 text-center">
-            <div className="flex flex-col gap-1">
-              <p className="text-p text-ds-fg-muted">No categories yet</p>
-              <p className="text-small text-ds-fg-subtle">Categories group posts on the site, each in its own colour.</p>
-            </div>
-            <DsButton iconLeft={Plus} onClick={() => setForm(EMPTY_FORM)}>
-              New category
-            </DsButton>
-          </div>
-        ) : filteredCategories.length === 0 ? (
-          <div className="flex flex-col items-center gap-4 py-16 text-center">
-            <p className="text-p text-ds-fg-muted">No categories match</p>
-            {hasActiveFilters && (
-              <DsButton iconLeft={RotateCcw} onClick={resetFilters}>
-                Reset filters
+          <DsEmptyState
+            action={
+              <DsButton iconLeft={Plus} onClick={() => setForm(EMPTY_FORM)}>
+                New category
               </DsButton>
-            )}
-          </div>
+            }
+          >
+            No categories yet
+          </DsEmptyState>
+        ) : filteredCategories.length === 0 ? (
+          <DsEmptyState
+            action={
+              hasActiveFilters && (
+                <DsButton iconLeft={RotateCcw} onClick={resetFilters}>
+                  Reset filters
+                </DsButton>
+              )
+            }
+          >
+            No categories match
+          </DsEmptyState>
         ) : (
           <ul className={cn("flex flex-col transition-opacity", reordering && "opacity-70")}>
             {paginatedCategories.map((category, index) => {

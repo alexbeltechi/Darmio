@@ -18,7 +18,7 @@ import {
   Trash2,
   Pencil,
 } from "lucide-react";
-import {
+import { DsEmptyState,
   DsButton,
   DsCheckbox,
   DsDropdown,
@@ -623,16 +623,18 @@ export function PostsWorkspace({ children }: { children: React.ReactNode }) {
               <Loader2 aria-label="Loading posts" className="size-6 animate-spin text-ds-fg-subtle" />
             </div>
           ) : pageEntries.length === 0 && openSlug !== "new" ? (
-            <div className="flex flex-col items-center gap-4 py-16 text-center">
-              <p className="text-p text-ds-fg-muted">
-                {searchQuery || hasActiveFilters ? "No posts match" : "No posts yet"}
-              </p>
-              {!searchQuery && !hasActiveFilters && (
-                <DsButton iconLeft={Plus} loading={creating} onClick={createPost}>
-                  New post
-                </DsButton>
-              )}
-            </div>
+            <DsEmptyState
+              action={
+                !searchQuery &&
+                !hasActiveFilters && (
+                  <DsButton iconLeft={Plus} loading={creating} onClick={createPost}>
+                    New post
+                  </DsButton>
+                )
+              }
+            >
+              {searchQuery || hasActiveFilters ? "No posts match" : "No posts yet"}
+            </DsEmptyState>
           ) : (
             <ul className="flex flex-col pb-5">
               {/* A new post isn't in the database until it's saved, so it shows

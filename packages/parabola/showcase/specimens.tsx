@@ -54,6 +54,8 @@ import { DS_TRAY_CLASS, DsColourDot, DsMenuItem, DsMenuSeparator, DsTray } from 
 import { DsMediaTile } from "../components/media-tile";
 import { DsNewsletterBlock } from "../blocks/newsletter";
 import { DsPlaceholder } from "../components/placeholder";
+import { DsEmptyState } from "../components/empty-state";
+import { DsInfoCard } from "../components/info-card";
 import { useDsOptionsSlot } from "./ds-shell";
 
 const CATEGORIES = ["Design", "Product", "Design Systems", "Photography", "Portrait", "Still life"].map((label) => ({
@@ -1021,5 +1023,35 @@ export function Newsletter() {
       }
       controls={<Controls options={o} labels={{ text: "Line of copy" }} onChange={setO} />}
     />
+  );
+}
+
+/** Components › States › Empty state: one line, centred, with or without an action. */
+export function EmptyState() {
+  return (
+    <div className="grid w-full max-w-3xl gap-4 sm:grid-cols-2">
+      <div className="flex h-64 flex-col rounded-ds-lg border border-ds-border">
+        <DsEmptyState action={<DsButton>New post</DsButton>}>No posts yet</DsEmptyState>
+      </div>
+      <div className="flex h-64 flex-col rounded-ds-lg border border-ds-border">
+        <DsEmptyState>Choose a post or create a new one</DsEmptyState>
+      </div>
+    </div>
+  );
+}
+
+/** Components › States › Info card: a side note with an icon, here another way to do the thing. */
+export function InfoCard() {
+  return (
+    <div className="flex w-full max-w-md flex-col gap-4">
+      <DsInfoCard>
+        <p>Rather have your agent do it? Paste this into Claude Code, or any agent.</p>
+        <p className="font-mono text-small break-words text-ds-fg-muted">Set up my site at https://example.com.</p>
+        <DsButton size="small" className="self-start">Copy</DsButton>
+      </DsInfoCard>
+      <DsInfoCard>
+        <p>Changes to a published post stay unpublished until you publish them.</p>
+      </DsInfoCard>
+    </div>
   );
 }

@@ -88,6 +88,19 @@ with the why. To change one, add a new line that overrides it.
 
 ## Design
 
+- 2026-10-26 — **Phones: fields full width, buttons their own width.**
+  Below 1024px (where the admin switches to its phone layout) fields fill
+  the row; from 1024px they take the standard 320px. Buttons never stretch
+  unless pinned to the bottom of the screen. Overrides the field-width
+  token's note that 320px needed no second size on phones.
+- 2026-10-26 — **Empty states are one line and an optional button,**
+  centred both ways in the section (`DsEmptyState`), in every section.
+  Side notes go in an info card (`DsInfoCard`).
+- 2026-10-26 — The onboarding opens straight on its first step under a
+  three-line outline (you, your projects, start creating) that marks where
+  you are; doing it with an agent is an info card with a prompt to copy,
+  not a choice up front. Refines the same day's onboarding decision.
+
 - 2026-10-24 — **Fields have one standard width**, 320px
   (`--ds-field-width`), set by Parabola: a field dropped on a page is
   already that size, and what `/parabola` shows is what a page gets. Forms

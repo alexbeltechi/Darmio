@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { usePathname } from "next/navigation";
-import { ChevronDown, LayoutGrid, LogOut, Menu, UserRound, X } from "lucide-react";
+import { ChevronDown, LayoutGrid, LogOut, Menu, Settings, X } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { DsButton, DsMenu, DsThemeToggle } from "@beltechi/parabola";
 import { cn } from "@/lib/utils";
@@ -142,7 +142,7 @@ export function AdminMobileNav({ children }: { children: React.ReactNode }) {
         </div>
 
         {home ? (
-          // Home's sidebar, as pills: every project, each one, New project, your account, sign out.
+          // Home's sidebar, as pills: every project, each one, New project, your settings, sign out.
           <nav aria-label="Projects" className="flex flex-col items-center gap-1">
             {[
               { key: "all", href: HOME_PATH, icon: LayoutGrid, label: "All projects", current: pathname === HOME_PATH },
@@ -154,7 +154,7 @@ export function AdminMobileNav({ children }: { children: React.ReactNode }) {
                 current: false,
               })),
               { key: "new", href: NEW_PROJECT_PATH, icon: undefined, label: "New project", current: pathname === NEW_PROJECT_PATH },
-              { key: "account", href: ACCOUNT_PATH, icon: UserRound, label: "Account", current: pathname === ACCOUNT_PATH },
+              { key: "settings", href: ACCOUNT_PATH, icon: Settings, label: "Settings", current: pathname === ACCOUNT_PATH },
               { key: "sign-out", onClick: () => signOut({ callbackUrl: "/admin/login" }), icon: LogOut, label: "Sign out", current: false },
             ].map((item, i) => (
               <DsButton

@@ -4,7 +4,7 @@ import { AdminMenuButton } from "@/components/admin/layout";
 import { AccountSettings } from "@/components/admin/settings/account-settings";
 
 /**
- * Home › Settings › Account: you, for the whole install rather than one
+ * Home › More › Settings: you, for the whole install rather than one
  * project (decisions, 2026-10-26): your name and password. Each project's
  * own settings stay behind its gear.
  */
@@ -13,7 +13,7 @@ export default function AccountPage() {
     <div className="flex min-h-dvh flex-col">
       <div className="pointer-events-none sticky top-0 z-20 flex flex-col ds-nav-fade pb-5 [&>*]:pointer-events-auto">
         <div className="flex items-center gap-2 px-5 py-5">
-          <h1 className="min-w-0 flex-1 truncate text-p text-ds-fg">Account</h1>
+          <h1 className="min-w-0 flex-1 truncate text-p text-ds-fg">Settings</h1>
           <AdminMenuButton />
         </div>
       </div>

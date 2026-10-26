@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { LogOut, UserRound } from "lucide-react";
+import { LogOut, Settings, UserRound } from "lucide-react";
 import {
   DsDropdown,
   DsDropdownContent,
@@ -31,8 +31,8 @@ function useMe(): Me | null {
 
 /**
  * You, at the foot of a project's rail (decisions, 2026-10-26): a round
- * avatar with your initial that opens your email, Account (the install's,
- * not a project's) and Sign out. Home's sidebar lists the same as items.
+ * avatar with your initial that opens your email, Settings (yours, for the
+ * install, not a project's) and Sign out. Home's sidebar lists the same as items.
  */
 export function AccountMenu({ align = "end", side = "right" }: { align?: "start" | "end"; side?: "right" | "bottom" }) {
   const router = useRouter();
@@ -53,8 +53,8 @@ export function AccountMenu({ align = "end", side = "right" }: { align?: "start"
       </DsDropdownTrigger>
       <DsDropdownContent side={side} align={align} sideOffset={8} className="min-w-56">
         {me && <DsDropdownLabel className="truncate">{me.email}</DsDropdownLabel>}
-        <DsDropdownItem iconLeft={UserRound} onSelect={() => router.push(ACCOUNT_PATH)}>
-          Account
+        <DsDropdownItem iconLeft={Settings} onSelect={() => router.push(ACCOUNT_PATH)}>
+          Settings
         </DsDropdownItem>
         <DsDropdownSeparator />
         <DsDropdownItem iconLeft={LogOut} onSelect={() => signOut({ callbackUrl: "/admin/login" })}>

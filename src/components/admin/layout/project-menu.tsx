@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { Check, Home, Settings, UserRound } from "lucide-react";
+import { Check, Home, Settings } from "lucide-react";
 import {
   DsDropdown,
   DsDropdownContent,
@@ -23,7 +23,7 @@ const CLOSE_DELAY_MS = 150;
 /**
  * The projects menu (decisions, 2026-10-26), Home's sidebar in short: your
  * projects, the current one ticked, each with a gear for its settings, New
- * project, then Home and your Account. Picking a project opens it.
+ * project, then Home and your Settings. Picking a project opens it.
  *
  * `hover`: the rail's Home button. The menu opens while the pointer is on the
  * button or the menu, and a click on the button goes Home instead of
@@ -120,8 +120,8 @@ export function ProjectMenu({
         <DsDropdownItem iconLeft={Home} onSelect={() => router.push(HOME_PATH)}>
           Home
         </DsDropdownItem>
-        <DsDropdownItem iconLeft={UserRound} onSelect={() => router.push(ACCOUNT_PATH)}>
-          Account
+        <DsDropdownItem iconLeft={Settings} onSelect={() => router.push(ACCOUNT_PATH)}>
+          Settings
         </DsDropdownItem>
       </DsDropdownContent>
     </DsDropdown>

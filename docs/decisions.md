@@ -11,18 +11,19 @@ with the why. To change one, add a new line that overrides it.
 ## Product
 
 - 2026-10-26 — **Home is Framer's dashboard.** Home pages (all projects,
-  New project, your Account) get their own full sidebar instead of the
-  rail: plain items in titled sections, Projects (All projects, each
-  project stacked, New project) and Settings (Account, Sign out), with the
+  New project, your Settings) get their own full sidebar instead of the
+  rail: plain items in titled sections 20px apart, Projects (All projects,
+  each project stacked, New project) and More (Settings, then Sign out as a
+  small grey button, so it doesn't read as one more place to go), with the
   theme at the foot. The main area shows the projects as cards with no
   thumbnails or icons (name, "Live at …" or "Not published", a gear), with
   a search and New project at the top right, and one centred line when
   there are none or none match. Projects and New project carry no icons in
-  any menu. Account (`/admin/account`) is yours across the install: name
-  and password. Creating a project returns to Home, where its card appears;
+  any menu. Settings there (`/admin/account`, a gear) is yours across the
+  install: name and password. Creating a project returns to Home, where its card appears;
   you open it from there. Inside a project the rail keeps its transparent
   Home button: hover for the projects menu (projects, New project, Home,
-  Account), click for Home; the avatar at its foot still opens Account and
+  Settings), click for Home; the avatar at its foot still opens Settings and
   Sign out. Signing in and setting up land on Home; opening a project goes
   to its posts. Overrides the same day's Home page with rows.
 - 2026-10-26 — **Without a working setup link, setup is a page, not a

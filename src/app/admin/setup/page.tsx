@@ -201,6 +201,7 @@ function AgentCard() {
 
   return (
     <DsInfoCard icon={Bot} title="Set up with AI">
+      <p>Paste this into Claude Code, or any AI that can work in your Dharmify folder.</p>
       <DsCopyField value={prompt} aria-label="Prompt for your AI" className="w-full" />
     </DsInfoCard>
   );

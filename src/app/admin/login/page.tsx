@@ -113,7 +113,7 @@ function LoginForm() {
   return (
     <div className="flex min-h-screen justify-center bg-ds-bg px-ds-20 py-ds-80 text-ds-fg">
       <form onSubmit={handleSubmit} className="flex w-full max-w-[440px] flex-col gap-ds-40">
-        <h1 className="text-h2">Sign in</h1>
+        <h1 className="text-h2">Sign in to Dharmify</h1>
 
         <div className="flex flex-col gap-ds-20">
           <DsField label="Email">

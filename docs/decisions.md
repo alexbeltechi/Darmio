@@ -10,6 +10,7 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-26 — Sign-in is titled **Sign in to Dharmify**, so you know where you are; setup, **Set up Dharmify**.
 - 2026-10-26 — **A forgotten password is a one-time link from your AI.**
   Dharmify can't send email yet. Sign-in has a quiet "Forgot your
   password?" that opens in place: "Email isn't set up for this site yet.
@@ -36,8 +37,8 @@ with the why. To change one, add a new line that overrides it.
   Sign out. Signing in and setting up land on Home; opening a project goes
   to its posts. Overrides the same day's Home page with rows.
 - 2026-10-26 — **Without a working setup link, setup is a page, not a
-  form:** "This site isn't set up yet", then "Paste this into the AI that
-  installed it:" over a prompt that asks that AI for the link (it carries
+  form:** "Set up Dharmify", then "This site isn't set up yet. Paste this
+  into the AI that installed it:" over a prompt that asks that AI for the link (it carries
   the site's address). No "if it's yours": a stranger can't use the prompt. A wrong link adds "That setup link
   didn't work." The paste-your-link field is gone: whoever has the link
   just opens it.

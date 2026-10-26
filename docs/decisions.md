@@ -10,6 +10,23 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-26 — **An account is an email.** Setup asks only for email and
+  password; a name is optional, added under Settings › Account. Accounts
+  belong to the install, not a project, so more people with roles (a
+  simple Figma-like owner and editor) can come later without changing this.
+- 2026-10-26 — **Sign in with email and password**, no usernames. Overrides
+  2026-10-24's "username and password". Passwords are stored only as bcrypt
+  hashes (cost 12) in the install's hub database; nothing is generated and
+  nothing is kept in the browser. Five wrong passwords for an email in 15
+  minutes lock it for 15 minutes; twenty from one address too
+  (`login_attempts` in the hub, kept across server instances); a correct
+  sign-in clears the email's count. An unknown email answers and takes as
+  long as a wrong password. Next, in order: a one-time **setup code** the
+  deploy creates (so nobody who reaches a fresh install first can claim
+  it; must land before the Deploy button), password reset by email once an
+  install can send email, and **Google sign-in** as an option for installs
+  that add their own Google keys.
+
 - 2026-10-26 — **Onboarding is steps on the page, no window**: start (set it
   up here, or hand it to your agent with a prompt to paste), then *you* (name,
   username, password: global, for the whole install), then *your projects*

@@ -1044,13 +1044,13 @@ export function EmptyState() {
 export function InfoCard() {
   return (
     <div className="flex w-full max-w-md flex-col gap-4">
-      <DsInfoCard>
-        <p>Rather have your agent do it? Paste this into Claude Code, or any agent.</p>
-        <p className="font-mono text-small break-words text-ds-fg-muted">Set up my site at https://example.com.</p>
+      <DsInfoCard title="Made for agents">
+        <p>Paste this into your agent. It does the rest.</p>
+        <p className="font-mono text-small break-words">Set up my site at https://example.com.</p>
         <DsButton size="small" className="self-start">Copy</DsButton>
       </DsInfoCard>
-      <DsInfoCard>
-        <p>Changes to a published post stay unpublished until you publish them.</p>
+      <DsInfoCard title="Not live yet">
+        <p>Changes to a published post wait until you publish them.</p>
       </DsInfoCard>
     </div>
   );

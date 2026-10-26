@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { handleDatabaseError, isDatabaseError } from "@/lib/api/error-handler";
 import { PASSWORD_MIN } from "@/lib/cms/password";
+import { isEmail } from "@/lib/cms/email";
 import { parseBrain, parseProjectName, PROJECTS_MAX } from "@/lib/cms/projects";
 import { createUser, hasUsers } from "@/lib/cms/users";
 import { createProject } from "@/lib/db/projects";
@@ -11,14 +12,13 @@ import { createProject } from "@/lib/db/projects";
  * and the login page takes over. An agent can do the setup by reading GET.
  */
 
-const AGENT_GUIDE = `Set up this Dharmify install. Ask the owner for: their name, a username
-(an email works) and a password of at least ${PASSWORD_MIN} characters, and their projects: a name
+const AGENT_GUIDE = `Set up this Dharmify install. Ask the owner for: their email and a password
+of at least ${PASSWORD_MIN} characters, and their projects: a name
 each (a site, a newsletter, a brand), and, if they have one, a brain for it (a folder or link
 with what an agent should know first). Then POST /api/setup with JSON:
 
 {
-  "name": "Their name",
-  "username": "them@example.com",
+  "email": "them@example.com",
   "password": "…",
   "projects": [{ "name": "First project", "brain": "optional folder or link" }]
 }
@@ -36,7 +36,7 @@ export async function GET() {
   }
 }
 
-/** Create the owner and the projects: `{ name, username, password, projects: [{ name, brain? }] }`. */
+/** Create the owner and the projects: `{ email, password, projects: [{ name, brain? }], name? }`. */
 export async function POST(request: NextRequest) {
   try {
     if (await hasUsers()) {
@@ -45,14 +45,13 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const name = typeof body.name === "string" ? body.name.trim() : "";
-    const username = typeof body.username === "string" ? body.username.trim().toLowerCase() : "";
+    const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
     const password = typeof body.password === "string" ? body.password : "";
     const projects = Array.isArray(body.projects) ? body.projects : [];
 
-    if (!name || name.length > 80) return NextResponse.json({ error: "Your name needs 1–80 characters" }, { status: 400 });
-    if (!/^[^\s]{3,100}$/.test(username)) {
-      return NextResponse.json({ error: "The username needs 3–100 characters, no spaces (an email works)" }, { status: 400 });
-    }
+    // Optional: an account is its email until its owner adds a name (Settings › Account).
+    if (name.length > 80) return NextResponse.json({ error: "A name can be at most 80 characters" }, { status: 400 });
+    if (!isEmail(email)) return NextResponse.json({ error: "Enter a valid email" }, { status: 400 });
     if (password.length < PASSWORD_MIN || password.length > 200) {
       return NextResponse.json({ error: `The password needs ${PASSWORD_MIN} to 200 characters` }, { status: 400 });
     }
@@ -62,11 +61,11 @@ export async function POST(request: NextRequest) {
     // Check every project before creating anything, so a bad one doesn't leave half a setup.
     const clean = projects.map((p: { name?: unknown; brain?: unknown }) => ({ name: parseProjectName(p?.name), brain: parseBrain(p?.brain) }));
 
-    const result = await createUser({ email: username, name, password, role: "owner" });
+    const result = await createUser({ email, name, password, role: "owner" });
     if (result.error) return NextResponse.json({ error: result.error }, { status: 400 });
     for (const project of clean) await createProject(project);
 
-    return NextResponse.json({ data: { username } }, { status: 201 });
+    return NextResponse.json({ data: { email } }, { status: 201 });
   } catch (error) {
     if (isDatabaseError(error)) return handleDatabaseError(error);
     return NextResponse.json({ error: error instanceof Error ? error.message : "Couldn't set up" }, { status: 400 });

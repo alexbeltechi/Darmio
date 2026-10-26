@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, Bot, Check, Copy, Plus, X } from "lucide-react";
 import { DsButton, DsField, DsInfoCard, DsInput, dsToast } from "@beltechi/parabola";
 import { PASSWORD_MIN } from "@/lib/cms/password";
+import { isEmail } from "@/lib/cms/email";
 import { PROJECTS_MAX } from "@/lib/cms/projects";
 import { ProjectFields, type ProjectDraft } from "@/components/admin/projects/project-fields";
 import { cn } from "@/lib/utils";
@@ -15,10 +16,10 @@ type Step = "you" | "projects";
 const emptyProject = (): ProjectDraft => ({ name: "", brain: "" });
 
 /** The outline at the top, which is also where you are. */
-const OUTLINE: { step: Step | "create"; label: string }[] = [
-  { step: "you", label: "You: how you sign in" },
-  { step: "projects", label: "Your projects: a site, a newsletter, a brand" },
-  { step: "create", label: "Start creating" },
+const OUTLINE: { step: Step | "publish"; label: string }[] = [
+  { step: "you", label: "Create your account" },
+  { step: "projects", label: "Create your projects" },
+  { step: "publish", label: "Start publishing" },
 ];
 
 /**
@@ -26,7 +27,8 @@ const OUTLINE: { step: Step | "create"; label: string }[] = [
  * so the admin opens here, straight on the first step. No window around it:
  * the fields float on the page, and buttons keep their own width.
  *
- * 1. You: what belongs to the whole install (your name, how you sign in).
+ * 1. Your account, for the whole install: email and password. A name is
+ *    optional, added later under Settings › Account.
  * 2. Your projects, as tabs: a name each, and maybe a brain.
  *
  * An info card offers the same through an agent. Nothing is saved until the
@@ -37,8 +39,7 @@ export default function SetupPage() {
   const router = useRouter();
   const [checking, setChecking] = useState(true);
   const [step, setStep] = useState<Step>("you");
-  const [name, setName] = useState("");
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [repeat, setRepeat] = useState("");
   const [projects, setProjects] = useState<ProjectDraft[]>([emptyProject()]);
@@ -62,7 +63,8 @@ export default function SetupPage() {
   }, [router]);
 
   const mismatch = repeat.length > 0 && password !== repeat;
-  const youReady = Boolean(name.trim() && username.trim().length >= 3 && password.length >= PASSWORD_MIN && password === repeat);
+  const badEmail = email.trim().length > 0 && !isEmail(email);
+  const youReady = Boolean(isEmail(email) && password.length >= PASSWORD_MIN && password === repeat);
   const projectsReady = projects.every((p) => p.name.trim());
 
   const updateProject = (index: number, draft: ProjectDraft) =>
@@ -84,11 +86,11 @@ export default function SetupPage() {
       const res = await fetch("/api/setup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, username, password, projects }),
+        body: JSON.stringify({ email, password, projects }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error);
-      const signedIn = await signIn("credentials", { username: json.data.username, password, redirect: false });
+      const signedIn = await signIn("credentials", { username: json.data.email, password, redirect: false });
       router.replace(signedIn?.ok ? "/admin" : "/admin/login");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Couldn't set up");
@@ -121,11 +123,8 @@ export default function SetupPage() {
             }}
           >
             <div className="flex flex-col gap-ds-20">
-              <DsField label="Your name">
-                <DsInput value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" autoFocus />
-              </DsField>
-              <DsField label="Username" description="What you sign in with. An email works.">
-                <DsInput value={username} onChange={(e) => setUsername(e.target.value)} autoComplete="username" />
+              <DsField label="Email" error={badEmail ? "That doesn't look like an email" : undefined}>
+                <DsInput type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" autoFocus />
               </DsField>
               <DsField label="Password" description={`At least ${PASSWORD_MIN} characters.`}>
                 <DsInput type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" />
@@ -196,9 +195,9 @@ function AgentCard() {
   const prompt = `Set up my Dharmify at ${origin}. Read ${origin}/api/setup first: it says what to ask me and what to send.`;
 
   return (
-    <DsInfoCard icon={Bot}>
-      <p>Rather have your agent do it? Paste this into Claude Code, or the agent or builder you use. This page moves on by itself when it&apos;s done.</p>
-      <p className="font-mono text-small break-words text-ds-fg-muted">{prompt}</p>
+    <DsInfoCard icon={Bot} title="Made for agents">
+      <p>Paste this into your agent. It does the rest.</p>
+      <p className="font-mono text-small break-words">{prompt}</p>
       <DsButton
         type="button"
         size="small"

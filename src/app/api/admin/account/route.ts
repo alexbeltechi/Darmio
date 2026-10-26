@@ -21,13 +21,25 @@ export async function GET(request: NextRequest) {
   }
 }
 
-/** Change the signed-in person's password: `{ currentPassword, newPassword }`. */
+/**
+ * Change the signed-in person's name, `{ name }` (optional, "" for none), or
+ * their password, `{ currentPassword, newPassword }`.
+ */
 export async function PATCH(request: NextRequest) {
   const userId = getUserId(request);
   if (!userId) return NextResponse.json({ error: "Agents don't have an account" }, { status: 403 });
 
   try {
     const body = await request.json();
+
+    if (typeof body.name === "string" && body.newPassword === undefined) {
+      const name = body.name.trim();
+      if (name.length > 80) return NextResponse.json({ error: "A name can be at most 80 characters" }, { status: 400 });
+      const result = await updateUser(userId, { name });
+      if (result.error) return NextResponse.json({ error: result.error }, { status: 400 });
+      return NextResponse.json({ data: { name } });
+    }
+
     const currentPassword = typeof body.currentPassword === "string" ? body.currentPassword : "";
     const newPassword = typeof body.newPassword === "string" ? body.newPassword : "";
     if (newPassword.length < PASSWORD_MIN || newPassword.length > 200) {

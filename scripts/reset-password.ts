@@ -2,7 +2,7 @@
  * Set a user's password from the terminal, for when you're locked out of the
  * admin (decisions, 2026-10-24). Works against the database in `.env.local`.
  *
- * Usage: npm run reset-password -- <username> <new password>
+ * Usage: npm run reset-password -- <email> <new password>
  */
 
 import * as dotenv from "dotenv";
@@ -10,9 +10,9 @@ import * as dotenv from "dotenv";
 dotenv.config({ path: ".env.local" });
 
 async function main() {
-  const [username, password] = process.argv.slice(2);
-  if (!username || !password) {
-    console.error("Usage: npm run reset-password -- <username> <new password>");
+  const [email, password] = process.argv.slice(2);
+  if (!email || !password) {
+    console.error("Usage: npm run reset-password -- <email> <new password>");
     process.exit(1);
   }
 
@@ -25,9 +25,9 @@ async function main() {
     process.exit(1);
   }
 
-  const user = await getUserByEmail(username);
+  const user = await getUserByEmail(email);
   if (!user) {
-    console.error(`No user "${username}"`);
+    console.error(`No user "${email}"`);
     process.exit(1);
   }
 

@@ -85,7 +85,9 @@ When a task changes an item, update this file in the same change.
       - **e. Media:** six moments (three stills, three 3–5s loops, first
         person, never her face; briefs in each post's placeholder line) and
         Alex's OK to ship the Y3K Ilo images in an open-source repo.
-      - **f. Setup screen and Deploy button,** README for testers, an
+      - **f. Setup code, then the Deploy button** (decisions, 2026-10-26:
+        the deploy makes a one-time code the setup screen asks for). Setup
+        screen done 2026-10-26. Was: **Setup screen and Deploy button,** README for testers, an
         install skill. The V0 doesn't need these (the seed script makes the
         owner), so they come after it.
       Done: a non-technical maker deploys and sees Ilo's site without a
@@ -93,7 +95,8 @@ When a task changes an item, update this file in the same change.
       database.
    5. **Projects.** First version done 2026-10-26 (decisions): the hub, a
       database per project, the switcher and Add project, onboarding with
-      several projects. Left: domains (the public site shows the first
+      several projects. Later: more accounts with roles (owner, editor),
+      per project. Left: domains (the public site shows the first
       project today), a project's own connection string and media store,
       renaming a project in Settings. Was: a hub holding each project's name, domains, encrypted
       connection string, media store and agent token; the project menu on

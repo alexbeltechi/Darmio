@@ -2,12 +2,15 @@
 
 import * as React from "react";
 import { usePathname } from "next/navigation";
-import { ChevronDown, Menu, X } from "lucide-react";
+import { ChevronDown, Folder, Globe, LayoutGrid, Menu, Plus, Settings, X } from "lucide-react";
 import { DsButton, DsMenu, DsThemeToggle } from "@beltechi/parabola";
 import { cn } from "@/lib/utils";
 import { useSiteName } from "@/components/admin/use-site-settings";
 import { ADMIN_NAV_ITEMS, activeNavItem, type AdminNavKey } from "./nav-items";
 import { ProjectMenu } from "./project-menu";
+import { HOME_PATH, HOME_SETTINGS_PATH, NEW_PROJECT_PATH, isHomePath } from "@/components/admin/home/home-routes";
+import { useProjects } from "@/components/admin/home/use-projects";
+import { openProject } from "@/components/admin/projects/project-actions";
 import { AccountMenu } from "./account-menu";
 
 const OPEN_EVENT = "admin-menu:open";
@@ -81,6 +84,8 @@ export function AdminMobileNav({ children }: { children: React.ReactNode }) {
   const active = activeNavItem(pathname);
   const [menuOpen, setMenuOpen] = React.useState(false);
   const siteName = useSiteName();
+  const home = isHomePath(pathname);
+  const projects = useProjects();
   const counts = useNavCounts(menuOpen);
   const closeMenu = React.useCallback(() => setMenuOpen(false), []);
 
@@ -119,11 +124,15 @@ export function AdminMobileNav({ children }: { children: React.ReactNode }) {
 
       <DsMenu open={menuOpen} onClose={closeMenu} label="Admin menu" className="lg:hidden">
         <div className="absolute inset-x-5 top-5 flex items-center justify-between">
-          <ProjectMenu>
-            <DsButton iconRight={ChevronDown} aria-label="Project menu">
-              {siteName ?? "…"}
-            </DsButton>
-          </ProjectMenu>
+          {home ? (
+            <span className="text-p text-ds-fg">Home</span>
+          ) : (
+            <ProjectMenu>
+              <DsButton iconRight={ChevronDown} aria-label="Project menu">
+                {siteName ?? "…"}
+              </DsButton>
+            </ProjectMenu>
+          )}
           <div className="flex items-center gap-2">
             <DsThemeToggle />
             <AccountMenu side="bottom" align="end" />
@@ -131,6 +140,35 @@ export function AdminMobileNav({ children }: { children: React.ReactNode }) {
           </div>
         </div>
 
+        {home ? (
+          // Home's sidebar, as pills: every project, each one, New project, the install's settings.
+          <nav aria-label="Projects" className="flex flex-col items-center gap-1">
+            {[
+              { key: "all", href: HOME_PATH, icon: LayoutGrid, label: "All projects", current: pathname === HOME_PATH },
+              ...(projects?.projects ?? []).map((project, index) => ({
+                key: project.slug,
+                onClick: () => openProject(project.slug, projects?.current ?? null),
+                icon: index === 0 ? Globe : Folder,
+                label: project.name,
+                current: false,
+              })),
+              { key: "new", href: NEW_PROJECT_PATH, icon: Plus, label: "New project", current: pathname === NEW_PROJECT_PATH },
+              { key: "settings", href: HOME_SETTINGS_PATH, icon: Settings, label: "Settings", current: pathname === HOME_SETTINGS_PATH },
+            ].map((item, i) => (
+              <DsButton
+                key={item.key}
+                href={"href" in item ? item.href : undefined}
+                iconLeft={item.icon}
+                current={item.current}
+                onClick={"onClick" in item ? item.onClick : closeMenu}
+                className="animate-in fade-in slide-in-from-bottom-2 duration-300 ease-out [animation-fill-mode:both] motion-reduce:animate-none"
+                style={{ animationDelay: `${i * 60}ms` }}
+              >
+                {item.label}
+              </DsButton>
+            ))}
+          </nav>
+        ) : (
         <nav aria-label="Admin" className="flex flex-col items-center gap-1">
           {ADMIN_NAV_ITEMS.map((item, i) => (
             <DsButton
@@ -147,6 +185,7 @@ export function AdminMobileNav({ children }: { children: React.ReactNode }) {
             </DsButton>
           ))}
         </nav>
+        )}
       </DsMenu>
     </>
   );

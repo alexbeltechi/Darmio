@@ -10,16 +10,18 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
-- 2026-10-26 — **Home, the way Figma and Framer open.** The rail's top
-  button is Home: a transparent icon button (inverse while you're on Home),
-  not the project's initial. Hovering it shows the projects menu (each
-  project with its gear, then New project); clicking it goes Home. Home
-  (`/admin`) lists the projects as plain rows, no thumbnails, with New
-  project, then you (name, password): what belongs to the install, not a
-  project. Signing in and setting up land on Home; opening a project goes
-  to its posts. Account is part of Home, so it has no page of its own. On
-  phones the menu opens on a tap and starts with Home. Overrides the same
-  day's project tile.
+- 2026-10-26 — **Home is Framer's dashboard.** Home pages (all projects,
+  New project, the install's Settings) get their own full sidebar instead of
+  the rail: a search over the projects, then Projects (All projects, each
+  project stacked, New project), and at the foot Settings, you (avatar and
+  email: Account settings, Sign out) and the theme. The main area shows the
+  projects as cards with no thumbnails (name, where it's live, a gear), New
+  project at the top right, and one centred line when there are none or
+  none match. Home › Settings is the install's, for now your name and
+  password. Inside a project the rail keeps its transparent Home button:
+  hover for the projects menu, click for Home. Signing in and setting up
+  land on Home; opening a project goes to its posts. Overrides the same
+  day's Home page with rows.
 - 2026-10-26 — **Without a working setup link, setup is a page, not a
   form:** "This site isn't set up yet", then "Paste this into the AI that
   installed it:" over a prompt that asks that AI for the link (it carries

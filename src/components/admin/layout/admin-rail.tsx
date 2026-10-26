@@ -21,14 +21,12 @@ export const ADMIN_RAIL_WIDTH = "lg:pl-[76px]";
 export function AdminRail() {
   const pathname = usePathname();
   const active = activeNavItem(pathname);
-  const onHome = pathname === "/admin";
 
   return (
     <aside className="fixed inset-y-0 left-0 z-(--ds-z-nav) hidden w-[76px] flex-col items-center border-r border-ds-border bg-ds-bg p-5 lg:flex">
-      {/* Home: the transparent button, inverse on Home like any current section.
-          Hovering shows the projects menu; a click goes Home. */}
+      {/* Home: the transparent button. Hovering shows the projects menu; a click goes Home. */}
       <ProjectMenu hover>
-        <DsButton href="/admin" iconLeft={Home} aria-label="Home" variant={onHome ? "default" : "text"} current={onHome} />
+        <DsButton href="/admin" iconLeft={Home} aria-label="Home" variant="text" />
       </ProjectMenu>
 
       {/* The divider starts level with the top of the search bar beside it: a page
@@ -39,9 +37,8 @@ export function AdminRail() {
         <div className="mt-5 h-px w-full bg-ds-border" />
       </div>
 
-      {/* Home is about every project, so the current project's sections step aside there. */}
       <nav aria-label="Admin" className="flex flex-1 flex-col gap-1">
-        {!onHome && ADMIN_NAV_ITEMS.map((item) => (
+        {ADMIN_NAV_ITEMS.map((item) => (
           <DsTooltip key={item.key} content={item.label} side="right">
             <DsButton
               href={item.href}

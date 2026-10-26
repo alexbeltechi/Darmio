@@ -10,6 +10,9 @@ import * as MongoUsers from "../db/users";
 
 export type UserRole = "owner" | "admin" | "editor";
 
+// bcrypt's work factor for new and changed passwords; older hashes still verify.
+const HASH_COST = 12;
+
 export interface User {
   id: string;
   email: string;
@@ -72,6 +75,17 @@ export async function verifyPassword(user: User, password: string): Promise<bool
   return bcrypt.compare(password, user.passwordHash);
 }
 
+let nobodysHash: Promise<string> | null = null;
+/**
+ * A password check for an email nobody has: the same bcrypt work as a real
+ * one, always false, so sign-in takes as long whether or not the email exists.
+ */
+export async function checkNobodysPassword(password: string): Promise<false> {
+  nobodysHash ??= bcrypt.hash(crypto.randomUUID(), HASH_COST);
+  await bcrypt.compare(password, await nobodysHash);
+  return false;
+}
+
 export async function createUser(input: {
   email: string;
   name: string;
@@ -85,7 +99,7 @@ export async function createUser(input: {
     return { error: "Email already in use" };
   }
   
-  const passwordHash = await bcrypt.hash(input.password, 10);
+  const passwordHash = await bcrypt.hash(input.password, HASH_COST);
   
   const user: User = {
     id: `user_${crypto.randomUUID()}`,
@@ -116,11 +130,11 @@ export async function updateUser(
     updatedAt: new Date().toISOString(),
   };
   
-  if (updates.name) updateDoc.name = updates.name;
+  if (updates.name !== undefined) updateDoc.name = updates.name;
   if (updates.email) updateDoc.email = updates.email.toLowerCase();
   if (updates.role) updateDoc.role = updates.role;
   if (updates.password) {
-    updateDoc.passwordHash = await bcrypt.hash(updates.password, 10);
+    updateDoc.passwordHash = await bcrypt.hash(updates.password, HASH_COST);
   }
   
   if (updates.email) {

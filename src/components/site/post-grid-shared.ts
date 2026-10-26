@@ -1,4 +1,5 @@
 import type { Entry, MediaItem } from "@/lib/cms/types";
+import { topLevelOf } from "@/lib/cms/category-groups";
 
 /** Homepage grid layout modes. */
 export type GridLayout = "masonry" | "grid";
@@ -19,37 +20,12 @@ export interface Category {
   id: string;
   slug: string;
   label: string;
+  /** Set when it sits inside a top-level category (see lib/cms/category-groups.ts). */
+  parentId?: string | null;
 }
 
-/**
- * The site's top-level categories, in nav order. Everything else in the CMS
- * (Portrait, Wedding, Garments, …) is a sub-category: it tags posts and rolls
- * up into one of these, but never appears in the nav or on a card's tag.
- * `nav: false` is a group of its own that isn't in the nav yet (Bikes): its
- * posts don't roll up into another group, and its page still works.
- */
-export const MAIN_CATEGORIES = [
-  { slug: "design", label: "Design", members: ["design", "brand", "product"], nav: true },
-  {
-    slug: "photography",
-    label: "Photography",
-    members: [
-      "photography",
-      "portrait",
-      "still-life",
-      "fashion",
-      "wedding",
-      "travel",
-      "garments",
-      "lifestyle",
-    ],
-    nav: true,
-  },
-  { slug: "journal", label: "Journal", members: ["journal"], nav: true },
-  { slug: "bikes", label: "Bikes", members: ["bikes"], nav: false },
-] as const;
-
-export type MainCategory = (typeof MAIN_CATEGORIES)[number];
+/** The fields a feed needs from each category: pass every category, so parents can be found. */
+export const feedCategory = ({ id, slug, label, parentId }: Category): Category => ({ id, slug, label, parentId });
 
 /** Slugs of every category tagged on the post. */
 export function getPostCategorySlugs(
@@ -61,47 +37,26 @@ export function getPostCategorySlugs(
 }
 
 /**
- * Every top-level category the post belongs to, in nav order, through the
- * sub-category roll-up (a post tagged "Portrait" and "Design" gives
- * Design and Photography). Empty when none of its tags roll up to one.
+ * The top-level categories the post rolls up to, in its tags' order and once
+ * each (a post tagged "Portrait" and "Design" gives Photography and Design).
  */
-export function getPostMainCategories(
-  post: Entry,
-  categoryMap: Map<string, Category>
-): MainCategory[] {
-  const slugs = getPostCategorySlugs(post, categoryMap);
-  return MAIN_CATEGORIES.filter((main) => main.members.some((member) => slugs.includes(member)));
+export function getPostGroups(post: Entry, categoryMap: Map<string, Category>): Category[] {
+  const groups = new Map<string, Category>();
+  for (const id of (post.data.categories as string[] | undefined) || []) {
+    const category = categoryMap.get(id);
+    if (category) {
+      const top = topLevelOf(category, categoryMap);
+      groups.set(top.id, top);
+    }
+  }
+  return [...groups.values()];
 }
 
-/**
- * The line under a post's title in feeds and grids: the top-level categories
- * it rolls up to ("Design, Photography"), or, when it rolls up to none (say,
- * only "Journal"), its own category names.
- */
+/** The line under a post's title in feeds and grids: its top-level categories ("Design, Photography"). */
 export function getPostCategoryLine(post: Entry, categoryMap: Map<string, Category>): string {
-  const main = getPostMainCategories(post, categoryMap).map((m) => m.label);
-  if (main.length > 0) return main.join(", ");
-  return ((post.data.categories as string[] | undefined) || [])
-    .map((id) => categoryMap.get(id)?.label)
-    .filter((label): label is string => Boolean(label))
+  return getPostGroups(post, categoryMap)
+    .map((c) => c.label)
     .join(", ");
-}
-
-/**
- * The post's top-level category, resolved through the sub-category roll-up —
- * a post tagged only "Wedding" still reports Photography. Null when nothing
- * matches any group.
- */
-export function getMainCategory(
-  post: Entry,
-  categoryMap: Map<string, Category>
-): MainCategory | null {
-  const slugs = getPostCategorySlugs(post, categoryMap);
-  return (
-    MAIN_CATEGORIES.find((main) =>
-      main.members.some((member) => slugs.includes(member))
-    ) || null
-  );
 }
 
 /**

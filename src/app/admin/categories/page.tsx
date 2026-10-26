@@ -15,7 +15,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import {
+import { DsEmptyState,
   DS_ACCENTS,
   DsButton,
   DsCheckbox,
@@ -42,6 +42,7 @@ import {
 } from "@beltechi/parabola";
 import { AdminMenuButton } from "@/components/admin/layout";
 import { CATEGORY_COLOR_PRESETS, DEFAULT_CATEGORY_COLOR } from "@/lib/cms/category-colors";
+import { CATEGORY_LAYOUTS, type CategoryLayout } from "@/lib/cms/types";
 import { cn } from "@/lib/utils";
 
 const ITEMS_PER_PAGE = 25;
@@ -52,7 +53,10 @@ interface Category {
   color: string;
   description?: string;
   order?: number;
-  showOnHomepage?: boolean;
+  parentId?: string | null;
+  nav?: boolean;
+  headline?: string;
+  layout?: CategoryLayout;
 }
 
 type VisibilityFilter = "all" | "visible" | "hidden";
@@ -64,15 +68,36 @@ type CategoryForm = {
   label: string;
   color: string;
   description: string;
-  showOnHomepage: boolean;
+  /** "" for top-level. */
+  parentId: string;
+  nav: boolean;
+  headline: string;
+  layout: CategoryLayout;
 };
 
-const EMPTY_FORM: CategoryForm = { label: "", color: DEFAULT_CATEGORY_COLOR, description: "", showOnHomepage: true };
+const EMPTY_FORM: CategoryForm = {
+  label: "",
+  color: DEFAULT_CATEGORY_COLOR,
+  description: "",
+  parentId: "",
+  nav: true,
+  headline: "",
+  layout: "hero",
+};
+
+// The "Inside" picker's value for top-level: a select item can't have an empty value.
+const TOP_LEVEL = "top-level";
+
+const LAYOUT_LABELS: Record<CategoryLayout, string> = {
+  hero: "Headline over the posts",
+  left: "Text beside the posts",
+  wall: "Posts only",
+};
 
 const visibilityOptions: DsSelectOption[] = [
   { value: "all", label: "All" },
-  { value: "visible", label: "On homepage" },
-  { value: "hidden", label: "Hidden" },
+  { value: "visible", label: "In the nav" },
+  { value: "hidden", label: "Not in the nav" },
 ];
 
 const sortOptions: DsSelectOption[] = [
@@ -144,9 +169,9 @@ export default function CategoriesPage() {
     }
 
     if (visibilityFilter === "visible") {
-      result = result.filter((cat) => cat.showOnHomepage !== false);
+      result = result.filter((cat) => !cat.parentId && cat.nav !== false);
     } else if (visibilityFilter === "hidden") {
-      result = result.filter((cat) => cat.showOnHomepage === false);
+      result = result.filter((cat) => cat.parentId || cat.nav === false);
     }
 
     if (sortOption === "a-z") {
@@ -239,13 +264,13 @@ export default function CategoriesPage() {
   }
 
   async function handleToggleVisibility(category: Category) {
-    const newVisibility = !(category.showOnHomepage ?? true);
+    const newVisibility = !(category.nav ?? true);
     setActionLoading(category.id);
     try {
       const res = await fetch(`/api/admin/categories/${category.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ showOnHomepage: newVisibility }),
+        body: JSON.stringify({ nav: newVisibility }),
       });
 
       if (!res.ok) {
@@ -254,7 +279,7 @@ export default function CategoriesPage() {
       }
 
       await fetchCategories();
-      dsToast.success(`${category.label} ${newVisibility ? "shown on" : "hidden from"} the homepage`);
+      dsToast.success(`${category.label} ${newVisibility ? "added to" : "taken out of"} the nav`);
     } catch (error) {
       dsToast.error(error instanceof Error ? error.message : "Failed to update visibility");
     } finally {
@@ -302,7 +327,7 @@ export default function CategoriesPage() {
             fetch(`/api/admin/categories/${id}`, {
               method: "PATCH",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ showOnHomepage: action === "show" }),
+              body: JSON.stringify({ nav: action === "show" }),
             })
           )
         );
@@ -310,7 +335,7 @@ export default function CategoriesPage() {
 
       await fetchCategories();
       setSelectedIds(new Set());
-      const done = { show: "shown on the homepage", hide: "hidden from the homepage", delete: "deleted" }[action];
+      const done = { show: "added to the nav", hide: "taken out of the nav", delete: "deleted" }[action];
       dsToast.success(`${count} ${noun} ${done}`);
     } catch {
       dsToast.error("Some categories couldn't be updated");
@@ -367,8 +392,21 @@ export default function CategoriesPage() {
       label: category.label,
       color: category.color,
       description: category.description ?? "",
-      showOnHomepage: category.showOnHomepage ?? true,
+      parentId: category.parentId ?? "",
+      nav: category.nav ?? true,
+      headline: category.headline ?? "",
+      layout: category.layout ?? "hero",
     });
+
+  const labelOf = new Map(categories.map((c) => [c.id, c.label]));
+  // Where a category can go: top-level, or inside a top-level category that
+  // isn't itself. One with categories inside it stays top-level.
+  const parentOptions = (form: CategoryForm): DsSelectOption[] => [
+    { value: TOP_LEVEL, label: "Nothing (its own section)" },
+    ...(form.id && categories.some((c) => c.parentId === form.id)
+      ? []
+      : categories.filter((c) => !c.parentId && c.id !== form.id).map((c) => ({ value: c.id, label: c.label }))),
+  ];
 
   return (
     <div className="flex min-h-dvh flex-col">
@@ -410,7 +448,7 @@ export default function CategoriesPage() {
           </DsTooltip>
 
           <DsSelect
-            aria-label="Visibility"
+            aria-label="Nav"
             options={visibilityOptions}
             value={visibilityFilter}
             onValueChange={(value) => setVisibilityFilter(value as VisibilityFilter)}
@@ -475,28 +513,32 @@ export default function CategoriesPage() {
             <Loader2 aria-label="Loading categories" className="size-6 animate-spin text-ds-fg-subtle" />
           </div>
         ) : categories.length === 0 ? (
-          <div className="flex flex-col items-center gap-4 py-16 text-center">
-            <div className="flex flex-col gap-1">
-              <p className="text-p text-ds-fg-muted">No categories yet</p>
-              <p className="text-small text-ds-fg-subtle">Categories group posts on the site, each in its own colour.</p>
-            </div>
-            <DsButton iconLeft={Plus} onClick={() => setForm(EMPTY_FORM)}>
-              New category
-            </DsButton>
-          </div>
-        ) : filteredCategories.length === 0 ? (
-          <div className="flex flex-col items-center gap-4 py-16 text-center">
-            <p className="text-p text-ds-fg-muted">No categories match</p>
-            {hasActiveFilters && (
-              <DsButton iconLeft={RotateCcw} onClick={resetFilters}>
-                Reset filters
+          <DsEmptyState
+            action={
+              <DsButton iconLeft={Plus} onClick={() => setForm(EMPTY_FORM)}>
+                New category
               </DsButton>
-            )}
-          </div>
+            }
+          >
+            No categories yet
+          </DsEmptyState>
+        ) : filteredCategories.length === 0 ? (
+          <DsEmptyState
+            action={
+              hasActiveFilters && (
+                <DsButton iconLeft={RotateCcw} onClick={resetFilters}>
+                  Reset filters
+                </DsButton>
+              )
+            }
+          >
+            No categories match
+          </DsEmptyState>
         ) : (
           <ul className={cn("flex flex-col transition-opacity", reordering && "opacity-70")}>
             {paginatedCategories.map((category, index) => {
-              const hidden = category.showOnHomepage === false;
+              const inside = category.parentId ? labelOf.get(category.parentId) : undefined;
+              const hidden = !inside && category.nav === false;
               return (
                 <li key={category.id}>
                   <DsListRow
@@ -517,8 +559,8 @@ export default function CategoriesPage() {
                       </div>
                     }
                     title={category.label}
-                    pill={hidden && <DsPill>Hidden</DsPill>}
-                    meta={category.description || undefined}
+                    pill={hidden && <DsPill>Not in the nav</DsPill>}
+                    meta={inside ? `Inside ${inside}` : category.description || undefined}
                     onOpen={() => openEdit(category)}
                     actions={
                       <DsDropdown>
@@ -535,9 +577,11 @@ export default function CategoriesPage() {
                           <DsDropdownItem iconLeft={Pencil} onSelect={() => openEdit(category)}>
                             Edit
                           </DsDropdownItem>
-                          <DsDropdownItem iconLeft={hidden ? Eye : EyeOff} onSelect={() => handleToggleVisibility(category)}>
-                            {hidden ? "Show on homepage" : "Hide from homepage"}
-                          </DsDropdownItem>
+                          {!inside && (
+                            <DsDropdownItem iconLeft={hidden ? Eye : EyeOff} onSelect={() => handleToggleVisibility(category)}>
+                              {hidden ? "Add to the nav" : "Take out of the nav"}
+                            </DsDropdownItem>
+                          )}
                           <DsDropdownSeparator />
                           <DsDropdownItem tone="danger" iconLeft={Trash2} onSelect={() => handleDeleteCategory(category)}>
                             Delete
@@ -620,16 +664,40 @@ export default function CategoriesPage() {
                   placeholder="Optional"
                 />
               </DsField>
-              <div className="flex items-center gap-3">
-                <label htmlFor="category-show-on-homepage" className="flex-1 text-p text-ds-fg">
-                  Show on homepage
-                </label>
-                <DsSwitch
-                  id="category-show-on-homepage"
-                  checked={form.showOnHomepage}
-                  onCheckedChange={(showOnHomepage) => setForm({ ...form, showOnHomepage })}
+              <DsField
+                label="Inside"
+                description="A category inside another rolls up into its page (Portrait inside Photography)."
+              >
+                <DsSelect
+                  options={parentOptions(form)}
+                  value={form.parentId || TOP_LEVEL}
+                  onValueChange={(value) => setForm({ ...form, parentId: value === TOP_LEVEL ? "" : value })}
                 />
-              </div>
+              </DsField>
+              {!form.parentId && (
+                <>
+                  <div className="flex items-center gap-3">
+                    <label htmlFor="category-nav" className="flex-1 text-p text-ds-fg">
+                      In the site&apos;s nav
+                    </label>
+                    <DsSwitch id="category-nav" checked={form.nav} onCheckedChange={(nav) => setForm({ ...form, nav })} />
+                  </div>
+                  <DsField label="Headline" description="The big line on its page. Empty uses the name.">
+                    <DsInput
+                      value={form.headline}
+                      onChange={(e) => setForm({ ...form, headline: e.target.value })}
+                      placeholder="Optional"
+                    />
+                  </DsField>
+                  <DsField label="Page layout">
+                    <DsSelect
+                      options={CATEGORY_LAYOUTS.map((value) => ({ value, label: LAYOUT_LABELS[value] }))}
+                      value={form.layout}
+                      onValueChange={(layout) => setForm({ ...form, layout: layout as CategoryLayout })}
+                    />
+                  </DsField>
+                </>
+              )}
             </div>
             <DsDialogActions>
               <DsButton type="submit" variant="primary" loading={saving} disabled={!form.label.trim()}>
@@ -646,7 +714,7 @@ export default function CategoriesPage() {
       {/* Filter dialog (below md) */}
       <DsDialog open={showFilterModal} onOpenChange={setShowFilterModal} title="Filter and sort">
         <div className="flex flex-col gap-4">
-          <DsField label="Visibility">
+          <DsField label="Nav">
             <DsSelect
               options={visibilityOptions}
               value={visibilityFilter}

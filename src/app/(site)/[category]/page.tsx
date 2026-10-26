@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { PageView } from "@/components/site/page-view";
 import { CategoryFeed } from "@/components/site/category-feed";
-import { MAIN_CATEGORIES, getPreviewCandidateIds } from "@/components/site/post-grid-shared";
-import { CATEGORY_VIEWS } from "@/components/site/site-views";
+import { feedCategory, getPreviewCandidateIds } from "@/components/site/post-grid-shared";
+import { categoryGroups } from "@/lib/cms/category-groups";
 import { getEntry, getPublishedEntries } from "@/lib/db/entries";
 import { getMediaByIds } from "@/lib/cms/media";
 import { listCategories } from "@/lib/db/categories";
@@ -57,10 +57,10 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     return <PageView page={page} />;
   }
 
-  // A main category rolls up its sub-categories (Photography includes
-  // Portrait, Wedding, …); a sub-category shows only its own work.
-  const main = MAIN_CATEGORIES.find((m) => m.slug === category.slug);
-  const memberSlugs: readonly string[] = main ? main.members : [category.slug];
+  // A top-level category rolls up the categories inside it (Photography
+  // includes Portrait, Wedding, …); one inside another shows only its own work.
+  const group = categoryGroups(categories).find((g) => g.slug === category.slug);
+  const memberSlugs = group ? group.members : [category.slug];
   const slugById = new Map(categories.map((c) => [c.id, c.slug]));
 
   const entries = posts
@@ -74,9 +74,9 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   const mediaIds = new Set(entries.flatMap(getPreviewCandidateIds));
   const mediaItems = await getMediaByIds(Array.from(mediaIds));
 
-  const view = CATEGORY_VIEWS[category.slug] ?? {
-    layout: "hero" as const,
-    intro: { title: category.label, description: category.description },
+  const view = {
+    layout: category.layout ?? ("hero" as const),
+    intro: { title: category.headline || category.label, description: category.description },
   };
 
   return (
@@ -85,7 +85,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         layout={view.layout}
         sections={[{ intro: view.intro, posts: entries }]}
         mediaItems={mediaItems}
-        categories={categories.map(({ id, slug, label }) => ({ id, slug, label }))}
+        categories={categories.map(feedCategory)}
       />
     </main>
   );

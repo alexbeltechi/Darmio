@@ -4,3 +4,6 @@
  * without pulling in the database.
  */
 export const PASSWORD_MIN = 8;
+
+/** How a locked sign-in's message starts, so the login page shows it as it is. */
+export const LOCKED_PREFIX = "Too many wrong passwords.";

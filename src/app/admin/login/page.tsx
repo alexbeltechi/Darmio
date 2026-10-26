@@ -1,29 +1,47 @@
 "use client";
 
 /**
- * Admin Login Page
- * 
- * Simple username/password login form.
- * Default credentials: admin / kombucha
+ * Sign in with your email and password, floating on the page like the
+ * onboarding. A fresh install has no users yet, so this sends you to
+ * /admin/setup. Too many wrong passwords lock the email for a while
+ * (lib/db/login-attempts.ts); that message is shown as it comes.
  */
 
-import { useState, Suspense } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2, Eye, EyeOff } from "lucide-react";
 import { DsButton, DsField, DsInput } from "@beltechi/parabola";
+import { LOCKED_PREFIX } from "@/lib/cms/password";
+import { installProblem, type InstallProblem } from "@/lib/cms/install-problems";
+import { InstallProblemNotice } from "@/components/admin/install-problem";
+
+const WRONG = "Wrong email or password";
 
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/admin";
   const errorParam = searchParams.get("error");
-  
-  const [username, setUsername] = useState("");
+
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [problem, setProblem] = useState<InstallProblem | null>(null);
+
+  useEffect(() => {
+    fetch("/api/setup")
+      .then((res) => res.json())
+      .then((json) => {
+        // Signing in can't work on an install without its database: say why instead.
+        const found = installProblem(json.code);
+        if (found) setProblem(found);
+        else if (json.data?.needed) router.replace("/admin/setup");
+      })
+      .catch(() => {});
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,52 +49,43 @@ function LoginForm() {
     setFormError(null);
 
     try {
-      const result = await signIn("credentials", {
-        username,
-        password,
-        redirect: false,
-        callbackUrl,
-      });
+      const result = await signIn("credentials", { username: email, password, redirect: false, callbackUrl });
 
       if (result?.error) {
-        setFormError("Invalid username or password");
+        setFormError(result.error.startsWith(LOCKED_PREFIX) ? result.error : WRONG);
         setLoading(false);
       } else if (result?.ok) {
         router.push(callbackUrl);
         router.refresh();
       } else {
-        setFormError("Sign in failed. Check NEXTAUTH_SECRET is set.");
+        setFormError("Couldn't sign in. Check NEXTAUTH_SECRET is set.");
         setLoading(false);
       }
     } catch (err) {
       console.error("Sign in error:", err);
-      setFormError("Connection error. Please try again.");
+      setFormError("Couldn't reach the server. Try again.");
       setLoading(false);
     }
   };
 
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-ds-bg p-4 text-ds-fg">
-      <div className="flex w-full max-w-sm flex-col gap-5 rounded-ds-lg bg-ds-surface-subtle p-5 ds-fields-fill">
-        <div className="flex flex-col gap-2 text-center">
-          <h1 className="text-h3">Admin</h1>
-          <p className="text-p text-ds-fg-muted">Sign in to access the dashboard</p>
-        </div>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          {/* Error messages */}
-          {(formError || errorParam) && (
-            <div role="alert" className="rounded-ds-md bg-ds-error/10 p-3 text-p text-ds-error">
-              {formError || (errorParam === "CredentialsSignin" ? "Invalid username or password" : "Authentication error")}
-            </div>
-          )}
+  if (problem) return <InstallProblemNotice problem={problem} />;
 
-          <DsField label="Username">
+  const message = formError || (errorParam ? (errorParam === "CredentialsSignin" ? WRONG : "Couldn't sign in") : null);
+
+  return (
+    <div className="flex min-h-screen justify-center bg-ds-bg px-ds-20 py-ds-80 text-ds-fg">
+      <form onSubmit={handleSubmit} className="flex w-full max-w-[440px] flex-col gap-ds-40">
+        <h1 className="text-h2">Sign in</h1>
+
+        <div className="flex flex-col gap-ds-20">
+          <DsField label="Email">
             <DsInput
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
-              autoComplete="username"
+              autoComplete="email"
+              autoFocus
               disabled={loading}
             />
           </DsField>
@@ -93,6 +102,7 @@ function LoginForm() {
                 className="pr-10"
               />
               <DsButton
+                type="button"
                 variant="text"
                 size="small"
                 iconLeft={showPassword ? EyeOff : Eye}
@@ -103,12 +113,20 @@ function LoginForm() {
               />
             </div>
           </DsField>
+        </div>
 
-          <DsButton type="submit" variant="primary" className="w-full" loading={loading}>
-            {loading ? "Signing in..." : "Sign in"}
+        {message && (
+          <p role="alert" className="text-p text-ds-error">
+            {message}
+          </p>
+        )}
+
+        <div>
+          <DsButton type="submit" variant="primary" loading={loading}>
+            Sign in
           </DsButton>
-        </form>
-      </div>
+        </div>
+      </form>
     </div>
   );
 }

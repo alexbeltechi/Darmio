@@ -78,7 +78,7 @@ function tokens(line: string): string[] {
 }
 
 function render(event: ActivityEvent): string {
-  // Local time, as Alex reads it ("sv-SE" is the locale that prints YYYY-MM-DD HH:MM).
+  // Local time, as the owner reads it ("sv-SE" is the locale that prints YYYY-MM-DD HH:MM).
   const parsed = new Date(event.at);
   const when = Number.isNaN(parsed.getTime()) ? event.at : parsed.toLocaleString("sv-SE").slice(0, 16);
   const head = [when, event.action, event.slug, event.status]

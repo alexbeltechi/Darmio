@@ -6,7 +6,9 @@
 import type { NextAuthOptions, Session } from "next-auth";
 import type { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { getUserByEmail, verifyPassword, updateLastLogin } from "./cms/users";
+import { checkNobodysPassword, getUserByEmail, verifyPassword, updateLastLogin } from "./cms/users";
+import { LOCKED_PREFIX } from "./cms/password";
+import { clearMisses, lockedForMinutes, recordMiss } from "./db/login-attempts";
 
 declare module "next-auth" {
   interface Session {
@@ -30,40 +32,40 @@ export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
+      // The field is still called `username` inside NextAuth; it holds the email.
       credentials: {
-        username: { label: "Username", type: "text" },
-        password: { label: "Password", type: "password" }
+        username: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
-        if (!credentials?.username || !credentials?.password) {
+      async authorize(credentials, req) {
+        const email = credentials?.username?.trim().toLowerCase();
+        const password = credentials?.password;
+        if (!email || !password) return null;
+
+        const forwarded = req?.headers?.["x-forwarded-for"];
+        const ip = (Array.isArray(forwarded) ? forwarded[0] : forwarded)?.split(",")[0]?.trim() || null;
+
+        // Too many wrong passwords: refuse before checking this one (lib/db/login-attempts.ts).
+        const wait = await lockedForMinutes(email, ip);
+        if (wait > 0) throw new Error(`${LOCKED_PREFIX} Try again in ${wait} minute${wait === 1 ? "" : "s"}.`);
+
+        const user = await getUserByEmail(email);
+        // Same work and the same answer whether or not the email exists.
+        const valid = user ? await verifyPassword(user, password) : await checkNobodysPassword(password);
+        if (!user || !valid) {
+          await recordMiss(email, ip);
           return null;
         }
-        
-        // Look up user by username (stored in email field)
-        const user = await getUserByEmail(credentials.username);
-        
-        if (!user) {
-          console.log(`🚫 Login failed - user not found: ${credentials.username}`);
-          return null;
-        }
-        
-        const isValid = await verifyPassword(user, credentials.password);
-        
-        if (!isValid) {
-          console.log(`🚫 Login failed - wrong password: ${credentials.username}`);
-          return null;
-        }
-        
+
+        await clearMisses(email);
         await updateLastLogin(user.id);
-        
-        console.log(`✅ Successful login: ${user.email}`);
         return {
           id: user.id,
           email: user.email,
           name: user.name,
           role: user.role,
         };
-      }
+      },
     }),
   ],
 

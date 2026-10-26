@@ -11,7 +11,8 @@ import { PostGrid } from "@/components/site/post-grid";
 import { PostHeader } from "@/components/site/post-header";
 import { PostPageWrapper } from "@/components/site/post-page-wrapper";
 import { NavHighlight } from "@/components/site/site-nav";
-import { getMainCategory, getPreviewCandidateIds, MAIN_CATEGORIES } from "@/components/site/post-grid-shared";
+import { feedCategory, getPostGroups, getPreviewCandidateIds } from "@/components/site/post-grid-shared";
+import { categoryGroups } from "@/lib/cms/category-groups";
 import type { Block, Entry, MediaItem } from "@/lib/cms/types";
 import type { Category } from "@/lib/db/categories";
 
@@ -67,7 +68,7 @@ export async function PostView({
   const mediaItems = await getMediaByIds(blockMediaIds(blocks));
 
   const categoryMap = new Map(allCategories.map((c) => [c.id, c]));
-  const mainCategory = getMainCategory(post, categoryMap);
+  const mainCategory = getPostGroups(post, categoryMap)[0];
 
   return (
     <PostPageWrapper>
@@ -169,14 +170,13 @@ async function moreToExplore({
   const slugOf = new Map(allCategories.map((cat) => [cat.id, cat.slug]));
   const slugsOf = (ids: string[]) => ids.map((id) => slugOf.get(id)).filter((slug): slug is string => Boolean(slug));
   const postSlugs = slugsOf(categoryIds);
+  const groups = categoryGroups(allCategories);
   const groupSlugs = new Set<string>(
-    MAIN_CATEGORIES.filter((main) => main.members.some((member) => postSlugs.includes(member))).flatMap(
-      (main) => main.members
-    )
+    groups.filter((g) => g.members.some((member) => postSlugs.includes(member))).flatMap((g) => g.members)
   );
   const inGroup = (p: Entry) => slugsOf((p.data.categories as string[]) || []).some((slug) => groupSlugs.has(slug));
   // Sharing a sub-category (Lifestyle) ranks above sharing only a top-level one (Photography).
-  const isGroupSlug = (slug: string) => MAIN_CATEGORIES.some((main) => main.slug === slug);
+  const isGroupSlug = (slug: string) => groups.some((g) => g.slug === slug);
   const subSlugs = postSlugs.filter((slug) => !isGroupSlug(slug));
   const sharesSub = (p: Entry) => slugsOf((p.data.categories as string[]) || []).some((slug) => subSlugs.includes(slug));
 
@@ -190,12 +190,8 @@ async function moreToExplore({
   const mediaItems = await getMediaByIds([...new Set(displayPosts.flatMap(getPreviewCandidateIds))]);
   const mediaMap = new Map<string, MediaItem>(mediaItems.map((item) => [item.id, item]));
 
-  const usedCategoryIds = new Set(
-    displayPosts.flatMap((p) => (p.data.categories as string[] | undefined) || [])
-  );
-  const categories = allCategories
-    .filter((cat) => usedCategoryIds.has(cat.id))
-    .map((cat) => ({ id: cat.id, slug: cat.slug, label: cat.label }));
+  // Every category, so each card's line can find the group its tags roll up to.
+  const categories = allCategories.map(feedCategory);
 
   // Name one of the post's categories, linked, but only one some other post
   // shares: a sub-category (Travel) over a top-level one (Photography). A post
@@ -211,8 +207,8 @@ async function moreToExplore({
   // category rolls up to ("See all Photography" under "More Travel"), else
   // to the post's own top-level category, else to every post.
   const parent =
-    MAIN_CATEGORIES.find((main) => primaryCategory && (main.members as readonly string[]).includes(primaryCategory.slug)) ??
-    MAIN_CATEGORIES.find((main) => main.members.some((member) => postSlugs.includes(member)));
+    groups.find((g) => primaryCategory && g.members.includes(primaryCategory.slug)) ??
+    groups.find((g) => g.members.some((member) => postSlugs.includes(member)));
   const named = primaryCategory ?? parent;
 
   return (

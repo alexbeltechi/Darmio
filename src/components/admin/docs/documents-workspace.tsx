@@ -4,6 +4,7 @@ import * as React from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { FilePlus, FileText, Loader2, Plus, Upload } from "lucide-react";
 import {
+  DsEmptyState,
   DsButton,
   DsDropdown,
   DsDropdownContent,
@@ -174,14 +175,7 @@ export function DocumentsWorkspace({ children }: { children: React.ReactNode }) 
             <Loader2 aria-label="Loading documents" className="size-6 animate-spin text-ds-fg-subtle" />
           </div>
         ) : rows.length === 0 ? (
-          <div className="flex flex-col items-center gap-2 py-16 text-center">
-            <p className="text-p text-ds-fg-muted">{q ? "Nothing matches" : "No documents yet"}</p>
-            {!q && (
-              <p className="max-w-xs text-small text-ds-fg-subtle">
-                Notes, copy, briefs, HTML: anything Claude can read for context. Upload one, or attach one from a post or page.
-              </p>
-            )}
-          </div>
+          <DsEmptyState>{q ? "Nothing matches" : "No documents yet"}</DsEmptyState>
         ) : (
           <ul className="flex flex-col pb-5">
             {rows.map((doc) => (

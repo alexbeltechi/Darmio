@@ -16,7 +16,7 @@
  *   "width": "auto",                       // auto (default: 1-3 stacked, 4-19 three a row inline, 20+ full width) | large (inline, 1024px) | full
  *   "intro": "<p>Optional lead text</p>",  // optional text block above the gallery
  *   "sourcePath": "/Users/.../Butter",
- *   "mediaTags": ["Butter", "lettering"],  // Alex's words, confirmed by him: on every image
+ *   "mediaTags": ["Butter", "lettering"],  // the owner's words, confirmed by them: on every image
  *   "keywordsBy": "/post",                 // who wrote the keywords (/curate when from selection.json)
  *   "assets": [{ "path": "...",              // the file to send (an export, or the original)
  *                "source": "...",            // the original, when path is an export: its folder gets the _activity.md log
@@ -24,7 +24,7 @@
  *                "alt": "...",               // one sentence saying what's in it, for screen readers and search
  *                "description": "...",       // optional: a longer line for search
  *                "caption": "...", "capturedAt": "...",
- *                "tags": ["..."],          // more of Alex's tags for this frame only
+ *                "tags": ["..."],          // more of the owner's tags for this frame only
  *                "keywords": ["tent", "hills", "dusk"] }]   // what's in it, from looking at it
  * }
  *
@@ -99,7 +99,7 @@ interface Plan {
   columns?: number;
   intro?: string;
   sourcePath?: string;
-  /** Tags for every image in the post: Alex's words (place, people, project, camera), confirmed by him. */
+  /** Tags for every image in the post: the owner's words (place, people, project, camera), confirmed by them. */
   mediaTags?: string[];
   /** Who wrote the assets' keywords: "/curate" (from selection.json) or "/post". */
   keywordsBy?: string;

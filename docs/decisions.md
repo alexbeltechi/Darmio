@@ -10,6 +10,52 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-26 — **Installing is one prompt to your AI.** The README opens
+  with it; `INSTALL.md` is the one install guide, written for an AI: fork
+  the repo, a Vercel project, MongoDB Atlas and Blob from Vercel's Storage
+  tab, the keys and a one-time `SETUP_CODE`, deploy, then hand the owner a
+  single link to the live site's setup (`/admin/setup?code=…`), where they
+  choose their own email and password. Online from the start: no local
+  install first, no localhost for the maker. No npx package, start page,
+  hosting picker or deploy button yet; those come if testers get stuck.
+  Setup refuses without the code, which closes "whoever visits first
+  claims it". Developers run it locally from the same file's last section.
+
+- 2026-10-26 — **An account is an email.** Setup asks only for email and
+  password; a name is optional, added under Settings › Account. Accounts
+  belong to the install, not a project, so more people with roles (a
+  simple Figma-like owner and editor) can come later without changing this.
+- 2026-10-26 — **Sign in with email and password**, no usernames. Overrides
+  2026-10-24's "username and password". Passwords are stored only as bcrypt
+  hashes (cost 12) in the install's hub database; nothing is generated and
+  nothing is kept in the browser. Five wrong passwords for an email in 15
+  minutes lock it for 15 minutes; twenty from one address too
+  (`login_attempts` in the hub, kept across server instances); a correct
+  sign-in clears the email's count. An unknown email answers and takes as
+  long as a wrong password. Next, in order: a one-time **setup code** the
+  deploy creates (so nobody who reaches a fresh install first can claim
+  it; must land before the Deploy button), password reset by email once an
+  install can send email, and **Google sign-in** as an option for installs
+  that add their own Google keys.
+
+- 2026-10-26 — **Onboarding is steps on the page, no window**: start (set it
+  up here, or hand it to your agent with a prompt to paste), then *you* (name,
+  username, password: global, for the whole install), then *your projects*
+  as tabs (a name each and an optional brain). Nothing is saved until the
+  last step. "Project", not "site": a project can be a site, a newsletter, a
+  brand. A project's **brain** is a folder or link an agent reads before
+  working on it; the agent guide names it.
+
+- 2026-10-26 — **A fresh install is a blank slate.** Nothing about one site
+  is in code. A site's sections are its top-level categories: each has a
+  page, and is in the nav unless switched off, so the nav grows as sections
+  are added. A category can sit inside one top-level category (one level),
+  and rolls up into its page. A top-level category carries its page's
+  headline and layout (`CATEGORY_LAYOUTS`). The home headline and its button
+  are in Settings › Site; without one the homepage is just the posts. An
+  install with no users opens `/admin/setup` (name the site, make the
+  owner); `/api/setup` only works while there are no users.
+
 - 2026-10-26 — The CMS is called **Dharmify CMS** (Alex, 2026-10-25, in his
   brain; working title since 2026-10-21). **Parabola** stays the design
   system's name and nothing else, which settles 2026-10-04's idea of
@@ -69,6 +115,20 @@ with the why. To change one, add a new line that overrides it.
   compose pages and propose gaps but don't invent blocks alone.
 
 ## Design
+
+- 2026-10-26 — **Phones: fields full width, buttons their own width.**
+  Below 1024px (where the admin switches to its phone layout) fields fill
+  the row; from 1024px they take the standard 320px. Buttons never stretch
+  unless pinned to the bottom of the screen. Overrides the field-width
+  token's note that 320px needed no second size on phones.
+- 2026-10-26 — **Empty states are one line and an optional button,**
+  centred both ways in the section (`DsEmptyState`), in every section.
+  Side notes go in an info card (`DsInfoCard`).
+- 2026-10-26 — The onboarding opens straight on its first step, titled by
+  the step ("Set up Dharmify", then "Your projects"), with no outline;
+  doing it with an AI is an info card with a prompt to copy (it points at
+  `INSTALL.md`), not a choice up front. Refines the same day's onboarding
+  decision.
 
 - 2026-10-24 — **Fields have one standard width**, 320px
   (`--ds-field-width`), set by Parabola: a field dropped on a page is
@@ -142,6 +202,27 @@ with the why. To change one, add a new line that overrides it.
   hand-written CSS kit.
 
 ## Engineering
+
+- 2026-10-26 — **Projects, first version.** The hub is the database in the
+  connection string: it holds the users (global) and the `projects` list.
+  Each project's content is its own database on the same cluster: the first
+  in the hub's own (so an install from before projects keeps its data
+  where it is), the rest in `<hub>-<slug>`. The admin's project is a cookie
+  the middleware turns into `x-dharmify-project`; an agent sends the header
+  itself; none means the first project, which is also what the public site
+  shows until projects get domains. An install with no projects listed
+  works as before, and only one with several reads the request, so
+  single-project sites keep their static pages. Implements 2026-10-24's
+  "separate databases"; a project's own connection string comes later.
+
+- 2026-10-26 — **Two repos: the core and installs on top.** `dharmify` is the
+  core (private until the pre-release, then public). A maker's site is an
+  install: a copy that tracks `dharmify` as its upstream and pulls updates.
+  Alex's is `alexbeltechi/beltechi` (beltechi.com, y3k.club). Core features
+  are built here, never in an install, so updates flow one way. An install
+  keeps its brands, site-specific code and its own docs; its content lives
+  in its database and its keys in its deployment's environment. Why: one
+  core everyone shares, and Alex takes updates the way every maker will.
 
 - 2026-10-24 — **Every outside service is a connector.** Each job that
   depends on a service (newsletter list, sending, media storage, cross-

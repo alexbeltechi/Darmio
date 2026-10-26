@@ -25,7 +25,9 @@ export function DatabaseErrorHandler({ children }: { children: React.ReactNode }
           try {
             const data = await clone.json();
             
-            if (data.code && data.code.startsWith("DB_")) {
+            // The setup and sign-in pages say this themselves, in plain words (install-problem.tsx).
+            const url = String(args[0] instanceof Request ? args[0].url : args[0]);
+            if (data.code && data.code.startsWith("DB_") && !url.includes("/api/setup")) {
               setError(data.error + "\n\n" + (data.message || ""));
             }
           } catch {

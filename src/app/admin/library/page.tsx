@@ -29,7 +29,7 @@ import {
 } from "lucide-react";
 import type { MediaItem } from "@/lib/cms/types";
 import { MediaDetailModal } from "@/components/admin/media-detail-modal";
-import {
+import { DsEmptyState,
   DsButton,
   DsCheckbox,
   DsDialog,
@@ -1142,33 +1142,34 @@ export default function MediaLibraryPage() {
         onDragLeave={handleDrag}
         onDragOver={handleDrag}
         onDrop={handleDrop}
-        className={`rounded-ds-lg transition-colors ${dragActive ? "bg-ds-surface-subtle" : ""}`}
+        className={`flex flex-1 flex-col rounded-ds-lg transition-colors ${dragActive ? "bg-ds-surface-subtle" : ""}`}
       >
         {loading ? (
           <div className="flex justify-center py-20">
             <Loader2 aria-label="Loading media" className="size-6 animate-spin text-ds-fg-subtle" />
           </div>
         ) : filteredMedia.length === 0 && media.length === 0 ? (
-          <div className="flex flex-col items-center gap-4 py-16 text-center">
-            <div className="flex flex-col gap-1">
-              <p className="text-p text-ds-fg-muted">No media yet</p>
-              <p className="text-small text-ds-fg-subtle">
-                Drag and drop files here or upload them. Images are optimized for the web automatically.
-              </p>
-            </div>
-            <DsButton iconLeft={Upload} onClick={() => uploadInputRef.current?.click()}>
-              Upload
-            </DsButton>
-          </div>
-        ) : filteredMedia.length === 0 ? (
-          <div className="flex flex-col items-center gap-4 py-16 text-center">
-            <p className="text-p text-ds-fg-muted">No media matches</p>
-            {hasActiveFilters && (
-              <DsButton iconLeft={RotateCcw} onClick={resetFilters}>
-                Reset filters
+          <DsEmptyState
+            action={
+              <DsButton iconLeft={Upload} onClick={() => uploadInputRef.current?.click()}>
+                Upload
               </DsButton>
-            )}
-          </div>
+            }
+          >
+            Nothing here yet. Drop files anywhere, or upload.
+          </DsEmptyState>
+        ) : filteredMedia.length === 0 ? (
+          <DsEmptyState
+            action={
+              hasActiveFilters && (
+                <DsButton iconLeft={RotateCcw} onClick={resetFilters}>
+                  Reset filters
+                </DsButton>
+              )
+            }
+          >
+            No media matches
+          </DsEmptyState>
         ) : (
           <div className="grid grid-cols-1 gap-x-4 gap-y-6 min-[480px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
             {paginatedMedia.map((item) => {

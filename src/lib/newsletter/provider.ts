@@ -9,9 +9,9 @@ import { getKitConfig, markKitRejected } from "@/lib/db/integrations";
 import { KitAuthError, kitSubscribe } from "./kit";
 
 export interface SubscribeOptions {
-  /** Which list the person asked for ("beltechi", "y3k"); a provider with one list ignores it. */
+  /** Which list the person asked for ("news", "studio"); a provider with one list ignores it. */
   list?: string;
-  /** Where the sign-up came from ("beltechi-footer", "y3k-home"), or a page URL. */
+  /** Where the sign-up came from ("footer", "home"), or a page URL. */
   source?: string;
 }
 

@@ -59,6 +59,7 @@ export async function middleware(request: NextRequest) {
   if (
     pathname === "/admin/login" ||
     pathname === "/admin/setup" ||
+    pathname === "/admin/reset" ||
     pathname.startsWith("/api/auth")
   ) {
     return NextResponse.next();

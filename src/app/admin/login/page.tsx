@@ -10,13 +10,52 @@
 import { useEffect, useState, Suspense } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Loader2, Eye, EyeOff } from "lucide-react";
-import { DsButton, DsField, DsInput } from "@beltechi/parabola";
+import { ChevronDown, Loader2, Eye, EyeOff } from "lucide-react";
+import { DsButton, DsCopyField, DsField, DsInput } from "@beltechi/parabola";
 import { LOCKED_PREFIX } from "@/lib/cms/password";
 import { installProblem, type InstallProblem } from "@/lib/cms/install-problems";
 import { InstallProblemNotice } from "@/components/admin/install-problem";
 
 const WRONG = "Wrong email or password";
+
+/**
+ * Forgot your password? It opens in place (decisions, 2026-10-26): email
+ * isn't set up for a Dharmify site yet, so a reset comes from the computer,
+ * by hand or from the AI that installed it, as a one-time link
+ * (`npm run reset-link`). The prompt asks that AI for one.
+ */
+function ForgotPassword() {
+  const [open, setOpen] = useState(false);
+  const [address, setAddress] = useState("");
+  useEffect(() => {
+    const id = window.setTimeout(() => setAddress(window.location.origin));
+    return () => window.clearTimeout(id);
+  }, []);
+
+  return (
+    <div className="flex flex-col gap-ds-20">
+      <DsButton
+        type="button"
+        variant="text"
+        iconRight={ChevronDown}
+        aria-expanded={open}
+        onClick={() => setOpen(!open)}
+        className="self-start text-ds-fg-muted [&_svg]:transition-transform aria-expanded:[&_svg]:rotate-180"
+      >
+        Forgot your password?
+      </DsButton>
+      {open && (
+        <div className="flex flex-col gap-ds-8">
+          <p className="text-p text-ds-fg-muted">
+            Email isn&apos;t set up for this site yet, so a reset comes from your computer: by hand, or from the AI
+            that installed it. Paste this into it:
+          </p>
+          <DsCopyField wrap value={`Give me a password reset link for my Dharmify site at ${address}`} aria-label="Prompt for your AI" />
+        </div>
+      )}
+    </div>
+  );
+}
 
 function LoginForm() {
   const router = useRouter();
@@ -126,6 +165,8 @@ function LoginForm() {
             Sign in
           </DsButton>
         </div>
+
+        <ForgotPassword />
       </form>
     </div>
   );

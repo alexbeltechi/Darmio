@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { DsButton, DsField, DsInput, dsToast } from "@beltechi/parabola";
-import { SITE_NAME_MAX, siteInitial, type HomeHero } from "@/lib/cms/site";
+import { SITE_NAME_MAX, type HomeHero } from "@/lib/cms/site";
 import { announceSiteSettingsChanged } from "@/components/admin/use-site-settings";
 import { useCurrentProject } from "@/components/admin/use-current-project";
 import { SettingsSection } from "./settings-section";
@@ -92,7 +92,7 @@ export function SiteSettings() {
       <form onSubmit={save} className="flex flex-col gap-5">
         <DsField
           label="Name"
-          description={form.siteName.trim() ? `The site's name. Its initial, ${siteInitial(form.siteName)}, is the project's tile.` : undefined}
+          description="The project's name, and the site's."
         >
           <DsInput
             value={form.siteName}

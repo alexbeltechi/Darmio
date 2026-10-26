@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { DsButton, DsField, DsInput, dsToast } from "@beltechi/parabola";
 import { PROJECT_NAME_MAX } from "@/lib/cms/projects";
+import { PROJECT_START } from "@/components/admin/projects/project-actions";
 
 /**
  * New project: one field, its name (decisions, 2026-10-26). It gets its own
@@ -33,7 +34,7 @@ export default function NewProjectPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ slug: json.data.slug }),
       });
-      window.location.assign("/admin");
+      window.location.assign(PROJECT_START);
     } catch (error) {
       dsToast.error("Couldn't create the project", { description: error instanceof Error ? error.message : undefined });
       setSaving(false);

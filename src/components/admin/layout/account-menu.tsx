@@ -53,7 +53,7 @@ export function AccountMenu({ align = "end", side = "right" }: { align?: "start"
       </DsDropdownTrigger>
       <DsDropdownContent side={side} align={align} sideOffset={8} className="min-w-56">
         {me && <DsDropdownLabel className="truncate">{me.email}</DsDropdownLabel>}
-        <DsDropdownItem iconLeft={UserRound} onSelect={() => router.push("/admin/account")}>
+        <DsDropdownItem iconLeft={UserRound} onSelect={() => router.push("/admin#account")}>
           Account
         </DsDropdownItem>
         <DsDropdownSeparator />

@@ -11,12 +11,13 @@ with the why. To change one, add a new line that overrides it.
 ## Product
 
 - 2026-10-27 — **Settings cards: title, one short line, then the rest.** The
-  line under a card's title says only what it is or runs on ("MongoDB
-  Atlas", "Not published", "This computer, ready for Vercel"); the longer
-  explanation sits apart below it, in the same muted text. Run locally, the
-  install cards say what they're ready for once deployed. Named things link
-  out inline with a small ↗ (the cluster, the Blob store) instead of a
-  button. "Image storage" is **Storage**: it holds images and video. A
+  line under a card's title says only what it is or runs on ("Vercel",
+  "MongoDB Atlas", "Not published"); the longer explanation sits apart below
+  it, in the same muted text. Services link out in that grey, underlined,
+  with a small ↗ (Vercel, the cluster, Vercel Blob) instead of a button.
+  Written for makers, not developers: before the site is deployed, the cards
+  say "Not deployed yet" and what shows once it is, never "this computer,
+  ready for…". "Image storage" is **Storage**: it holds images and video. A
   project's card says Published at its address, or Not published. Usage
   bars lead with the percentage used ("40% used", "<0.1% used").
 - 2026-10-27 — **Usage bars split by project.** Parabola's `DsProgress` takes

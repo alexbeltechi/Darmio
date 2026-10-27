@@ -38,8 +38,8 @@ function Fact({ label, children }: { label: string; children: React.ReactNode })
  * set up once when Darmio was installed. Projects share all three: the free
  * tiers are the install's, not split per project. Bars measure against the
  * free tiers, since a site can't ask Vercel or Atlas which plan it's on. Each
- * card's short line says what it runs on now; run locally, it says what it's
- * ready for once deployed. The named things link to where they're managed.
+ * card's short line names the service, linking to it; before the site is
+ * deployed, the note says so in plain words and what shows here once it is.
  */
 export function InstallSettings() {
   const [usage, setUsage] = useState<InstallUsage | null>(null);
@@ -67,7 +67,7 @@ export function InstallSettings() {
       <SettingsSection
         id="hosting"
         title="Hosting"
-        description={usage && (usage.hosting.provider === "vercel" ? "Vercel" : "This computer, ready for Vercel")}
+        description={<SettingsLink href="https://vercel.com/dashboard">Vercel</SettingsLink>}
         note={
           usage &&
           (usage.hosting.provider === "vercel" ? (
@@ -80,7 +80,7 @@ export function InstallSettings() {
               One deployment serves every project; the public address shows the first one.
             </>
           ) : (
-            "You're running it here to develop. Deployed to Vercel, this shows its address, the repo it deploys from and its region."
+            "Not deployed yet. Once you deploy to Vercel, your site's address and details show here."
           ))
         }
       >
@@ -103,7 +103,10 @@ export function InstallSettings() {
       <SettingsSection
         id="database"
         title="Database"
-        description={usage && (usage.database.atlas ? "MongoDB Atlas" : "MongoDB")}
+        description={
+          usage &&
+          (usage.database.atlas ? <SettingsLink href="https://cloud.mongodb.com">MongoDB Atlas</SettingsLink> : "MongoDB")
+        }
         note={
           usage ? (
             <>
@@ -140,16 +143,13 @@ export function InstallSettings() {
       <SettingsSection
         id="storage"
         title="Storage"
-        description={usage && (usage.storage.provider === "vercel-blob" ? "Vercel Blob" : "This computer, ready for Vercel Blob")}
+        description={<SettingsLink href="https://vercel.com/dashboard/stores">Vercel Blob</SettingsLink>}
         note={
           usage &&
           (usage.storage.provider === "vercel-blob" ? (
-            <>
-              Images and video from every project, in one{" "}
-              <SettingsLink href="https://vercel.com/dashboard/stores">Blob store</SettingsLink>.
-            </>
+            "Images and video from every project, in one store."
           ) : (
-            "Images and video go to the public/uploads folder while you develop. Deployed to Vercel with a Blob store, they go there."
+            "Not deployed yet, so uploads stay on this computer for now. Once you deploy to Vercel, they're kept in Vercel Blob."
           ))
         }
       >

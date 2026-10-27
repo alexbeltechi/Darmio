@@ -44,14 +44,14 @@ export function SettingsSection({
   );
 }
 
-/** A link out of the admin inside a card's text: underlined, with a small ↗. */
+/** A link out of the admin inside a card's text: in the text's own colour, underlined, with a small ↗. */
 export function SettingsLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <a
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex items-baseline gap-0.5 text-ds-fg underline underline-offset-4"
+      className="inline-flex items-baseline gap-0.5 underline underline-offset-4 hover:text-ds-fg"
     >
       {children}
       <ArrowUpRight aria-hidden className="size-3.5 shrink-0 self-center" />

@@ -33,7 +33,7 @@ changes in the running app with read-only actions (see `CLAUDE.md`).
 | A primitive Parabola lacks | Add it to Parabola, on Radix if needed, then use it | lint: raw Radix outside Parabola |
 | An empty section (no posts, nothing chosen, nothing matches) | `DsEmptyState`: one line, an optional button, centred in the section. Never a title plus a sentence | |
 | A side note on a screen (another way to do it, a tip) | `DsInfoCard` | |
-| How much is used or done (storage, a quota, progress) | `DsProgress`: a rounded track, a straight-edged fill, a `meter` with a label | |
+| How much is used or done (storage, a quota, progress) | `DsProgress`: a rounded track, a straight-edged fill, a `meter` with a label; with `title`, `meta` and `description` it carries its own heading and note | |
 | Something to copy (a prompt, a command, a link) | `DsCopyField`: read-only, copies the whole value. One cut-short line by default; `wrap` for a prompt someone should read first | |
 | Messages after an action | `dsToast(...)`, failures as "Couldn't …" with the reason as `description` | lint: no `alert`, no `sonner` |
 | Asking before an action | `useDsConfirm()` | lint: no `confirm` |

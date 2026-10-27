@@ -2,26 +2,43 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Loader2, Plus, Settings } from "lucide-react";
-import { DsButton, DsEmptyState, DsPill, DsSearch } from "@beltechi/parabola";
+import { Loader2, MoreVertical, Pencil, Plus, Settings, Trash2 } from "lucide-react";
+import {
+  DsButton,
+  DsDialog,
+  DsDialogActions,
+  DsDialogCancel,
+  DsDropdown,
+  DsDropdownContent,
+  DsDropdownItem,
+  DsDropdownSeparator,
+  DsDropdownTrigger,
+  DsEmptyState,
+  DsField,
+  DsInput,
+  DsPill,
+  DsSearch,
+  dsToast,
+  useDsConfirm,
+} from "@beltechi/parabola";
 import { AdminMenuButton } from "@/components/admin/layout";
 import { openProject } from "@/components/admin/projects/project-actions";
 import { HOME_PATH, NEW_PROJECT_PATH } from "@/components/admin/home/home-routes";
 import { useProjects } from "@/components/admin/home/use-projects";
+import { PROJECT_NAME_MAX, type ProjectSummary } from "@/lib/cms/projects";
 import { formatChangedAt } from "@/lib/utils";
 
 /**
  * Home (decisions, 2026-10-26), the way Framer's dashboard opens: every
  * project as a card (no thumbnails or icons): its name with a Published or
  * Not published pill beside it, then at the bottom its address when it's
- * published and when it last changed, with a gear for its settings at the
- * bottom right; with a search over them and New
- * project at the top right. Signing in and setting up land here; the sidebar
- * beside it holds the projects stacked and your account. Nothing yet, or
- * nothing matching the search: one line in the middle of the page.
+ * published and when it last changed, with a ⋮ menu at the bottom right
+ * (Settings, Rename, Delete project). A search over them and + Project at the
+ * top right. Signing in and setting up land here. Nothing yet, or nothing
+ * matching the search: one line in the middle of the page.
  */
 function HomeProjects() {
-  const list = useProjects();
+  const { list, reload } = useProjects();
   const router = useRouter();
   const search = useSearchParams().get("q") ?? "";
   const query = search.trim().toLowerCase();
@@ -34,16 +51,55 @@ function HomeProjects() {
     return () => window.clearTimeout(id);
   }, []);
 
+  const [renaming, setRenaming] = useState<{ slug: string; name: string } | null>(null);
+  const [savingName, setSavingName] = useState(false);
+  const [confirm, confirmDialog] = useDsConfirm();
+
   const current = list?.current ?? null;
   // Keep each project's place: the public site shows the first one for now.
   const cards = (list?.projects ?? [])
     .map((project, index) => ({ project, onSite: index === 0 }))
     .filter(({ project }) => !query || project.name.toLowerCase().includes(query));
-  const newProject = (
-    <DsButton href={NEW_PROJECT_PATH} variant="primary" iconLeft={Plus}>
-      New project
-    </DsButton>
-  );
+
+  async function saveName() {
+    if (!renaming || !renaming.name.trim() || savingName) return;
+    setSavingName(true);
+    try {
+      const res = await fetch(`/api/admin/projects/${renaming.slug}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: renaming.name }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error);
+      await reload();
+      setRenaming(null);
+      dsToast.success("Project renamed");
+    } catch (error) {
+      dsToast.error("Couldn't rename the project", { description: error instanceof Error ? error.message : undefined });
+    } finally {
+      setSavingName(false);
+    }
+  }
+
+  async function deleteProject(project: ProjectSummary) {
+    const ok = await confirm({
+      title: `Delete ${project.name}?`,
+      description: "Its posts, pages, categories, library and settings are deleted for good, with the files in storage.",
+      confirmLabel: "Delete project",
+      destructive: true,
+    });
+    if (!ok) return;
+    try {
+      const res = await fetch(`/api/admin/projects/${project.slug}`, { method: "DELETE" });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error);
+      await reload();
+      dsToast.success(`${project.name} deleted`);
+    } catch (error) {
+      dsToast.error("Couldn't delete the project", { description: error instanceof Error ? error.message : undefined });
+    }
+  }
 
   return (
     <div className="flex min-h-dvh flex-col">
@@ -58,7 +114,12 @@ function HomeProjects() {
             aria-label="Search projects"
             className="order-last w-full sm:order-none sm:w-60"
           />
-          {(cards.length > 0 || query) && newProject}
+          {/* Like + Post on the posts list. */}
+          {(cards.length > 0 || query) && (
+            <DsButton href={NEW_PROJECT_PATH} iconLeft={Plus}>
+              Project
+            </DsButton>
+          )}
           <AdminMenuButton />
         </div>
       </div>
@@ -72,7 +133,15 @@ function HomeProjects() {
         query ? (
           <DsEmptyState>No projects match that.</DsEmptyState>
         ) : (
-          <DsEmptyState action={newProject}>No projects yet.</DsEmptyState>
+          <DsEmptyState
+            action={
+              <DsButton href={NEW_PROJECT_PATH} iconLeft={Plus}>
+                New project
+              </DsButton>
+            }
+          >
+            No projects yet.
+          </DsEmptyState>
         )
       ) : (
         <ul className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-5 px-5 pb-5">
@@ -93,24 +162,74 @@ function HomeProjects() {
                 </button>
                 <DsPill>{onSite ? "Published" : "Not published"}</DsPill>
               </div>
-              {/* Where it lives and when it changed; the gear at the bottom right (pulled into the corner). */}
+              {/* Where it lives and when it changed; the ⋮ menu at the bottom right (pulled into the corner). */}
               <div className="flex min-w-0 items-end justify-between gap-2">
                 <div className="flex min-w-0 flex-col gap-0.5 text-small text-ds-fg-subtle">
                   {onSite && <p className="truncate">{host}</p>}
                   {project.lastChange && <p className="truncate">Changed {formatChangedAt(project.lastChange)}</p>}
                 </div>
-                <DsButton
-                  variant="text"
-                  iconLeft={Settings}
-                  aria-label={`${project.name} settings`}
-                  onClick={() => openProject(project.slug, current, "/admin/settings")}
-                  className="relative z-10 -mr-2 -mb-2 shrink-0"
-                />
+                <DsDropdown>
+                  <DsDropdownTrigger asChild>
+                    <DsButton
+                      variant="text"
+                      iconLeft={MoreVertical}
+                      aria-label={`Actions for ${project.name}`}
+                      className="relative z-10 -mr-2 -mb-2 shrink-0"
+                    />
+                  </DsDropdownTrigger>
+                  <DsDropdownContent>
+                    <DsDropdownItem iconLeft={Settings} onSelect={() => openProject(project.slug, current, "/admin/settings")}>
+                      Settings
+                    </DsDropdownItem>
+                    <DsDropdownItem iconLeft={Pencil} onSelect={() => setRenaming({ slug: project.slug, name: project.name })}>
+                      Rename
+                    </DsDropdownItem>
+                    {/* The project the site shows holds the accounts too, so it stays. */}
+                    {!onSite && (
+                      <>
+                        <DsDropdownSeparator />
+                        <DsDropdownItem tone="danger" iconLeft={Trash2} onSelect={() => deleteProject(project)}>
+                          Delete project
+                        </DsDropdownItem>
+                      </>
+                    )}
+                  </DsDropdownContent>
+                </DsDropdown>
               </div>
             </li>
           ))}
         </ul>
       )}
+
+      <DsDialog open={renaming !== null} onOpenChange={(open) => !open && !savingName && setRenaming(null)} title="Rename project">
+        {renaming && (
+          <form
+            className="flex flex-col gap-5"
+            onSubmit={(e) => {
+              e.preventDefault();
+              saveName();
+            }}
+          >
+            <DsField label="Name" description="It's the site's name too.">
+              <DsInput
+                value={renaming.name}
+                onChange={(e) => setRenaming({ ...renaming, name: e.target.value })}
+                maxLength={PROJECT_NAME_MAX}
+                autoFocus
+              />
+            </DsField>
+            <DsDialogActions>
+              <DsButton type="submit" variant="primary" loading={savingName} disabled={!renaming.name.trim()}>
+                Save
+              </DsButton>
+              <DsDialogCancel asChild>
+                <DsButton disabled={savingName}>Cancel</DsButton>
+              </DsDialogCancel>
+            </DsDialogActions>
+          </form>
+        )}
+      </DsDialog>
+      {confirmDialog}
     </div>
   );
 }

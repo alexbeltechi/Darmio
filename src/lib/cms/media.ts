@@ -450,50 +450,62 @@ export async function deleteMedia(
   // First, clean up all references to this media in posts
   const { updatedCount } = await removeMediaReferences(id);
 
+  await deleteMediaFiles([item]);
+  await mediaDb.deleteMedia(id);
+
+  return { success: true, updatedEntries: updatedCount };
+}
+
+/**
+ * Remove media items' files from storage (Blob or the local folder): the
+ * original, every rendition and variant, the fallback and a video's poster.
+ * Their records are the caller's to remove. Used for one item, and for a whole
+ * project's library when the project is deleted.
+ */
+export async function deleteMediaFiles(items: MediaItem[]): Promise<void> {
   const filesToDelete: string[] = [];
 
   // For Blob storage, we need URLs; for local, we need paths
   const useUrl = shouldUseBlob();
 
-  if (item.original) {
-    filesToDelete.push(useUrl ? item.original.url : item.original.path);
-  }
+  for (const item of items) {
+    if (item.original) {
+      filesToDelete.push(useUrl ? item.original.url : item.original.path);
+    }
 
-  // Renditions, the fallback and the variants (which, for newer uploads,
-  // point at renditions: the Set below drops the repeats)
-  for (const variant of [
-    ...(item.renditions ?? []),
-    item.fallback,
-    ...Object.values(item.variants ?? {}),
-  ]) {
-    if (variant) {
-      filesToDelete.push(useUrl ? variant.url : variant.path);
+    // Renditions, the fallback and the variants (which, for newer uploads,
+    // point at renditions: the Set below drops the repeats)
+    for (const variant of [
+      ...(item.renditions ?? []),
+      item.fallback,
+      ...Object.values(item.variants ?? {}),
+    ]) {
+      if (variant) {
+        filesToDelete.push(useUrl ? variant.url : variant.path);
+      }
+    }
+
+    const primaryFile = useUrl ? item.url : item.path;
+    if (primaryFile) {
+      filesToDelete.push(primaryFile);
+    }
+
+    if (item.poster?.url) {
+      filesToDelete.push(item.poster.url);
     }
   }
 
-  const primaryFile = useUrl ? item.url : item.path;
-  if (primaryFile) {
-    filesToDelete.push(primaryFile);
-  }
-
-  if (item.poster?.url) {
-    filesToDelete.push(item.poster.url);
-  }
-
-  if (shouldUseBlob()) {
-    const blobUrls = [...new Set(filesToDelete)].filter((f) => f.startsWith("http"));
-    if (blobUrls.length > 0) {
-      await deleteMultipleFromBlob(blobUrls);
+  if (useUrl) {
+    const blobUrls = [...new Set(filesToDelete)].filter((f) => f && f.startsWith("http"));
+    // Blob takes deletions in batches.
+    for (let i = 0; i < blobUrls.length; i += 500) {
+      await deleteMultipleFromBlob(blobUrls.slice(i, i + 500));
     }
   } else {
     for (const filePath of new Set(filesToDelete)) {
-      await deleteFile(filePath);
+      if (filePath) await deleteFile(filePath);
     }
   }
-
-  await mediaDb.deleteMedia(id);
-
-  return { success: true, updatedEntries: updatedCount };
 }
 
 type PostMediaData = {

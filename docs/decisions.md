@@ -10,6 +10,12 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-27 — **A project card has a ⋮ menu**, the same as a post row:
+  Settings, Rename (a dialog with the name; it renames the site too), and
+  Delete project, which removes its library's files, its database and its
+  place in the list for good, after a confirm. The project the site shows
+  has no Delete: its database is the hub, with the accounts. The header's
+  button reads + Project, like + Post.
 - 2026-10-26 — **The CMS is Darmio** (darmio.io), was Dharmify. The repo is
   `alexbeltechi/darmio`, the folder `~/Documents/Code/products/darmio`, and
   the name runs through the code (the `darmio-project` cookie, the

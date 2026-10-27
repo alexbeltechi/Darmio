@@ -5,6 +5,7 @@
  * `<hub>-<slug>`. A project can move to its own cluster later; only `dbName`
  * (and a connection string) would change.
  */
+import type { Document } from "mongodb";
 import { Collections, forgetProjects, getHubDb, getMongoClient, hubProjects, withoutId, type ProjectRow } from "@/lib/db/mongodb";
 import { SETTINGS_KEY } from "@/lib/db/settings";
 import { parseBrain, parseProjectName, PROJECTS_MAX, type ProjectSummary } from "@/lib/cms/projects";
@@ -134,5 +135,42 @@ export async function updateProject(slug: string, updates: { name?: unknown; bra
     .findOneAndUpdate({ slug }, { ...(Object.keys(set).length ? { $set: set } : {}), ...(Object.keys(unset).length ? { $unset: unset } : {}) }, { returnDocument: "after" });
   if (!result) throw new Error(`No project "${slug}"`);
   forgetProjects();
-  return withoutId<ProjectRow>(result);
+  const row = withoutId<ProjectRow>(result);
+  // A project's name is its site's name too (decisions, 2026-10-26).
+  if (set.name) {
+    const client = await getMongoClient();
+    await client
+      .db(row.dbName)
+      .collection(Collections.SETTINGS)
+      .updateOne({ key: SETTINGS_KEY }, { $set: { siteName: set.name, updatedAt: new Date().toISOString() } });
+  }
+  return row;
+}
+
+/**
+ * The project a delete would remove, or the reason it can't be deleted. The
+ * first project can't: the public site shows it, and its database is the
+ * hub, which also holds the accounts and the project list.
+ */
+export async function deletableProject(slug: string): Promise<ProjectRow> {
+  const projects = await hubProjects({ fresh: true });
+  const index = projects.findIndex((p) => p.slug === slug);
+  if (index < 0) throw new Error(`No project "${slug}"`);
+  if (index === 0) throw new Error("This is the project your site shows, so it can't be deleted");
+  return projects[index];
+}
+
+/** Every library item in a project, for removing their files before the project goes. */
+export async function projectMediaItems(row: ProjectRow): Promise<Document[]> {
+  const client = await getMongoClient();
+  return client.db(row.dbName).collection(Collections.MEDIA).find({}).toArray();
+}
+
+/** Remove a project for good: its database, then its place in the list. */
+export async function removeProject(row: ProjectRow): Promise<void> {
+  const client = await getMongoClient();
+  await client.db(row.dbName).dropDatabase();
+  const hub = await getHubDb();
+  await hub.collection(Collections.PROJECTS).deleteOne({ slug: row.slug });
+  forgetProjects();
 }

@@ -5,6 +5,7 @@
  * `<hub>-<slug>`. A project can move to its own cluster later; only `dbName`
  * (and a connection string) would change.
  */
+import type { Document } from "mongodb";
 import { Collections, forgetProjects, getHubDb, getMongoClient, hubProjects, withoutId, type ProjectRow } from "@/lib/db/mongodb";
 import { SETTINGS_KEY } from "@/lib/db/settings";
 import { parseBrain, parseProjectName, PROJECTS_MAX, type ProjectSummary } from "@/lib/cms/projects";
@@ -110,6 +111,9 @@ export async function ensureFirstProject(): Promise<void> {
   if ((await hubProjects({ fresh: true })).length > 0) return;
   const hub = await getHubDb();
   const settings = await hub.collection(Collections.SETTINGS).findOne({ key: SETTINGS_KEY });
+  // Nothing there (every project was deleted): there's no old site to keep.
+  const content = settings ?? (await hub.collection(Collections.ENTRIES).findOne({}, { projection: { _id: 1 } }));
+  if (!content) return;
   await createProject({ name: (settings?.siteName as string) || "My site" });
 }
 
@@ -134,5 +138,53 @@ export async function updateProject(slug: string, updates: { name?: unknown; bra
     .findOneAndUpdate({ slug }, { ...(Object.keys(set).length ? { $set: set } : {}), ...(Object.keys(unset).length ? { $unset: unset } : {}) }, { returnDocument: "after" });
   if (!result) throw new Error(`No project "${slug}"`);
   forgetProjects();
-  return withoutId<ProjectRow>(result);
+  const row = withoutId<ProjectRow>(result);
+  // A project's name is its site's name too (decisions, 2026-10-26).
+  if (set.name) {
+    const client = await getMongoClient();
+    await client
+      .db(row.dbName)
+      .collection(Collections.SETTINGS)
+      .updateOne({ key: SETTINGS_KEY }, { $set: { siteName: set.name, updatedAt: new Date().toISOString() } });
+  }
+  return row;
+}
+
+/** The project a delete would remove. Any project can go, the first (the one the site shows) too. */
+export async function deletableProject(slug: string): Promise<ProjectRow> {
+  const row = (await hubProjects({ fresh: true })).find((p) => p.slug === slug);
+  if (!row) throw new Error(`No project "${slug}"`);
+  return row;
+}
+
+/** What the hub keeps when the project living in it is deleted: the install's own records. */
+const HUB_ONLY = new Set<string>([Collections.USERS, Collections.PROJECTS, "login_attempts", "password_resets"]);
+
+/** Every library item in a project, for removing their files before the project goes. */
+export async function projectMediaItems(row: ProjectRow): Promise<Document[]> {
+  const client = await getMongoClient();
+  return client.db(row.dbName).collection(Collections.MEDIA).find({}).toArray();
+}
+
+/**
+ * Remove a project for good: its content, then its place in the list. It
+ * drops the project's collections one by one rather than its database:
+ * database users made by Vercel's MongoDB Atlas integration may drop
+ * collections but not databases (found 2026-10-27), and a database with no
+ * collections left is gone anyway. The first project shares the hub's
+ * database, so there only its content goes; the accounts and the project
+ * list stay.
+ */
+export async function removeProject(row: ProjectRow): Promise<void> {
+  const client = await getMongoClient();
+  const hub = await getHubDb();
+  const db = client.db(row.dbName);
+  const inHub = row.dbName === hub.databaseName;
+  for (const { name } of await db.listCollections({}, { nameOnly: true }).toArray()) {
+    if (inHub && HUB_ONLY.has(name)) continue;
+    if (name.startsWith("system.")) continue;
+    await db.collection(name).drop();
+  }
+  await hub.collection(Collections.PROJECTS).deleteOne({ slug: row.slug });
+  forgetProjects();
 }

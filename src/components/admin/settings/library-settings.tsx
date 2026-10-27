@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { DsField, DsSelect, dsToast } from "@beltechi/parabola";
+import { DsField, DsProgress, DsSelect, dsToast } from "@beltechi/parabola";
 import { SettingsSection } from "./settings-section";
 
 // Vercel Blob's free (Hobby) plan. Past it, Blob stops serving until the month resets.
@@ -80,24 +80,21 @@ export function LibrarySettings() {
         />
       </DsField>
 
-      <div className="flex flex-col gap-2">
-        <div className="flex items-baseline justify-between gap-4">
-          <span className="text-p text-ds-fg">Storage</span>
-          <span className="text-p text-ds-fg-muted">
-            {usage ? `${formatMB(usage.bytes)} of 1 GB free` : "…"}
-          </span>
-        </div>
-        <div className="h-2 overflow-hidden rounded-full bg-ds-bg" role="meter" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(share * 100)} aria-label="Storage used">
-          <div className="h-full rounded-full bg-ds-fg" style={{ width: `${share * 100}%` }} />
-        </div>
-        {usage && (
-          <p className="text-small text-ds-fg-muted">
-            {usage.items} media items, counted by the CMS.
-            {usage.legacyItems > 0 &&
-              ` ${usage.legacyItems} images are from before AVIF and are resized on request by Vercel until they're uploaded again.`}
-          </p>
-        )}
-      </div>
+      <DsProgress
+        value={share * 100}
+        label="Storage used"
+        title="Storage"
+        meta={usage ? `${formatMB(usage.bytes)} of 1 GB free` : "…"}
+        description={
+          usage
+            ? `${usage.items} media items, counted by the CMS.${
+                usage.legacyItems > 0
+                  ? ` ${usage.legacyItems} images are from before AVIF and are resized on request by Vercel until they're uploaded again.`
+                  : ""
+              }`
+            : undefined
+        }
+      />
     </SettingsSection>
   );
 }

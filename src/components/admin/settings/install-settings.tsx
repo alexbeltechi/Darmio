@@ -10,6 +10,12 @@ export const mb = (bytes: number) =>
   bytes < 1024 ** 2
     ? `${Math.max(bytes > 0 ? 1 : 0, Math.round(bytes / 1024))} KB`
     : `${bytes < 10 * 1024 ** 2 ? (bytes / 1024 ** 2).toFixed(1) : Math.round(bytes / 1024 ** 2)} MB`;
+/** How much of a limit is used, e.g. "0.1% used", "40% used": one decimal under 10%, "<0.1%" for a trace. */
+export const percentUsed = (bytes: number, max: number) => {
+  const pct = max > 0 ? (bytes / max) * 100 : 0;
+  const shown = pct === 0 ? "0" : pct < 0.1 ? "<0.1" : pct < 10 ? pct.toFixed(1).replace(/\.0$/, "") : String(Math.round(pct));
+  return `${shown}% used`;
+};
 export const gbOrMb = (bytes: number) => (bytes >= 1024 ** 3 ? `${bytes / 1024 ** 3} GB` : `${Math.round(bytes / 1024 ** 2)} MB`);
 
 /** One segment per project, in its place in the project list (so its colour matches everywhere). */
@@ -124,7 +130,7 @@ export function InstallSettings() {
             segments={projectSegments(usage.database.projects)}
             max={usage.database.freeBytes}
             label="Database used"
-            title="Used"
+            title={percentUsed(usage.database.totalBytes, usage.database.freeBytes)}
             meta={`${mb(usage.database.totalBytes)} of ${gbOrMb(usage.database.freeBytes)}`}
             description={`Measured against Atlas's free cluster (M0). ${shared} Anything else in the cluster counts too.`}
           />
@@ -152,7 +158,7 @@ export function InstallSettings() {
             segments={projectSegments(usage.storage.projects)}
             max={usage.storage.freeBytes}
             label="Storage used"
-            title="Used"
+            title={percentUsed(usage.storage.totalBytes, usage.storage.freeBytes)}
             meta={`${mb(usage.storage.totalBytes)} of ${gbOrMb(usage.storage.freeBytes)}`}
             description={
               usage.storage.provider === "vercel-blob"

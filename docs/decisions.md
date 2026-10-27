@@ -17,7 +17,8 @@ with the why. To change one, add a new line that overrides it.
   install cards say what they're ready for once deployed. Named things link
   out inline with a small ↗ (the cluster, the Blob store) instead of a
   button. "Image storage" is **Storage**: it holds images and video. A
-  project's card says Published at its address, or Not published.
+  project's card says Published at its address, or Not published. Usage
+  bars lead with the percentage used ("40% used", "<0.1% used").
 - 2026-10-27 — **Usage bars split by project.** Parabola's `DsProgress` takes
   `segments`: parts of the fill side by side, each in one of Parabola's
   accents in a fixed order (blue, orange, green, violet, pink, teal, sky,

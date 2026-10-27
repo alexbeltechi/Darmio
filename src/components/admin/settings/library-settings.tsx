@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { DsField, DsLink, DsProgress, DsSelect, dsSegmentColor, dsToast } from "@beltechi/parabola";
-import { gbOrMb, mb } from "./install-settings";
+import { gbOrMb, mb, percentUsed } from "./install-settings";
 import type { InstallUsage } from "@/lib/db/install";
 import { ACCOUNT_PATH } from "@/components/admin/home/home-routes";
 import { SettingsSection } from "./settings-section";
@@ -92,7 +92,7 @@ export function LibrarySettings() {
       {usage && share && (
         <DsProgress
           max={share.freeBytes}
-          title="Storage"
+          title={`Storage, ${percentUsed(share.totalBytes, share.freeBytes)}`}
           meta={`${mb(share.totalBytes)} of ${gbOrMb(share.freeBytes)}`}
           segments={[
             { value: share.mine, label: "This project", meta: mb(share.mine), color: dsSegmentColor(share.index) },

@@ -83,11 +83,21 @@ function HomeProjects() {
   }
 
   async function deleteProject(project: ProjectSummary) {
+    // The site shows the first project: say what it shows once this one is gone.
+    const projects = list?.projects ?? [];
+    const onSite = projects[0]?.slug === project.slug;
+    const next = onSite ? projects[1] : undefined;
+    const site = onSite
+      ? next
+        ? ` Your site will show ${next.name} instead.`
+        : " Your site will be empty until you make a new project."
+      : "";
     const ok = await confirm({
       title: `Delete ${project.name}?`,
-      description: "Its posts, pages, categories, library and settings are deleted for good, with the files in storage.",
+      description: `Its posts, pages, categories, library and settings are deleted for good, with the files in storage.${site}`,
       confirmLabel: "Delete project",
       destructive: true,
+      confirmWord: "delete",
     });
     if (!ok) return;
     try {
@@ -184,15 +194,10 @@ function HomeProjects() {
                     <DsDropdownItem iconLeft={Pencil} onSelect={() => setRenaming({ slug: project.slug, name: project.name })}>
                       Rename
                     </DsDropdownItem>
-                    {/* The project the site shows holds the accounts too, so it stays. */}
-                    {!onSite && (
-                      <>
-                        <DsDropdownSeparator />
-                        <DsDropdownItem tone="danger" iconLeft={Trash2} onSelect={() => deleteProject(project)}>
-                          Delete project
-                        </DsDropdownItem>
-                      </>
-                    )}
+                    <DsDropdownSeparator />
+                    <DsDropdownItem tone="danger" iconLeft={Trash2} onSelect={() => deleteProject(project)}>
+                      Delete project
+                    </DsDropdownItem>
                   </DsDropdownContent>
                 </DsDropdown>
               </div>

@@ -18,6 +18,9 @@ export const percentUsed = (bytes: number, max: number) => {
 };
 export const gbOrMb = (bytes: number) => (bytes >= 1024 ** 3 ? `${bytes / 1024 ** 3} GB` : `${Math.round(bytes / 1024 ** 2)} MB`);
 
+/** "1 file", "6 files". */
+export const files = (count: number) => `${count} ${count === 1 ? "file" : "files"}`;
+
 /** One segment per project, in its place in the project list (so its colour matches everywhere). */
 export const projectSegments = (projects: ProjectUse[]): DsProgressSegment[] =>
   projects.map((p) => ({ value: p.bytes, label: p.name, meta: mb(p.bytes) }));
@@ -155,15 +158,17 @@ export function InstallSettings() {
       >
         {usage && (
           <DsProgress
-            segments={projectSegments(usage.storage.projects)}
+            segments={usage.storage.totalBytes > 0 ? projectSegments(usage.storage.projects) : []}
             max={usage.storage.freeBytes}
             label="Storage used"
             title={percentUsed(usage.storage.totalBytes, usage.storage.freeBytes)}
             meta={`${mb(usage.storage.totalBytes)} of ${gbOrMb(usage.storage.freeBytes)}`}
             description={
-              usage.storage.provider === "vercel-blob"
-                ? `${usage.storage.items} media items, counted by Darmio, measured against Vercel Blob's free Hobby plan. ${shared} Past the limit, Blob stops serving files until the month resets.`
-                : `${usage.storage.items} media items, counted by Darmio. ${shared}`
+              usage.storage.items === 0
+                ? `Nothing uploaded yet. ${shared}`
+                : usage.storage.provider === "vercel-blob"
+                  ? `${files(usage.storage.items)}. ${shared} Measured against Vercel Blob's free Hobby plan; past the limit, Blob stops serving files until the month resets.`
+                  : `${files(usage.storage.items)}. ${shared}`
             }
           />
         )}

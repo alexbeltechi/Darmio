@@ -2,31 +2,20 @@
 
 import { useEffect, useState } from "react";
 import { ExternalLink } from "lucide-react";
-import { DsButton, DsProgress } from "@beltechi/parabola";
+import { DsButton, DsProgress, type DsProgressSegment } from "@beltechi/parabola";
 import type { InstallUsage, ProjectUse } from "@/lib/db/install";
 import { SettingsSection } from "./settings-section";
 
 /** A size in words: KB under a megabyte, MB (one decimal under 10) above. */
-const mb = (bytes: number) =>
+export const mb = (bytes: number) =>
   bytes < 1024 ** 2
     ? `${Math.max(bytes > 0 ? 1 : 0, Math.round(bytes / 1024))} KB`
     : `${bytes < 10 * 1024 ** 2 ? (bytes / 1024 ** 2).toFixed(1) : Math.round(bytes / 1024 ** 2)} MB`;
-const gbOrMb = (bytes: number) => (bytes >= 1024 ** 3 ? `${bytes / 1024 ** 3} GB` : `${Math.round(bytes / 1024 ** 2)} MB`);
+export const gbOrMb = (bytes: number) => (bytes >= 1024 ** 3 ? `${bytes / 1024 ** 3} GB` : `${Math.round(bytes / 1024 ** 2)} MB`);
 
-/** One line per project: its name and what it takes. */
-function PerProject({ projects }: { projects: ProjectUse[] }) {
-  if (projects.length === 0) return null;
-  return (
-    <ul className="flex flex-col gap-1">
-      {projects.map((p) => (
-        <li key={p.name} className="flex items-baseline justify-between gap-4 text-small text-ds-fg-muted">
-          <span className="truncate">{p.name}</span>
-          <span className="shrink-0">{mb(p.bytes)}</span>
-        </li>
-      ))}
-    </ul>
-  );
-}
+/** One segment per project, in its place in the project list (so its colour matches everywhere). */
+export const projectSegments = (projects: ProjectUse[]): DsProgressSegment[] =>
+  projects.map((p) => ({ value: p.bytes, label: p.name, meta: mb(p.bytes) }));
 
 /** A label and its value on one line. */
 function Fact({ label, children }: { label: string; children: React.ReactNode }) {
@@ -116,14 +105,13 @@ export function InstallSettings() {
         {usage && (
           <>
             <DsProgress
-              value={usage.database.totalBytes}
+              segments={projectSegments(usage.database.projects)}
               max={usage.database.freeBytes}
               label="Database used"
               title="Used"
               meta={`${mb(usage.database.totalBytes)} of ${gbOrMb(usage.database.freeBytes)}`}
               description={`Measured against Atlas's free cluster (M0). ${shared} Anything else in the cluster counts too.`}
             />
-            <PerProject projects={usage.database.projects} />
             {usage.database.atlas && <Open href="https://cloud.mongodb.com">Open MongoDB Atlas</Open>}
           </>
         )}
@@ -141,7 +129,7 @@ export function InstallSettings() {
         {usage && (
           <>
             <DsProgress
-              value={usage.storage.totalBytes}
+              segments={projectSegments(usage.storage.projects)}
               max={usage.storage.freeBytes}
               label="Image storage used"
               title="Used"
@@ -152,7 +140,6 @@ export function InstallSettings() {
                   : `${usage.storage.items} media items, counted by Darmio. ${shared}`
               }
             />
-            <PerProject projects={usage.storage.projects} />
             {usage.storage.provider === "vercel-blob" && <Open href="https://vercel.com/dashboard/stores">Open Vercel storage</Open>}
           </>
         )}

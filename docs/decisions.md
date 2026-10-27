@@ -1,5 +1,5 @@
 ---
-reviewed: 2026-10-26
+reviewed: 2026-10-27
 owner: Alex
 ---
 
@@ -10,6 +10,20 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-27 — **Darmio stays MIT; the business is selling taste, not a
+  SaaS.** Everything that makes Darmio work is free and complete under MIT:
+  the core, the agent API, the MCP connector, Parabola and the skills, so
+  anyone can make their own design system on it. What's sold is Alex's
+  taste: Parabola themes, editorial pages, blog formats and experiences a
+  maker installs into their own Darmio and changes as they like, like
+  shadcn. One-off purchases from a store (darmio.io/store or similar), kept
+  outside the free repo: never a paid tier, a hosted plan or a lock inside
+  the code. The core gets the extension points (themes as data, blocks and
+  pages from outside the core) so a store can come later without a
+  rewrite. Refines 2026-10-07's "no paid tiers": still no tiers, but
+  designs are sold. Why: Alex wants Darmio to earn without running a SaaS;
+  features can be copied, taste is what he can sell. Possible features are
+  in Linear (project Darmio, milestone Feature roadmap).
 - 2026-10-26 — **The CMS is Darmio** (darmio.io), was Dharmify. The repo is
   `alexbeltechi/darmio`, the folder `~/Documents/Code/products/darmio`, and
   the name runs through the code (the `darmio-project` cookie, the

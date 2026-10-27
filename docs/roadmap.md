@@ -1,5 +1,5 @@
 ---
-reviewed: 2026-10-26
+reviewed: 2026-10-27
 owner: Alex
 ---
 
@@ -117,8 +117,8 @@ When a task changes an item, update this file in the same change.
    Started 2026-10-24: the site name setting (Settings › Site), the rail
    mark as the project menu, Settings › Account with change password, and
    `npm run reset-password` for lock-outs.
-   Named **Darmio CMS** (decisions, 2026-10-26); the repo keeps
-   `beltechi-cms` for now.
+   Named **Darmio** (decisions, 2026-10-26); was Dharmify, and before
+   that Beltechi CMS (`beltechi-cms`).
    Replaces "Clean up for a first release": the walkthrough as "a
    photographer who wants to publish" is step 4's done test.
 
@@ -200,7 +200,7 @@ When a task changes an item, update this file in the same change.
   Regular passes through the app as a persona (a photographer, a painter, a
   designer) to find UX and bug issues. Results land here as items.
 - **Open-source readiness** — `shape`
-  Done: a non-technical person can install it locally with their agent,
+  MIT `LICENSE` added 2026-10-27. Done: a non-technical person can install it locally with their agent,
   following a README and agent skills that ship with the repo.
 - **Swappable connectors** — `shape`
   Every outside service behind one interface, shipped with one connector
@@ -224,6 +224,37 @@ When a task changes an item, update this file in the same change.
   Developed in its own repo, `~/Documents/Code/techistack`, linked into
   `~/.claude/skills/`. Done (v1.0): survived a few real curation batches;
   Alex calls it stable.
+
+## Taste
+
+Darmio stays MIT; what's sold is taste (decisions, 2026-10-27). These make
+room for it in the core. Each is a Feature in Linear (project Darmio,
+milestone Feature roadmap), unscheduled until Alex places it.
+
+- **MCP connector** — `shape` (BEL-111)
+  An MCP server on every install over the agent API that exists today.
+  Done: from a fresh Claude Desktop, a maker connects their install in one
+  step and publishes a post by asking.
+- **Parabola themes, customizable like shadcn** — `shape` (BEL-109)
+  A theme contract (which tokens and block variants a theme may set) and
+  themes as data (`*.theme.json`), imported and switched in Settings ›
+  Design or by an agent. Anyone can make their own design system from it.
+  Done: a maker's theme changes their whole site and comes off again,
+  without touching code.
+- **Extensions** — `shape` (BEL-110)
+  Blocks, page formats and interactions in a folder the install owns
+  (`src/extensions/`), each with a manifest the editor and agents read, so
+  they survive pulling Darmio's updates. Today blocks are a fixed list in
+  `src/lib/cms/types.ts`.
+  Done: a page format from outside the repo is added with one command and
+  shows up in the editor; a later pull doesn't conflict with it.
+- **Store-ready** — `shape` (BEL-112)
+  Paid themes and formats live outside the free repo: themes apply as
+  data, code installs from a registry with keys (as paid shadcn blocks do),
+  payments and keys through Polar. First a private repo sold through
+  Polar, then the registry, then a Design tab in the admin.
+  Done: a maker buys a theme on darmio.io, tells their agent to install
+  it, and their site has it.
 
 ## Later
 

@@ -1,5 +1,5 @@
 ---
-reviewed: 2026-10-26
+reviewed: 2026-10-27
 owner: Alex
 ---
 
@@ -22,9 +22,10 @@ Alex is the first customer: beltechi.com moves onto it at the pre-release
 
 - **Free to own.** No tiers, no monthly SaaS bill. People download it, run it,
   adapt it, and maybe contribute back.
-- **Open source, not a business to service.** Alex doesn't want to be
-  accountable for a paid product with customers on monthly plans. Some form of
-  compensation may come later; it is not the goal.
+- **Open source, not a SaaS.** The code is MIT and complete. Alex doesn't
+  want to be accountable for a paid product with customers on monthly
+  plans. He earns by selling taste: themes, editorial pages and blog
+  formats people install into their own Darmio (decisions, 2026-10-27).
 - **Bring people to your own site** in as free a format as possible.
 
 ## Who it's for
@@ -71,4 +72,4 @@ build a page, as optional skills any agent can read and act on.
 
 - A stale CMS that feels old.
 - A tool that needs a developer to run or understand.
-- A paid-tier product.
+- A paid-tier product. Designs are sold; features never are.

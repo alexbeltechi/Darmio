@@ -4,7 +4,7 @@
  * three are set up once, for the whole install; every project shares them.
  * Read-only: nothing here changes a plan or a setting.
  */
-import { getMongoClient, getHubDb, hubProjects } from "@/lib/db/mongodb";
+import { getCurrentProject, getMongoClient, getHubDb, hubProjects } from "@/lib/db/mongodb";
 import { mediaStorageUsage } from "@/lib/db/media";
 import { shouldUseBlob } from "@/lib/cms/blob-storage";
 import { PROJECTS_MAX } from "@/lib/cms/projects";
@@ -14,7 +14,7 @@ export const ATLAS_FREE_BYTES = 512 * 1024 ** 2;
 /** Vercel Blob's free (Hobby) plan holds 1 GB. */
 export const BLOB_FREE_BYTES = 1024 ** 3;
 
-export type ProjectUse = { name: string; bytes: number };
+export type ProjectUse = { slug: string; name: string; bytes: number };
 
 export type InstallUsage = {
   hosting: {
@@ -43,6 +43,8 @@ export type InstallUsage = {
   };
   projectCount: number;
   projectsMax: number;
+  /** The project this request is in, so a project's own page can find its share. */
+  current: string | null;
 };
 
 /** The cluster's host from the connection string, without the user and password in it. */
@@ -66,16 +68,16 @@ async function databaseBytes(name: string): Promise<number> {
 export async function installUsage(): Promise<InstallUsage> {
   const client = await getMongoClient();
   const hub = await getHubDb();
-  const projects = await hubProjects({ fresh: true });
+  const [projects, currentRow] = await Promise.all([hubProjects({ fresh: true }), getCurrentProject()]);
 
   // The hub holds the accounts and the project list, and the first project's content too.
   const rows = projects.length ? projects : [];
-  const databases = await Promise.all(rows.map(async (row) => ({ name: row.name, bytes: await databaseBytes(row.dbName) })));
+  const databases = await Promise.all(rows.map(async (row) => ({ slug: row.slug, name: row.name, bytes: await databaseBytes(row.dbName) })));
   const hubCounted = rows.some((row) => row.dbName === hub.databaseName);
   const hubBytes = hubCounted ? 0 : await databaseBytes(hub.databaseName);
 
   const libraries = await Promise.all(
-    rows.map(async (row) => ({ name: row.name, usage: await mediaStorageUsage(client.db(row.dbName)) }))
+    rows.map(async (row) => ({ slug: row.slug, name: row.name, usage: await mediaStorageUsage(client.db(row.dbName)) }))
   );
 
   const host = clusterHost();
@@ -103,9 +105,10 @@ export async function installUsage(): Promise<InstallUsage> {
       totalBytes: libraries.reduce((sum, l) => sum + l.usage.bytes, 0),
       items: libraries.reduce((sum, l) => sum + l.usage.items, 0),
       freeBytes: BLOB_FREE_BYTES,
-      projects: libraries.map((l) => ({ name: l.name, bytes: l.usage.bytes })),
+      projects: libraries.map((l) => ({ slug: l.slug, name: l.name, bytes: l.usage.bytes })),
     },
     projectCount: projects.length,
     projectsMax: PROJECTS_MAX,
+    current: currentRow?.slug ?? null,
   };
 }

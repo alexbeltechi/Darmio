@@ -10,6 +10,13 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-27 — **Usage bars split by project.** Parabola's `DsProgress` takes
+  `segments`: parts of the fill side by side, each in one of Parabola's
+  accents in a fixed order (blue, orange, green, violet, pink, teal, sky,
+  stone, red), with a legend. Settings' Database and Image storage bars show
+  each project's share; a project keeps its colour everywhere (its place in
+  the project list), and its own Library section shows its share in that
+  colour against the others in grey.
 - 2026-10-27 — **Home › Settings shows what the install runs on.** After
   you (account, password): Hosting (Vercel, its address, the repo it
   deploys from), Database (the MongoDB cluster, how much the projects use

@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { DsField, DsLink, DsSelect, dsToast } from "@beltechi/parabola";
+import { DsField, DsLink, DsProgress, DsSelect, dsSegmentColor, dsToast } from "@beltechi/parabola";
+import { gbOrMb, mb } from "./install-settings";
+import type { InstallUsage } from "@/lib/db/install";
 import { ACCOUNT_PATH } from "@/components/admin/home/home-routes";
 import { SettingsSection } from "./settings-section";
 
@@ -16,9 +18,6 @@ interface Usage {
   legacyItems: number;
 }
 
-function formatMB(bytes: number): string {
-  return `${Math.round(bytes / 1024 ** 2)} MB`;
-}
 
 /**
  * Settings › Library: how new uploads are made (AVIF quality), and this
@@ -30,6 +29,8 @@ function formatMB(bytes: number): string {
 export function LibrarySettings() {
   const [quality, setQuality] = useState<string | null>(null);
   const [usage, setUsage] = useState<Usage | null>(null);
+  // This project's share of the store every project uses, in its colour from the project list.
+  const [share, setShare] = useState<{ mine: number; others: number; totalBytes: number; freeBytes: number; index: number } | null>(null);
 
   useEffect(() => {
     fetch("/api/admin/settings")
@@ -39,6 +40,16 @@ export function LibrarySettings() {
     fetch("/api/admin/media/usage")
       .then((res) => res.json())
       .then((data) => data.data && setUsage(data.data))
+      .catch(() => {});
+    fetch("/api/admin/install")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((json) => {
+        const install = json?.data as InstallUsage | undefined;
+        if (!install) return;
+        const index = Math.max(0, install.storage.projects.findIndex((p) => p.slug === install.current));
+        const mine = install.storage.projects[index]?.bytes ?? 0;
+        setShare({ mine, others: install.storage.totalBytes - mine, totalBytes: install.storage.totalBytes, freeBytes: install.storage.freeBytes, index });
+      })
       .catch(() => {});
   }, []);
 
@@ -77,17 +88,29 @@ export function LibrarySettings() {
         />
       </DsField>
 
-      {usage && (
-        <p className="text-p text-ds-fg-muted">
-          This project&apos;s {usage.items} media items take {formatMB(usage.bytes)} of the image storage every project
-          shares.{" "}
-          <DsLink href={`${ACCOUNT_PATH}#storage`} className="text-ds-fg underline underline-offset-4">
-            See all of it in Settings
-          </DsLink>
-          .
-          {usage.legacyItems > 0 &&
-            ` ${usage.legacyItems} images are from before AVIF and are resized on request by Vercel until they're uploaded again.`}
-        </p>
+      {usage && share && (
+        <DsProgress
+          max={share.freeBytes}
+          title="Storage"
+          meta={`${mb(share.totalBytes)} of ${gbOrMb(share.freeBytes)}`}
+          segments={[
+            { value: share.mine, label: "This project", meta: mb(share.mine), color: dsSegmentColor(share.index) },
+            ...(share.others > 0
+              ? [{ value: share.others, label: "Your other projects", meta: mb(share.others), color: "var(--ds-fg-subtle)" }]
+              : []),
+          ]}
+          description={
+            <>
+              {usage.items} media items in this project. The image storage is shared by every project:{" "}
+              <DsLink href={`${ACCOUNT_PATH}#storage`} className="text-ds-fg underline underline-offset-4">
+                see all of it in Settings
+              </DsLink>
+              .
+              {usage.legacyItems > 0 &&
+                ` ${usage.legacyItems} images are from before AVIF and are resized on request by Vercel until they're uploaded again.`}
+            </>
+          }
+        />
       )}
     </SettingsSection>
   );

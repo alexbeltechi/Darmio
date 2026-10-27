@@ -1,11 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { DsField, DsProgress, DsSelect, dsToast } from "@beltechi/parabola";
+import { DsField, DsLink, DsSelect, dsToast } from "@beltechi/parabola";
+import { ACCOUNT_PATH } from "@/components/admin/home/home-routes";
 import { SettingsSection } from "./settings-section";
-
-// Vercel Blob's free (Hobby) plan. Past it, Blob stops serving until the month resets.
-const FREE_STORAGE_BYTES = 1024 ** 3;
 
 const QUALITY_OPTIONS = [50, 55, 60, 65, 70, 75, 80, 85, 90].map((q) => ({
   value: String(q),
@@ -23,8 +21,9 @@ function formatMB(bytes: number): string {
 }
 
 /**
- * Settings › Library: how new uploads are made (AVIF quality) and how much of
- * the free storage the library takes. Quality only applies to new uploads:
+ * Settings › Library: how new uploads are made (AVIF quality), and this
+ * project's share of the image storage every project shares (the whole store
+ * is under Home › Settings, decisions 2026-10-27). Quality only applies to new uploads:
  * going down later is possible from the stored copies, going up needs the
  * originals.
  */
@@ -60,8 +59,6 @@ export function LibrarySettings() {
     }
   }
 
-  const share = usage ? Math.min(1, usage.bytes / FREE_STORAGE_BYTES) : 0;
-
   return (
     <SettingsSection
       id="library"
@@ -80,21 +77,18 @@ export function LibrarySettings() {
         />
       </DsField>
 
-      <DsProgress
-        value={share * 100}
-        label="Storage used"
-        title="Storage"
-        meta={usage ? `${formatMB(usage.bytes)} of 1 GB free` : "…"}
-        description={
-          usage
-            ? `${usage.items} media items, counted by the CMS.${
-                usage.legacyItems > 0
-                  ? ` ${usage.legacyItems} images are from before AVIF and are resized on request by Vercel until they're uploaded again.`
-                  : ""
-              }`
-            : undefined
-        }
-      />
+      {usage && (
+        <p className="text-p text-ds-fg-muted">
+          This project&apos;s {usage.items} media items take {formatMB(usage.bytes)} of the image storage every project
+          shares.{" "}
+          <DsLink href={`${ACCOUNT_PATH}#storage`} className="text-ds-fg underline underline-offset-4">
+            See all of it in Settings
+          </DsLink>
+          .
+          {usage.legacyItems > 0 &&
+            ` ${usage.legacyItems} images are from before AVIF and are resized on request by Vercel until they're uploaded again.`}
+        </p>
+      )}
     </SettingsSection>
   );
 }

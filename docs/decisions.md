@@ -10,6 +10,16 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-27 — **Home › Settings shows what the install runs on.** After
+  you (account, password): Hosting (Vercel, its address, the repo it
+  deploys from), Database (the MongoDB cluster, how much the projects use
+  against Atlas's free 512 MB, per project) and Image storage (Vercel Blob,
+  the same against its free 1 GB, per project), each with a link to where
+  the plan is set. All three are set up once for the install and shared by
+  every project; the free tiers aren't split per project. A site can't see
+  its own plan, so the bars measure against the free tiers and say so. A
+  project's Library section keeps the image quality and shows that
+  project's share, linking to the whole.
 - 2026-10-27 — **A project card has a ⋮ menu**, the same as a post row:
   Settings, Rename (a dialog with the name; it renames the site too), and
   Delete project, which removes its library's files, its content and its

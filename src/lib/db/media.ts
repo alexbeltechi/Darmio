@@ -1,3 +1,4 @@
+import type { Db } from "mongodb";
 /**
  * MongoDB Media Storage
  * 
@@ -145,8 +146,9 @@ export async function deleteMedia(id: string): Promise<boolean> {
  * Bytes the whole library takes in storage (see storedBytes), and how many
  * items are still in the older format (no renditions).
  */
-export async function mediaStorageUsage(): Promise<{ bytes: number; items: number; legacyItems: number }> {
-  const db = await getDb();
+/** Bytes a library takes in storage: the current project's, or the one in `projectDb`. */
+export async function mediaStorageUsage(projectDb?: Db): Promise<{ bytes: number; items: number; legacyItems: number }> {
+  const db = projectDb ?? (await getDb());
   const docs = await db
     .collection(Collections.MEDIA)
     .find({ id: { $exists: true } })

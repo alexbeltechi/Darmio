@@ -10,6 +10,12 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-27 — **No home headline setting.** The headline and button over
+  the homepage feed are gone from Settings. A homepage with its own words
+  is a page with the slug "home", made like any other; otherwise the
+  homepage is just the posts. In Settings, "Original post link" is now
+  **Link back**, and "Agent" is **Brain** (a "Brain link" field, then the
+  rules).
 - 2026-10-27 — **Settings cards: title, one short line, then the rest.** The
   line under a card's title says only what it is or runs on ("Vercel",
   "MongoDB Atlas", "Not published"); the longer explanation sits apart below

@@ -3,13 +3,13 @@
  *
  * Global, site-wide settings stored as a single singleton document in the
  * `settings` collection (identified by a fixed key). Holds the site name, the
- * original post link and the image quality for new uploads, and grows with
+ * Link back line and the image quality for new uploads, and grows with
  * more settings over time.
  */
 
 import { getDb, Collections } from "@/lib/db/mongodb";
 import { DEFAULT_IMAGE_QUALITY } from "@/lib/cms/image-processing";
-import { parseHomeHero, parseSiteName, type HomeHero } from "@/lib/cms/site";
+import { parseSiteName } from "@/lib/cms/site";
 import {
   DEFAULT_SOURCE_LABELS,
   DEFAULT_SOURCE_LINE,
@@ -23,8 +23,6 @@ export const SETTINGS_KEY = "site";
 export interface SiteSettings {
   /** The brand: the admin's mark, the site's logo, the footer, browser titles. */
   siteName: string;
-  /** The homepage's headline over the feed; null shows the feed alone. */
-  homeHero: HomeHero | null;
   /** Presets for a post's "Source:" line. */
   sourceLabels: SourceLabel[];
   sourceLine: SourceLineSettings;
@@ -36,7 +34,6 @@ export interface SiteSettings {
 export const DEFAULT_SETTINGS: SiteSettings = {
   // Until the first-run setup names the site.
   siteName: "My site",
-  homeHero: null,
   sourceLabels: DEFAULT_SOURCE_LABELS,
   sourceLine: DEFAULT_SOURCE_LINE,
   imageQuality: DEFAULT_IMAGE_QUALITY,
@@ -102,7 +99,6 @@ export async function getSiteSettings(): Promise<SiteSettings> {
 
   return {
     siteName: tryParse(parseSiteName, doc.siteName, DEFAULT_SETTINGS.siteName),
-    homeHero: tryParse(parseHomeHero, doc.homeHero, DEFAULT_SETTINGS.homeHero),
     sourceLabels: tryParse(parseSourceLabels, doc.sourceLabels, DEFAULT_SETTINGS.sourceLabels),
     sourceLine: tryParse(parseSourceLine, doc.sourceLine, DEFAULT_SETTINGS.sourceLine),
     imageQuality: tryParse(parseImageQuality, doc.imageQuality, DEFAULT_SETTINGS.imageQuality),
@@ -125,10 +121,6 @@ export async function updateSiteSettings(
 
   if (updates.siteName !== undefined) {
     set.siteName = parseSiteName(updates.siteName);
-  }
-
-  if (updates.homeHero !== undefined) {
-    set.homeHero = parseHomeHero(updates.homeHero);
   }
 
   if (updates.sourceLabels !== undefined) {

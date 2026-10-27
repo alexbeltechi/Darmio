@@ -10,7 +10,7 @@ import { mdName, shortDate, type DocWithUsage } from "@/lib/cms/docs";
 import { SettingsSection } from "./settings-section";
 
 /**
- * Settings › Agent: the project's brain (a folder or link the agent reads
+ * Settings › Brain: the project's brain (a folder or link the agent reads
  * first), the rules every agent reads before working on this site (documents
  * of kind "guide", kept in Library › Documents), and the API guide agents
  * start from. Briefs and sources stay with their posts and pages.
@@ -73,13 +73,12 @@ export function AgentSettings() {
   return (
     <SettingsSection
       id="agent"
-      title="Agent"
-      description="Your brain, then your rules"
-      note="What your agent reads before it works on this site. Your rules hold your voice, what never to do and how you like things named."
+      title="Brain"
+      description="What your agent reads before it works on this site"
     >
       {current && (
         <form onSubmit={saveBrain} className="flex flex-col gap-5">
-          <DsField label="Brain (optional)" description="A folder or link with what your agent should know first: who it's for, its voice, what's decided.">
+          <DsField label="Brain link">
             <DsInput value={brain} onChange={(e) => setBrain(e.target.value)} maxLength={500} placeholder="~/Documents/brain or a link" />
           </DsField>
           <DsButton type="submit" disabled={brain.trim() === savedBrain || savingBrain} loading={savingBrain} className="self-start">

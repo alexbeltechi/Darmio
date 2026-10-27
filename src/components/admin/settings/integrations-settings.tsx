@@ -32,7 +32,7 @@ function daysUntil(iso: string): number {
 /**
  * Settings → Integrations. One card per platform (anchored `#x`, `#linkedin`,
  * which the post editor links to) and one for Kit, the newsletter list
- * (`#kit`), then the original post link presets.
+ * (`#kit`), then the Link back presets.
  */
 export function IntegrationsSettings() {
   return (
@@ -276,7 +276,7 @@ function SetupSteps({ platform }: { platform: Platform }) {
 }
 
 /**
- * The original post link: a line at the end of a post ("Source: LinkedIn")
+ * Link back: a line at the end of a post ("Source: LinkedIn")
  * pointing to where it first appeared. Its labels are presets; each post
  * picks one in the editor.
  */
@@ -316,7 +316,7 @@ function SourceLineCard() {
       setLabels(json.data.sourceLabels);
       setLine(json.data.sourceLine);
       setSaved(JSON.stringify([json.data.sourceLabels, json.data.sourceLine]));
-      dsToast("Original post link saved");
+      dsToast("Link back saved");
     } catch (error) {
       dsToast("Couldn't save", { description: error instanceof Error ? error.message : undefined });
     } finally {
@@ -332,13 +332,13 @@ function SourceLineCard() {
 
   return (
     <SettingsSection
-      id="original-post-link"
-      title="Original post link"
-      description="For posts that first appeared somewhere else"
-      note="The post ends with a line like the one below, linking there. Each post picks its label in the editor; a post you share from here to X or LinkedIn takes that label by itself."
+      id="link-back"
+      title="Link back"
+      description="A link at the end of a post, back to where it first appeared"
+      note="Each post picks its label in the editor; a post you share from here to X or LinkedIn gets its label by itself."
     >
         <div className="flex items-center gap-3">
-          <label htmlFor="source-line-enabled" className="flex-1 text-p text-ds-fg">
+          <label htmlFor="source-line-enabled" className="text-p text-ds-fg">
             Show the link on posts
           </label>
           <DsSwitch

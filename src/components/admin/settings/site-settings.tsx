@@ -2,42 +2,37 @@
 
 import { useEffect, useState } from "react";
 import { DsButton, DsField, DsInput, dsToast } from "@beltechi/parabola";
-import { SITE_NAME_MAX, type HomeHero } from "@/lib/cms/site";
+import { SITE_NAME_MAX } from "@/lib/cms/site";
 import { announceSiteSettingsChanged } from "@/components/admin/use-site-settings";
 import { useCurrentProject } from "@/components/admin/use-current-project";
 import { SettingsLink, SettingsSection } from "./settings-section";
 
-type Form = { siteName: string; title: string; ctaLabel: string; ctaHref: string };
+type Form = { siteName: string };
 
-const toForm = (siteName: string, hero: HomeHero | null): Form => ({
-  siteName,
-  title: hero?.title ?? "",
-  ctaLabel: hero?.ctaLabel ?? "",
-  ctaHref: hero?.ctaHref ?? "",
-});
+const toForm = (siteName: string): Form => ({ siteName });
 
 /**
  * The project: its name (the admin's tile, the project menu, the site's logo,
- * the footer, browser titles), whether its site is published and where, and the homepage's
- * headline over the feed, with an optional button.
+ * the footer, browser titles), and whether its site is published and where.
+ * The homepage's own words are a page, not a setting (decisions, 2026-10-27).
  */
 export function SiteSettings() {
   const { current } = useCurrentProject();
   const [address, setAddress] = useState("");
   useEffect(() => setAddress(window.location.host), []);
   const [saved, setSaved] = useState<Form | null>(null);
-  const [form, setForm] = useState<Form>(toForm("", null));
+  const [form, setForm] = useState<Form>(toForm(""));
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     fetch("/api/admin/settings")
       .then((res) => res.json())
       .then((json) => {
-        const current = toForm(json.data?.siteName ?? "", json.data?.homeHero ?? null);
+        const current = toForm(json.data?.siteName ?? "");
         setSaved(current);
         setForm(current);
       })
-      .catch(() => setSaved(toForm("", null)));
+      .catch(() => setSaved(toForm("")));
   }, []);
 
   const dirty = saved !== null && JSON.stringify(form) !== JSON.stringify(saved);
@@ -51,14 +46,11 @@ export function SiteSettings() {
       const res = await fetch("/api/admin/settings", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          siteName: form.siteName,
-          homeHero: { title: form.title, ctaLabel: form.ctaLabel, ctaHref: form.ctaHref },
-        }),
+        body: JSON.stringify({ siteName: form.siteName }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error);
-      const next = toForm(json.data.siteName, json.data.homeHero);
+      const next = toForm(json.data.siteName);
       setSaved(next);
       setForm(next);
       announceSiteSettingsChanged();
@@ -105,25 +97,6 @@ export function SiteSettings() {
             placeholder="Your name or your brand"
           />
         </DsField>
-        <DsField label="Home headline" description="The big line above your posts. Empty shows the posts alone.">
-          <DsInput
-            value={form.title}
-            onChange={(e) => set({ title: e.target.value })}
-            maxLength={200}
-            disabled={saved === null}
-            placeholder="Optional"
-          />
-        </DsField>
-        {form.title.trim() && (
-          <div className="grid gap-5 sm:grid-cols-2">
-            <DsField label="Button" description="Optional, with a link.">
-              <DsInput value={form.ctaLabel} onChange={(e) => set({ ctaLabel: e.target.value })} maxLength={40} placeholder="See my work" />
-            </DsField>
-            <DsField label="Button link">
-              <DsInput value={form.ctaHref} onChange={(e) => set({ ctaHref: e.target.value })} placeholder="/work" />
-            </DsField>
-          </div>
-        )}
         <DsButton type="submit" variant="primary" disabled={!dirty || saving} loading={saving} className="self-start">
           Save
         </DsButton>

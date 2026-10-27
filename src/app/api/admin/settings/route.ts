@@ -28,7 +28,6 @@ export async function PATCH(request: NextRequest) {
     // updateSiteSettings; a bad value throws and comes back as a 400 below.
     const settings = await updateSiteSettings({
       siteName: body.siteName,
-      homeHero: body.homeHero,
       sourceLabels: body.sourceLabels,
       sourceLine: body.sourceLine,
       imageQuality: body.imageQuality,

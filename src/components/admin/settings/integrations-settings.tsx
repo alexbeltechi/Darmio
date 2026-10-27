@@ -103,7 +103,8 @@ function ConnectionsCard() {
     <SettingsSection
       id="integrations"
       title="Integrations"
-      description="Accounts this site works with: the platforms posts go to, and the list newsletter sign-ups go to. Each name opens the account it's connected to, so you can check which one it is."
+      description="Where posts and sign-ups go"
+      note="The platforms posts go to, and the list newsletter sign-ups go to. Each name opens the account it's connected to, so you can check which one it is."
     >
         {PLATFORMS.map((platform, i) => {
           const status = statuses?.find((s) => s.platform === platform);
@@ -333,7 +334,8 @@ function SourceLineCard() {
     <SettingsSection
       id="original-post-link"
       title="Original post link"
-      description="For posts that first appeared somewhere else. The post ends with a line like the one below, linking there. Each post picks its label in the editor; a post you share from here to X or LinkedIn takes that label by itself."
+      description="For posts that first appeared somewhere else"
+      note="The post ends with a line like the one below, linking there. Each post picks its label in the editor; a post you share from here to X or LinkedIn takes that label by itself."
     >
         <div className="flex items-center gap-3">
           <label htmlFor="source-line-enabled" className="flex-1 text-p text-ds-fg">

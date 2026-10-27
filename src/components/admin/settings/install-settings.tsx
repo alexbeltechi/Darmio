@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ExternalLink } from "lucide-react";
-import { DsButton, DsProgress, type DsProgressSegment } from "@beltechi/parabola";
+import { DsProgress, type DsProgressSegment } from "@beltechi/parabola";
 import type { InstallUsage, ProjectUse } from "@/lib/db/install";
-import { SettingsSection } from "./settings-section";
+import { SettingsLink, SettingsSection } from "./settings-section";
 
 /** A size in words: KB under a megabyte, MB (one decimal under 10) above. */
 export const mb = (bytes: number) =>
@@ -27,21 +26,14 @@ function Fact({ label, children }: { label: string; children: React.ReactNode })
   );
 }
 
-function Open({ href, children }: { href: string; children: React.ReactNode }) {
-  return (
-    <DsButton href={href} target="_blank" rel="noopener noreferrer" iconRight={ExternalLink} className="self-start">
-      {children}
-    </DsButton>
-  );
-}
-
 /**
  * What the install runs on, for every project at once (decisions,
  * 2026-10-27): the hosting, the MongoDB database and the image storage, each
  * set up once when Darmio was installed. Projects share all three: the free
  * tiers are the install's, not split per project. Bars measure against the
- * free tiers, since a site can't ask Vercel or Atlas which plan it's on; each
- * card links to where the plan is set.
+ * free tiers, since a site can't ask Vercel or Atlas which plan it's on. Each
+ * card's short line says what it runs on now; run locally, it says what it's
+ * ready for once deployed. The named things link to where they're managed.
  */
 export function InstallSettings() {
   const [usage, setUsage] = useState<InstallUsage | null>(null);
@@ -56,9 +48,7 @@ export function InstallSettings() {
 
   if (failed) {
     return (
-      <SettingsSection id="install" title="Hosting and storage" description="Couldn't read what this install runs on. Try again in a moment." >
-        <span />
-      </SettingsSection>
+      <SettingsSection id="install" title="Hosting and storage" description="Couldn't read what this install runs on. Try again in a moment." />
     );
   }
 
@@ -71,24 +61,35 @@ export function InstallSettings() {
       <SettingsSection
         id="hosting"
         title="Hosting"
-        description={
-          usage?.hosting.provider === "vercel"
-            ? "Vercel runs this site. One deployment serves every project; the public address shows the first one."
-            : "This site runs on this computer, for development."
+        description={usage && (usage.hosting.provider === "vercel" ? "Vercel" : "This computer, ready for Vercel")}
+        note={
+          usage &&
+          (usage.hosting.provider === "vercel" ? (
+            <>
+              {usage.hosting.address && (
+                <>
+                  Your site is at <SettingsLink href={`https://${usage.hosting.address}`}>{usage.hosting.address}</SettingsLink>.{" "}
+                </>
+              )}
+              One deployment serves every project; the public address shows the first one.
+            </>
+          ) : (
+            "You're running it here to develop. Deployed to Vercel, this shows its address, the repo it deploys from and its region."
+          ))
         }
       >
         {usage && usage.hosting.provider === "vercel" && (
           <>
             <div className="flex flex-col gap-2">
-              {usage.hosting.address && <Fact label="Address">{usage.hosting.address}</Fact>}
               {usage.hosting.repo && <Fact label="Code from">{usage.hosting.repo}</Fact>}
               {usage.hosting.region && <Fact label="Region">{usage.hosting.region}</Fact>}
-              <Fact label="Plan">See it on Vercel</Fact>
+              <Fact label="Plan">
+                <SettingsLink href="https://vercel.com/dashboard">See it on Vercel</SettingsLink>
+              </Fact>
             </div>
             <p className="text-small text-ds-fg-muted">
               A site can&apos;t see its own Vercel plan. The free Hobby plan suits a personal site; traffic and build limits are on Vercel.
             </p>
-            <Open href="https://vercel.com/dashboard">Open Vercel</Open>
           </>
         )}
       </SettingsSection>
@@ -96,52 +97,69 @@ export function InstallSettings() {
       <SettingsSection
         id="database"
         title="Database"
-        description={
-          usage
-            ? `${usage.database.atlas ? "MongoDB Atlas" : "MongoDB"}${usage.database.host ? `, ${usage.database.host}` : ""}. Each project is its own database in this one cluster; your account lives with the first.`
-            : "Your posts, pages, settings and account."
+        description={usage && (usage.database.atlas ? "MongoDB Atlas" : "MongoDB")}
+        note={
+          usage ? (
+            <>
+              {usage.database.host && (
+                <>
+                  Your cluster is{" "}
+                  {usage.database.atlas ? (
+                    <SettingsLink href="https://cloud.mongodb.com">{usage.database.host}</SettingsLink>
+                  ) : (
+                    usage.database.host
+                  )}
+                  .{" "}
+                </>
+              )}
+              Each project is its own database in it; your account lives with the first.
+            </>
+          ) : (
+            "Your posts, pages, settings and account."
+          )
         }
       >
         {usage && (
-          <>
-            <DsProgress
-              segments={projectSegments(usage.database.projects)}
-              max={usage.database.freeBytes}
-              label="Database used"
-              title="Used"
-              meta={`${mb(usage.database.totalBytes)} of ${gbOrMb(usage.database.freeBytes)}`}
-              description={`Measured against Atlas's free cluster (M0). ${shared} Anything else in the cluster counts too.`}
-            />
-            {usage.database.atlas && <Open href="https://cloud.mongodb.com">Open MongoDB Atlas</Open>}
-          </>
+          <DsProgress
+            segments={projectSegments(usage.database.projects)}
+            max={usage.database.freeBytes}
+            label="Database used"
+            title="Used"
+            meta={`${mb(usage.database.totalBytes)} of ${gbOrMb(usage.database.freeBytes)}`}
+            description={`Measured against Atlas's free cluster (M0). ${shared} Anything else in the cluster counts too.`}
+          />
         )}
       </SettingsSection>
 
       <SettingsSection
         id="storage"
-        title="Image storage"
-        description={
-          usage?.storage.provider === "vercel-blob"
-            ? "Vercel Blob keeps every upload, for every project, in one store."
-            : "Uploads are kept in this computer's public/uploads folder."
+        title="Storage"
+        description={usage && (usage.storage.provider === "vercel-blob" ? "Vercel Blob" : "This computer, ready for Vercel Blob")}
+        note={
+          usage &&
+          (usage.storage.provider === "vercel-blob" ? (
+            <>
+              Images and video from every project, in one{" "}
+              <SettingsLink href="https://vercel.com/dashboard/stores">Blob store</SettingsLink>.
+            </>
+          ) : (
+            "Images and video go to the public/uploads folder while you develop. Deployed to Vercel with a Blob store, they go there."
+          ))
         }
       >
         {usage && (
-          <>
-            <DsProgress
-              segments={projectSegments(usage.storage.projects)}
-              max={usage.storage.freeBytes}
-              label="Image storage used"
-              title="Used"
-              meta={`${mb(usage.storage.totalBytes)} of ${gbOrMb(usage.storage.freeBytes)}`}
-              description={
-                usage.storage.provider === "vercel-blob"
-                  ? `${usage.storage.items} media items, counted by Darmio, measured against Vercel Blob's free Hobby plan. ${shared} Past the limit, Blob stops serving files until the month resets.`
-                  : `${usage.storage.items} media items, counted by Darmio. ${shared}`
-              }
-            />
-            {usage.storage.provider === "vercel-blob" && <Open href="https://vercel.com/dashboard/stores">Open Vercel storage</Open>}
-          </>
+          <DsProgress
+            segments={projectSegments(usage.storage.projects)}
+            max={usage.storage.freeBytes}
+            label="Storage used"
+            title="Used"
+            meta={`${mb(usage.storage.totalBytes)} of ${gbOrMb(usage.storage.freeBytes)}`}
+            description={
+              usage.storage.provider === "vercel-blob"
+                ? `${usage.storage.items} media items, counted by Darmio, measured against Vercel Blob's free Hobby plan. ${shared} Past the limit, Blob stops serving files until the month resets.`
+                : `${usage.storage.items} media items, counted by Darmio. ${shared}`
+            }
+          />
         )}
       </SettingsSection>
     </>

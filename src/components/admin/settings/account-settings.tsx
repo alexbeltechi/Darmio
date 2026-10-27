@@ -168,7 +168,8 @@ function PasswordCard() {
     <SettingsSection
       id="password"
       title="Password"
-      description="Forgotten it? Sign out and use “Forgot your password?” on the sign-in page."
+      description="The one you sign in with"
+      note="Forgotten it? Sign out and use “Forgot your password?” on the sign-in page."
     >
       <form onSubmit={change} className="flex flex-col gap-5">
         <DsField label="Current password">

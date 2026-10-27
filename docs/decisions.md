@@ -1,5 +1,5 @@
 ---
-reviewed: 2026-10-26
+reviewed: 2026-10-27
 owner: Alex
 ---
 
@@ -10,10 +10,18 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-27 — **Settings cards: title, one short line, then the rest.** The
+  line under a card's title says only what it is or runs on ("MongoDB
+  Atlas", "Not published", "This computer, ready for Vercel"); the longer
+  explanation sits apart below it, in the same muted text. Run locally, the
+  install cards say what they're ready for once deployed. Named things link
+  out inline with a small ↗ (the cluster, the Blob store) instead of a
+  button. "Image storage" is **Storage**: it holds images and video. A
+  project's card says Published at its address, or Not published.
 - 2026-10-27 — **Usage bars split by project.** Parabola's `DsProgress` takes
   `segments`: parts of the fill side by side, each in one of Parabola's
   accents in a fixed order (blue, orange, green, violet, pink, teal, sky,
-  stone, red), with a legend. Settings' Database and Image storage bars show
+  stone, red), with a legend. Settings' Database and Storage bars show
   each project's share; a project keeps its colour everywhere (its place in
   the project list), and its own Library section shows its share in that
   colour against the others in grey.

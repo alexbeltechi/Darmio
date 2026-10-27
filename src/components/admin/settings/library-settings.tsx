@@ -74,7 +74,8 @@ export function LibrarySettings() {
     <SettingsSection
       id="library"
       title="Library"
-      description="Every upload is saved once as AVIF at a few widths (up to 2560px) plus a JPEG for older browsers. Pages pick the width each screen needs."
+      description="AVIF at a few widths, up to 2560px"
+      note="Every upload is saved once as AVIF, plus a JPEG for older browsers. Pages pick the width each screen needs."
     >
       <DsField
         label="Quality for new uploads"
@@ -101,7 +102,7 @@ export function LibrarySettings() {
           ]}
           description={
             <>
-              {usage.items} media items in this project. The image storage is shared by every project:{" "}
+              {usage.items} media items in this project. Storage is shared by every project:{" "}
               <DsLink href={`${ACCOUNT_PATH}#storage`} className="text-ds-fg underline underline-offset-4">
                 see all of it in Settings
               </DsLink>

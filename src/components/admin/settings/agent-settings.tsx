@@ -74,7 +74,8 @@ export function AgentSettings() {
     <SettingsSection
       id="agent"
       title="Agent"
-      description="What your agent reads before it works on this site: your brain, then your rules (your voice, what never to do, how you like things named)."
+      description="Your brain, then your rules"
+      note="What your agent reads before it works on this site. Your rules hold your voice, what never to do and how you like things named."
     >
       {current && (
         <form onSubmit={saveBrain} className="flex flex-col gap-5">

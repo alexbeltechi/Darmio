@@ -5,7 +5,7 @@ import { DsButton, DsField, DsInput, dsToast } from "@beltechi/parabola";
 import { SITE_NAME_MAX, type HomeHero } from "@/lib/cms/site";
 import { announceSiteSettingsChanged } from "@/components/admin/use-site-settings";
 import { useCurrentProject } from "@/components/admin/use-current-project";
-import { SettingsSection } from "./settings-section";
+import { SettingsLink, SettingsSection } from "./settings-section";
 
 type Form = { siteName: string; title: string; ctaLabel: string; ctaHref: string };
 
@@ -18,7 +18,7 @@ const toForm = (siteName: string, hero: HomeHero | null): Form => ({
 
 /**
  * The project: its name (the admin's tile, the project menu, the site's logo,
- * the footer, browser titles), where its site is live, and the homepage's
+ * the footer, browser titles), whether its site is published and where, and the homepage's
  * headline over the feed, with an optional button.
  */
 export function SiteSettings() {
@@ -77,17 +77,20 @@ export function SiteSettings() {
       id="site"
       title="Project"
       description={
-        current?.onSite && address ? (
-          <>
-            Live at{" "}
-            <a href="/" target="_blank" rel="noopener noreferrer" className="text-ds-fg underline underline-offset-4">
-              {address}
-            </a>
-          </>
+        current &&
+        (current.onSite ? (
+          address ? (
+            <>
+              Published at <SettingsLink href="/">{address}</SettingsLink>
+            </>
+          ) : (
+            "Published"
+          )
         ) : (
-          "Its name, and what the homepage says above your posts."
-        )
+          "Not published"
+        ))
       }
+      note={current && !current.onSite && "Your site shows your first project for now."}
     >
       <form onSubmit={save} className="flex flex-col gap-5">
         <DsField

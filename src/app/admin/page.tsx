@@ -124,12 +124,10 @@ function HomeProjects() {
             aria-label="Search projects"
             className="order-last w-full sm:order-none sm:w-60"
           />
-          {/* Like + Post on the posts list. */}
-          {(cards.length > 0 || query) && (
-            <DsButton href={NEW_PROJECT_PATH} iconLeft={Plus}>
-              Project
-            </DsButton>
-          )}
+          {/* Like + Post on the posts list; always there, cards or not. */}
+          <DsButton href={NEW_PROJECT_PATH} iconLeft={Plus}>
+            Project
+          </DsButton>
           <AdminMenuButton />
         </div>
       </div>
@@ -143,10 +141,11 @@ function HomeProjects() {
         query ? (
           <DsEmptyState>No projects match that.</DsEmptyState>
         ) : (
+          // With nothing yet, making one is the page's one call to action: the black button.
           <DsEmptyState
             action={
-              <DsButton href={NEW_PROJECT_PATH} iconLeft={Plus}>
-                New project
+              <DsButton href={NEW_PROJECT_PATH} variant="primary" iconLeft={Plus}>
+                Project
               </DsButton>
             }
           >

@@ -19,9 +19,10 @@ export async function PATCH(request: NextRequest, context: { params: Promise<{ s
 }
 
 /**
- * Delete a project for good: its library's files in storage, its database
- * (posts, pages, categories, settings) and its place in the list. Not the
- * first project, which the public site shows.
+ * Delete a project for good: its library's files in storage, its content
+ * (posts, pages, categories, settings) and its place in the list. Any project,
+ * the one the site shows too: the next one takes its place, or the site is
+ * empty until a new project is made.
  */
 export async function DELETE(_request: NextRequest, context: { params: Promise<{ slug: string }> }) {
   try {

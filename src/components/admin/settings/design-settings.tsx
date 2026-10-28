@@ -6,7 +6,6 @@ import {
   DS_DEFAULT_LIBRARY,
   DsField,
   DsSelect,
-  dsApplyTheme,
   dsToast,
   parseDsThemeLibrary,
   type DsThemeLibrary,
@@ -14,9 +13,10 @@ import {
 import { SettingsSection } from "./settings-section";
 
 /**
- * Which of the project's Parabola themes its site and this admin wear
+ * Which of the project's Parabola themes its site wears (the admin always
+ * wears Parabola's own, so a theme can't make it hard to use)
  * (decisions, 2026-10-28): Default or one added on /parabola, where themes
- * are made and published. A pick shows at once and is saved right away.
+ * are made and published. A pick is saved right away and shows on the site.
  */
 export function DesignSettings() {
   const router = useRouter();
@@ -35,7 +35,6 @@ export function DesignSettings() {
     const before = library;
     const next = { ...library, active };
     setLibrary(next);
-    dsApplyTheme(next.themes.find((t) => t.id === active)!.theme);
     setSaving(true);
     try {
       const res = await fetch("/api/admin/settings", {
@@ -48,7 +47,6 @@ export function DesignSettings() {
       router.refresh();
     } catch (error) {
       setLibrary(before);
-      dsApplyTheme(before.themes.find((t) => t.id === before.active)!.theme);
       dsToast.error("Couldn't change the theme", { description: error instanceof Error ? error.message : undefined });
     } finally {
       setSaving(false);
@@ -61,7 +59,7 @@ export function DesignSettings() {
       title="Design"
       description={
         <>
-          The theme your site and this admin wear. Make and change themes on{" "}
+          The theme your site wears. Make and change themes on{" "}
           <a href="/parabola" target="_blank" rel="noopener noreferrer" className="text-ds-fg underline underline-offset-4">
             Parabola
           </a>

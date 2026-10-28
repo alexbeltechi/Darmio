@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { Instrument_Sans, Instrument_Serif } from "next/font/google";
-import { DS_FONTS, DsThemeStyle, dsActiveTheme } from "@beltechi/parabola";
 import { DEFAULT_SETTINGS, getSiteSettings } from "@/lib/db/settings";
 import "./globals.css";
 
 // Parabola's Google fonts, hosted with the app by next/font (no request to
 // Google from a visitor's browser). Each sets the `--ds-font-<id>` that its
-// stack in Parabola's fonts.ts tries first; a theme picks among them.
+// stack in Parabola's fonts.ts tries first; a theme picks among them. The
+// theme itself is the website's only ((site) layout) and /parabola's canvas:
+// the admin always wears Parabola's own, so a theme can't make it unusable.
 const instrumentSans = Instrument_Sans({
   subsets: ["latin"],
   variable: "--ds-font-instrument-sans",
@@ -30,20 +31,13 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // The project's Parabola theme (Settings › Design), for the site, the admin and /parabola alike.
-  const { themes } = await getSiteSettings().catch(() => DEFAULT_SETTINGS);
-  const { theme } = dsActiveTheme(themes);
   return (
     <html lang="en" suppressHydrationWarning className={`${instrumentSans.variable} ${instrumentSerif.variable}`}>
-      <head>
-        {/* Parabola's own fonts are hosted above; a font the theme added loads from Google. */}
-        <DsThemeStyle theme={theme} hosted={DS_FONTS.map((f) => f.id)} />
-      </head>
       <body className="antialiased">
         {children}
       </body>

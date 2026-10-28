@@ -48,8 +48,12 @@ with the why. To change one, add a new line that overrides it.
   (Alex, 2026-10-28); and an icon library (Lucide; the
   others shadcn offers need Parabola's icons in one place first). Themes
   live in a **library** in each project's settings: Parabola (the default
-  theme, can't go) and any added, one of them the site's, picked in Settings › Design; the root layout
-  applies it, so the site, the admin and `/parabola` all wear it.
+  theme, can't go) and any added, one of them the site's, picked in Settings › Design. Only the website
+  wears it, and on `/parabola` only the canvas (the open theme): the admin
+  and `/parabola`'s sidebar, header and panel always wear Parabola's own,
+  published or not, so a theme that breaks the site never breaks the tools
+  to fix it (Alex, 2026-10-28). In dark, text that's only based on the
+  light one falls back to black or white if it wouldn't read.
   Publishing remakes the site's cached pages at once, and `/parabola`
   makes the themes of the project picked in the admin, the one it
   publishes to.

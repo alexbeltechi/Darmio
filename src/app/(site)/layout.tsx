@@ -1,3 +1,4 @@
+import { DS_FONTS, DsThemeStyle, dsActiveTheme } from "@beltechi/parabola";
 import { Footer } from "@/components/site/footer";
 import { ScrollToTop } from "@/components/site/scroll-to-top";
 import { SiteNav } from "@/components/site/site-nav";
@@ -8,7 +9,7 @@ import { categoryGroups } from "@/lib/cms/category-groups";
 import { childPages, listSitePages } from "@/lib/db/site-pages";
 
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
-  const [{ siteName }, categories, pages] = await Promise.all([
+  const [{ siteName, themes }, categories, pages] = await Promise.all([
     // Without its database the page below fails into error.tsx; the frame around it still renders.
     getSiteSettings().catch(() => DEFAULT_SETTINGS),
     listCategories().catch(() => []),
@@ -33,6 +34,9 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       enableSystem
       disableTransitionOnChange
     >
+      {/* The project's Parabola theme (Settings › Design), the website's alone. Parabola's
+          own fonts are hosted (root layout); a font the theme added loads from Google. */}
+      <DsThemeStyle theme={dsActiveTheme(themes).theme} hosted={DS_FONTS.map((f) => f.id)} />
       <div className="site-root min-h-screen bg-ds-bg flex flex-col">
         {/* Rendered once here, not per-page, so it never unmounts (and never
             flickers) when navigating between views. */}

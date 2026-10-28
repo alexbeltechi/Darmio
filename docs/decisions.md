@@ -23,18 +23,19 @@ with the why. To change one, add a new line that overrides it.
 - 2026-10-28 — **Parabola themes, made like shadcn's create page.** A
   theme is data (`packages/parabola/theme.ts`): five colours
   (`colours.ts`), each based on the one before until given its own: the
-  **theme colour** (the website's background; Parabola's own is paper, a
+  **primary colour** (was "theme colour") (the website's background; Parabola's own is paper, a
   warm off-white #FAF7EF, its cards a step darker #EFECE4 so they show;
   it was white, cards a barely-there #FAFAF9, until 2026-10-28; every picker
   has a warmth bar, cold to warm, between hue and brightness), the
-  **surface** (cards, side panels, fields; based on the theme colour, a
+  **surface** (cards, side panels, fields; based on the primary colour, a
   bar sets how much lighter or darker, so the contrast between page and
-  cards is a choice; Alex, 2026-10-28), **typography**
+  cards is a choice; Alex, 2026-10-28), the **secondary colour** (was
+  "typography")
   (the text, and the quiet text, borders and shades drawn from it;
   Parabola's is black or white, whichever reads on the theme colour),
   **buttons** (solid buttons and selected states: the current nav item, a
   pressed button, a checked box, the Published pill, with black or white
-  on them; "Based on typography" by default; Alex, 2026-10-28) and
+  on them; "Based on secondary colour" by default; Alex, 2026-10-28) and
   the **accent colour** (the one highlight; "Based on buttons" by default,
   so Parabola's own highlight is black, white in dark, no longer purple,
   the admin's included; Alex, 2026-10-28). Selected states (the current nav
@@ -92,7 +93,9 @@ with the why. To change one, add a new line that overrides it.
   post's opening on the page itself, a subscribe card with the large
   buttons above the fold, a list of writing, a draft's card with its note,
   as a site and its admin lay them out; Alex, 2026-10-28),
-  the theme as JSON last, and the panel on the right (a rule between its
+  and the panel on the right (the theme as code last, folded: its
+  settings and every colour in light and dark, to copy, or paste one in to
+  apply it) (a rule between its
   sections, no line of explanation under its fields; under the top bar,
   which runs the full width with a rule under it) with its main choices (which
   theme: a dropdown whose last option is Add theme, and a ⋮ at the

@@ -10,18 +10,26 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
-- 2026-10-28 — **Parabola themes start with fonts, and Instrument Sans is
-  the default.** A theme is data (`packages/parabola/theme.ts`): a font for
-  text and one for headings, from a list (`fonts.ts`: Instrument Sans,
-  Instrument Serif, System), so a pairing is two picks and adding a font is
-  one entry. A project stores its theme in its settings; the root layout
-  applies it, so the site, the admin and `/parabola` all wear it. It's set
-  in Settings › Design or on `/parabola`, which now opens on **Theme**: the
-  controls, a grid of Parabola's pieces changing as you pick, the theme as
-  JSON, and Save. The CMS hosts the fonts with next/font, so a visitor's
-  browser never calls Google. The start of Alex's theme maker (BEL-109):
-  colours, corners and the rest join the same theme later. Why: anyone
-  should be able to make a Parabola theme quickly, starting with the font.
+- 2026-10-28 — **Parabola themes start with typography, and Instrument
+  Sans is the default.** A theme is data (`packages/parabola/theme.ts`):
+  two font families, primary and secondary, each from Parabola's fonts
+  (`fonts.ts`: Instrument Sans, Instrument Serif, System) or a Google font
+  added to the theme by its name or link; and for each text style (Display
+  to Small) its family, size and line height. The type tokens are `--ds-*`
+  variables, so a theme changes them at run time. A project stores its
+  theme in its settings; the root layout applies it, so the site, the
+  admin and `/parabola` all wear it. Settings › Design sets the two
+  families; `/parabola` sets everything: it opens on **Theme** (a grid of
+  Parabola's pieces and the theme as JSON), and **Typography** has Font
+  families (pick the two, add a font) and Type scale (per style). The
+  controls sit in a panel on the right, in collapsible sections like
+  Linear's properties, which also holds every page's options (they were in
+  the top bar); Save is in the panel, and every spacing is a Parabola one.
+  The CMS hosts Parabola's fonts with next/font, so a visitor's browser
+  calls Google only for a font a theme added. The start of Alex's theme
+  maker (BEL-109); uploading a font file, colours, corners and the rest
+  come next. Why: anyone should be able to make a Parabola theme quickly,
+  starting with its type.
 - 2026-10-28 — **The site's nav is a conventional bar** as wide as the
   reading column: the site's name on the left in H3, which is the way
   home (no Home button); the sections on the right as ghost buttons 4px

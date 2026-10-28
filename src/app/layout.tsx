@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Instrument_Sans, Instrument_Serif } from "next/font/google";
-import { DsThemeStyle } from "@beltechi/parabola";
+import { DS_FONTS, DsThemeStyle } from "@beltechi/parabola";
 import { DEFAULT_SETTINGS, getSiteSettings } from "@/lib/db/settings";
 import "./globals.css";
 
@@ -40,7 +40,8 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className={`${instrumentSans.variable} ${instrumentSerif.variable}`}>
       <head>
-        <DsThemeStyle theme={theme} loadFonts={false} />
+        {/* Parabola's own fonts are hosted above; a font the theme added loads from Google. */}
+        <DsThemeStyle theme={theme} hosted={DS_FONTS.map((f) => f.id)} />
       </head>
       <body className="antialiased">
         {children}

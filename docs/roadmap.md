@@ -278,12 +278,14 @@ Feature roadmap), unscheduled until Alex places it.
   self-hosted copy of the exact site, code and theme included. Not before
   the open-source release.
 - **Parabola themes, customizable like shadcn** — `doing` (BEL-109)
-  Started 2026-10-28 with fonts (decisions): a theme is data
-  (`packages/parabola/theme.ts`), Settings › Design and `/parabola`'s
-  Theme page set it, the root layout applies it. Next: colours, corners and
-  spacing in the same theme, the Theme page's grid showing every piece
-  (shadcn's "see everything"), import of a theme file, and an agent setting
-  it through the API.
+  Started 2026-10-28 with typography (decisions): a theme is data
+  (`packages/parabola/theme.ts`): two font families (Parabola's or a Google
+  font added by name or link) and, per text style, its family, size and line
+  height. Settings › Design and `/parabola` (Theme, Typography, with a
+  properties panel on the right) set it; the root layout applies it. Next:
+  uploading a font file, colours, corners and spacing in the same theme, the
+  Theme page's grid showing every piece (shadcn's "see everything"), import
+  of a theme file, and an agent setting it through the API.
   A theme contract (which tokens and block variants a theme may set) and
   themes as data (`*.theme.json`), imported and switched in Settings ›
   Design or by an agent. Anyone can make their own design system from it.

@@ -8,15 +8,16 @@
  * accent in accents.ts is a `--ds-accent-*` token with the same value and a
  * Tailwind utility (`bg-ds-accent-*`), and vice versa; and that every spacing
  * in spacing.ts is a `--ds-space-*` token with the same value and a utility
- * (`gap-ds-*`), and vice versa; and that `--ds-font` is the default font's
- * stack in fonts.ts.
+ * (`gap-ds-*`), and vice versa; and that the type tokens (families, sizes,
+ * line heights) are the default theme's in fonts.ts and theme.ts.
  */
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { DS_ACCENTS } from "../packages/parabola/accents";
 import { DS_SPACES } from "../packages/parabola/spacing";
 import { ROLES } from "../packages/parabola/showcase/colour-roles";
-import { DS_DEFAULT_FONT, dsFont } from "../packages/parabola/fonts";
+import { DS_DEFAULT_FONT, DS_DEFAULT_SECONDARY_FONT, dsFont } from "../packages/parabola/fonts";
+import { DS_TEXT_STYLES, DS_TEXT_STYLE_DEFAULTS } from "../packages/parabola/theme";
 
 const css = readFileSync(join(__dirname, "../packages/parabola/tokens.css"), "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
 
@@ -37,10 +38,14 @@ const dark = block(".dark");
 const theme = block("@theme inline");
 const problems: string[] = [];
 
-// Fonts: the default theme's face (fonts.ts) is the --ds-font tokens.css sets.
-const defaultFamily = dsFont(DS_DEFAULT_FONT).family;
-if (!same(root.get("--ds-font") ?? "", defaultFamily)) {
-  problems.push(`--ds-font in tokens.css isn't the default font (${DS_DEFAULT_FONT}): ${defaultFamily}`);
+// Typography: the default theme (fonts.ts, theme.ts) is what tokens.css sets.
+for (const [token, id] of [["--ds-font-primary", DS_DEFAULT_FONT], ["--ds-font-secondary", DS_DEFAULT_SECONDARY_FONT]]) {
+  if (!same(root.get(token) ?? "", dsFont(id).family)) problems.push(`${token} in tokens.css isn't the default font (${id}): ${dsFont(id).family}`);
+}
+for (const style of DS_TEXT_STYLES) {
+  const { size, lineHeight } = DS_TEXT_STYLE_DEFAULTS[style];
+  if (root.get(`--ds-text-${style}`) !== `${size}px`) problems.push(`--ds-text-${style} isn't ${size}px (theme.ts)`);
+  if (root.get(`--ds-text-${style}-leading`) !== `${lineHeight}px`) problems.push(`--ds-text-${style}-leading isn't ${lineHeight}px (theme.ts)`);
 }
 
 // UI palette: /parabola/colours/main against :root and .dark.

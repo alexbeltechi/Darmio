@@ -6,8 +6,9 @@ import { DS_DEFAULT_THEME, DsFontPairing, dsApplyTheme, dsToast, type DsThemeCon
 import { SettingsSection } from "./settings-section";
 
 /**
- * The project's Parabola theme (decisions, 2026-10-28): for now its fonts,
- * one for text and one for headings. A pick shows at once across the admin
+ * The project's Parabola theme (decisions, 2026-10-28): here its two font
+ * families, primary and secondary; the type scale and added fonts are on
+ * /parabola. A pick shows at once across the admin
  * and is saved right away; the site and /parabola take it on their next
  * load. More of the theme (colours, corners) joins here as Parabola grows.
  */
@@ -54,8 +55,9 @@ export function DesignSettings() {
       title="Design"
       description={
         <>
-          The fonts your site and this admin are set in. See everything they change on{" "}
-          <a href="/parabola" target="_blank" rel="noopener noreferrer" className="text-ds-fg underline underline-offset-4">
+          The two font families your site and this admin are set in. Which styles use which, their
+          sizes and fonts to add are on{" "}
+          <a href="/parabola/typography/type-scale" target="_blank" rel="noopener noreferrer" className="text-ds-fg underline underline-offset-4">
             Parabola
           </a>
           .

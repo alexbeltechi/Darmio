@@ -18,8 +18,8 @@ with the why. To change one, add a new line that overrides it.
   Serif, System) less any it took out, plus Google fonts added by name or
   link (a share link keeps the weights picked there); and for each text
   style (Display to Small) its name, family, weight (one its font has),
-  size and line height. By default Display to H3 are Secondary, Regular,
-  and the rest Primary, Medium, on the site and in the admin alike. Any
+  size and line height. By default Display to H2 are Secondary, Regular,
+  and the rest, H3 included, Primary, Medium, on the site and in the admin alike. Any
   font but System can be taken out, not while a family uses it. The type
   tokens are `--ds-*` variables (`--ds-family-<id>`, `--ds-font-<style>`…),
   so a theme changes them at run time. A project stores its theme in its

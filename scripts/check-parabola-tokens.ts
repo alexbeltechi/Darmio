@@ -19,7 +19,7 @@ import { DS_ACCENTS } from "../packages/parabola/accents";
 import { DS_SPACES } from "../packages/parabola/spacing";
 import { ROLES } from "../packages/parabola/showcase/colour-roles";
 import { DS_DEFAULT_FONT, DS_DEFAULT_HEADING_FONT, dsFont } from "../packages/parabola/fonts";
-import { DS_DEFAULT_ACCENT_COLOUR, DS_DEFAULT_BASE_COLOUR, dsAccentColour, dsBaseColour } from "../packages/parabola/colours";
+import { DS_DEFAULT_COLOURS, dsColourTokens } from "../packages/parabola/colours";
 import { DS_TEXT_STYLES, DS_TEXT_STYLE_DEFAULTS } from "../packages/parabola/theme";
 import { DS_DEFAULT_RADIUS, DS_RADIUS_TOKENS, dsRadiusPx } from "../packages/parabola/radius";
 
@@ -42,15 +42,16 @@ const dark = block(".dark");
 const theme = block("@theme inline");
 const problems: string[] = [];
 
-// Colours: the default base and accent colours (colours.ts) are tokens.css's, light and dark.
+// Colours: the default theme's (colours.ts) are tokens.css's, light and dark. Buttons are the text there
+// (var(--ds-fg)), so they're left out.
 {
-  const base = dsBaseColour(DS_DEFAULT_BASE_COLOUR);
-  const secondary = dsAccentColour(DS_DEFAULT_ACCENT_COLOUR);
-  for (const [mode, tokens, values] of [
-    ["light", root, { ...base.light, highlight: secondary.light.highlight, "highlight-tint": secondary.light.tint }],
-    ["dark", dark, { ...base.dark, highlight: secondary.dark.highlight, "highlight-tint": secondary.dark.tint }],
+  for (const [mode, tokens] of [
+    ["light", root],
+    ["dark", dark],
   ] as const) {
+    const values = dsColourTokens(DS_DEFAULT_COLOURS, mode);
     for (const [name, value] of Object.entries(values)) {
+      if (name === "button" || name === "on-button") continue;
       const css = tokens.get(`--ds-${name}`) ?? root.get(`--ds-${name}`);
       if (!css || !same(css, value)) problems.push(`--ds-${name} (${mode}) isn't the default colours' ${value} (colours.ts): ${css}`);
     }

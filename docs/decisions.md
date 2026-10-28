@@ -11,17 +11,21 @@ with the why. To change one, add a new line that overrides it.
 ## Product
 
 - 2026-10-28 — **Parabola themes, made like shadcn's create page.** A
-  theme is data (`packages/parabola/theme.ts`): four colours
-  (`colours.ts`): the **theme colour** (the website's background; cards,
-  fields, side panels and borders are shades of it), **typography**
+  theme is data (`packages/parabola/theme.ts`): five colours
+  (`colours.ts`), each based on the one before until given its own: the
+  **theme colour** (the website's background; Parabola's own is white, as
+  it has been since Parabola began, cards a barely-there #FAFAF9), the
+  **surface** (cards, side panels, fields; based on the theme colour, a
+  bar sets how much lighter or darker, so the contrast between page and
+  cards is a choice; Alex, 2026-10-28), **typography**
   (the text, and the quiet text, borders and shades drawn from it;
   Parabola's is black or white, whichever reads on the theme colour),
   **buttons** (solid buttons and selected states: the current nav item, a
   pressed button, a checked box, the Published pill, with black or white
   on them; "Based on typography" by default; Alex, 2026-10-28) and
-  the **accent colour** (the one highlight; Parabola's own is Purple, and
-  on a theme colour that colour's complement, deep on a light page and
-  pale on a dark one, Alex, 2026-10-28). Selected states (the current nav
+  the **accent colour** (the one highlight; "Based on buttons" by default,
+  so Parabola's own highlight is black, white in dark, no longer purple,
+  the admin's included; Alex, 2026-10-28). Selected states (the current nav
   item, a pressed button, a checked box) are the text colour, solid, as
   Publish is. In the panel each is just
   a colour picker (a short shade square, a hue bar and a brightness bar,

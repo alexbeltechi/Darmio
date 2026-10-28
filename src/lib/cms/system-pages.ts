@@ -45,7 +45,9 @@ export function reservedPageSlugReason(slug: string, categories: CategoryLike[])
   if (RESERVED_ROUTE_SLUGS.includes(normalized)) {
     return `"${slug}" is reserved by the site. Choose another URL.`;
   }
-  const system = buildSystemPages(categories).find((p) => p.slug === normalized);
+  // The homepage's editable version is a page at "home" (a Home-format page,
+  // decisions 2026-10-28); category pages can't be taken yet.
+  const system = buildSystemPages(categories).find((p) => p.slug === normalized && p.kind !== "home");
   if (system) {
     return `"${slug}" belongs to the ${system.title} system page. Choose another URL.`;
   }

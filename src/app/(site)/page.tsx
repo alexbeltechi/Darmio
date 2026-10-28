@@ -5,6 +5,7 @@ import { listCategories } from "@/lib/db/categories";
 import { PageView } from "@/components/site/page-view";
 import { feedCategory, getPreviewCandidateIds } from "@/components/site/post-grid-shared";
 import { getSiteSettings } from "@/lib/db/settings";
+import { pageSettings } from "@/lib/cms/page-formats";
 import type { Entry } from "@/lib/cms/types";
 
 // Use ISR - the feed is chronological, so the same output serves everyone.
@@ -15,10 +16,14 @@ function entryDate(entry: Entry): number {
 }
 
 export default async function HomePage() {
-  // If a published "home" builder page exists, render it. Otherwise fall back
-  // to the default homepage below (safe rollback path).
+  // If a published "home" builder page exists (a Home-format page, or one
+  // with blocks), render it. Otherwise fall back to the default homepage
+  // below (safe rollback path).
   const homePage = await getEntry("pages", "home");
-  if (homePage?.status === "published" && (homePage.data.content as unknown[] | undefined)?.length) {
+  if (
+    homePage?.status === "published" &&
+    (pageSettings(homePage.data).format === "home" || (homePage.data.content as unknown[] | undefined)?.length)
+  ) {
     return <PageView page={homePage} />;
   }
 

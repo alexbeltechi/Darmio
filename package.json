@@ -14,6 +14,7 @@
     "check:parabola": "npx tsx scripts/check-parabola-tokens.ts",
     "reset-password": "npx tsx scripts/reset-password.ts",
     "reset-link": "npx tsx scripts/reset-link.ts",
+    "seed": "npx tsx scripts/seed.ts",
     "verify": "next typegen && tsc --noEmit && eslint . --max-warnings 0 && npm run check:parabola && next build"
   },
   "dependencies": {

@@ -1,14 +1,14 @@
 {
   "slug": "pages",
   "name": "Pages",
-  "description": "Pages that live at their own URL (/<slug>): a title, a description for search and sharing, stacked content blocks (the same as posts), and the docs that guide them.",
+  "description": "Pages that live at their own URL (/<slug>): a title, a description for search and sharing, a format (blocks, text, home, links) with its few settings, a place (under another page, in the nav), stacked content blocks (the same as posts), and the docs that guide them.",
   "fields": [
     {
       "key": "title",
       "type": "text",
       "required": true,
       "label": "Title",
-      "placeholder": "Services, About, Contact…"
+      "placeholder": "Services, About, Contact\u2026"
     },
     {
       "key": "description",
@@ -18,18 +18,85 @@
       "placeholder": "One or two sentences for search results and sharing"
     },
     {
+      "key": "format",
+      "type": "select",
+      "required": false,
+      "label": "Format",
+      "description": "What kind of page it is (lib/cms/page-formats.ts). Unset is blocks.",
+      "options": [
+        {
+          "value": "blocks",
+          "label": "Blocks"
+        },
+        {
+          "value": "text",
+          "label": "Text"
+        },
+        {
+          "value": "home",
+          "label": "Home"
+        },
+        {
+          "value": "links",
+          "label": "Links"
+        }
+      ]
+    },
+    {
+      "key": "parent",
+      "type": "text",
+      "required": false,
+      "label": "Under",
+      "description": "The slug of the page this one sits under, one level deep."
+    },
+    {
+      "key": "nav",
+      "type": "boolean",
+      "required": false,
+      "label": "In the nav",
+      "description": "Top-level pages only."
+    },
+    {
+      "key": "links",
+      "type": "object",
+      "required": false,
+      "label": "Links",
+      "description": "Links pages: a list of { label, url, note }."
+    },
+    {
+      "key": "postsCategory",
+      "type": "text",
+      "required": false,
+      "label": "Posts from",
+      "description": "Home pages: the slug of the category whose posts they list."
+    },
+    {
+      "key": "newsletter",
+      "type": "object",
+      "required": false,
+      "label": "Newsletter",
+      "description": "Home pages: { heading, text } for the sign-up at the foot."
+    },
+    {
       "key": "content",
       "type": "blocks",
       "required": false,
       "label": "Content",
-      "blockTypes": ["text", "gallery", "video", "youtube", "quote", "divider"]
+      "blockTypes": [
+        "text",
+        "gallery",
+        "video",
+        "youtube",
+        "quote",
+        "divider"
+      ]
     },
     {
       "key": "docs",
       "type": "docs",
       "required": false,
       "label": "Docs",
-      "description": "Markdown briefs and sources that guide this page (admin › Agent)"
+      "description": "Markdown briefs and sources that guide this page (admin \u203a Agent)"
     }
   ],
   "admin": {

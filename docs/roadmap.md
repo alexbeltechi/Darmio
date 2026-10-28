@@ -57,34 +57,37 @@ When a task changes an item, update this file in the same change.
       Layouts move to the page they belong to, never here.
       Done: everything a project can vary is on this page, no code edit.
    4. **First run: the launch package.** The seed is **Ilo Odena**, one
-      of the Humans of Y3K (`seed/ilo/`, decisions 2026-10-24), shaped on
-      nicksaraev.com: categories **Writing** and **Moments**, an **About**
-      page, and a home page from blocks that overrides the feed (intro with
-      her portrait loop, latest writing as a list with year and read time,
-      latest moments as a strip, links, a newsletter form at the foot). Nav:
-      Writing, Moments, About, Newsletter. Everything is marked as an
-      example and removed in one action, which leaves the plain feed.
+      of the Humans of Y3K (`seed/ilo/`, decisions 2026-10-24 and
+      2026-10-28), shaped on nicksaraev.com: a **Writing** category (a list
+      by year), a **Home** page (her portrait, three short paragraphs, the
+      latest writing with year and read time, About's pages, Follow's
+      links, the newsletter), **About** with **Autobiography**, **Press
+      kit** and **FAQ** under it, **Work with me**, and **Follow**. Nav:
+      Writing, About, Work with me. Everything is marked as an example and
+      removed in one action, which leaves the plain feed.
       In order:
       - **a. V0 folder.** Done differently 2026-10-26: `darmio`'s own
         checkout, on its own empty `darmio-dev` database, is the blank
-        install; the Ilo seed goes there. Was: a second clone of this repo (not a fork) beside
-        it, with its own `.env.local`: the same Atlas cluster but its own
-        database in the URI (`/ilo-v0`), no Blob token (uploads stay in the
-        folder), its own `NEXTAUTH_SECRET` and agent token. It is what a
-        tester gets, and it is the separate dev database of item 3: agents
-        test there, never on the live data.
-      - **b. Blank slate first** (step 2): without it the V0 still shows
-        Alex's Design, Photography and Journal.
-      - **c. Blocks:** intro (portrait, video allowed), latest posts (by
-        category, as a list or a strip), link list, newsletter (the Kit
-        session). Posts gain a read time.
-      - **d. Seed script:** `npm run seed -- ilo` creates the owner from
-        the terminal, the settings, categories, pages and posts (through
-        the agent Markdown API), uploads the media, marks every item as an
-        example; "Remove examples" in Settings undoes it.
-      - **e. Media:** six moments (three stills, three 3–5s loops, first
-        person, never her face; briefs in each post's placeholder line) and
-        Alex's OK to ship the Y3K Ilo images in an open-source repo.
+        install; the Ilo seed goes there.
+      - **b. Blank slate first** (step 2). Done 2026-10-26.
+      - **c. Page formats instead of new blocks.** Done 2026-10-28
+        (decisions): Text, Home, Links and Blocks; pages under pages; pages
+        in the nav; the category `list` layout; presets in New page; posts
+        have a read time. The Parabola gaps it found, kept with the site's
+        pages until Alex designs them: a list of links with meta on the
+        right (`LinkRows`), a page title with the page it sits under, a
+        section heading, a smaller image size for a portrait (a gallery is
+        the column's width or more), and a nav with the name on the left
+        (the site's nav is centred pills).
+      - **d. Seed script.** Done 2026-10-28: `npm run seed -- ilo` loads the
+        settings, categories, media, posts and pages, each marked as an
+        example (`metadata.example`), and skips anything already there.
+        Left: **Remove examples** in Settings, and seeding from setup, so a
+        maker without a terminal gets Ilo's site (the owner comes from
+        setup, not the script).
+      - **e. Media.** Done 2026-10-28 with three Y3K images of Ilo (the
+        portrait, the black-sand shore, the lake), 730 KB in all. Moments
+        are out of the seed (decisions, 2026-10-28).
       - **f. Install by AI** (decisions, 2026-10-26): `INSTALL.md`, the
         README's one prompt, the setup code. Done 2026-10-26; next, Alex
         runs it from scratch with a fresh AI chat. A deploy button and a

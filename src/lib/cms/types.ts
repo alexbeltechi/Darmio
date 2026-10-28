@@ -179,9 +179,10 @@ export interface ImageBlock {
 /**
  * How a top-level category's page sets its intro: `hero` (a big headline over
  * the feed, the default), `left` (a sticky text column beside it), `wall` (no
- * intro, just the grid).
+ * intro, just the grid), `list` (a title, then every post as a line, by year:
+ * for writing).
  */
-export const CATEGORY_LAYOUTS = ["hero", "left", "wall"] as const;
+export const CATEGORY_LAYOUTS = ["hero", "left", "wall", "list"] as const;
 export type CategoryLayout = (typeof CATEGORY_LAYOUTS)[number];
 
 export const GALLERY_LAYOUTS = ["auto", "stack", "grid", "masonry"] as const;

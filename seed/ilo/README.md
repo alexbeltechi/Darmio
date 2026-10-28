@@ -1,55 +1,64 @@
 # Seed: Ilo Odena
 
-The example site a fresh install ships with (roadmap item 2, step 4;
-decisions, 2026-10-24). Every post and page here is marked as an example
-and goes in one action, leaving the plain feed.
+The example site a fresh install can start as (roadmap item 2, step 4;
+decisions, 2026-10-24 and 2026-10-28), shaped on nicksaraev.com. Every post
+and page is marked as an example (`metadata.example`).
 
-Posts and pages are in the CMS's own agent format (`src/lib/agent/markdown.ts`),
-so the seed script posts them exactly as an agent would. Empty galleries
-carry `placeholder` lines: they are the shot list until the media exists.
+```sh
+npm run seed -- ilo
+```
+
+It loads into the database in `.env.local` and skips anything already
+there. Posts and pages are in the CMS's own agent format
+(`src/lib/agent/markdown.ts`); an image is written `![alt](file:name.jpg)`
+and becomes an upload of `media/name.jpg`. Pages are made in file-name
+order, which is the order they're listed in.
 
 ## Who she is
 
 Ilo is one of the Humans of Y3K (`~/Documents/Code/Y3K/app/(club)/humans.ts`):
 long braids, silver glasses shaped like dragonfly wings. In that story she
 spent three summers at a lake and made **Hollow**, a palm-sized stone that
-holds one drop of lake water, in Y3K's cohort 02. That is the soft plug, and
-it is already true inside the story.
+holds one drop of lake water, in Y3K's cohort 02. Odena is a quiet nod to
+Odonata, the dragonflies.
 
-Odena is a quiet nod to Odonata, the dragonflies.
-
-She makes objects, writes, and keeps **moments**: a few seconds of light,
-with whatever else was in the air (temperature, sound, smell). Her glasses
-keep them. The site never explains how.
+She makes objects, writes, and keeps **moments**: a few seconds of a place,
+with whatever else was in the air. Her glasses keep them. The site never
+explains how.
 
 ## Voice
 
 - Quiet, exact, sensory. Short sentences. Concrete nouns over adjectives.
 - Never says "the future", "year 3000", "Renaissance", "multi-sensory" or
   "AI". The reader should think "who is this?", not be told.
-- The home page and About are in the third person (like nicksaraev.com);
-  her writing is in the first.
-- Y3K appears twice, plainly: in About, as where she made Hollow, and in
-  Elsewhere. Never as an ad.
+- Home, About and the press kit are in the third person (like
+  nicksaraev.com); her writing, Autobiography and Work with me in the first.
+- Y3K appears plainly in About, the press kit and Follow. Never as an ad.
 
 ## What's in here
 
 | File | Becomes |
 | --- | --- |
-| `site.md` | Settings (site name), categories, nav, the home page's blocks and copy, newsletter copy |
-| `pages/about.md` | The About page |
-| `posts/*.md` | Three writing posts and six moments, published, backdated |
+| `site.json` | The site's name and the Writing category (list layout, in the nav) |
+| `media/` | Her portrait, the black-sand shore and the lake, from Y3K |
+| `pages/01-home.md` | Home: the portrait, three short paragraphs; the format adds Writing, About, Follow and the newsletter |
+| `pages/02-about.md` | About (in the nav): short, two images |
+| `pages/03…05` | Autobiography, Press kit, FAQ, under About |
+| `pages/06-work-with-me.md` | Work with me (in the nav): four ways |
+| `pages/07-follow.md` | Follow: YouTube, Newsletter, Instagram, X, Y3K Club |
+| `posts/*.md` | Six essays in Writing, 2025–2026 |
 
-## Media
+## Made up for the seed
 
-| Asset | Where | Status |
-| --- | --- | --- |
-| `ilo.mp4` + `ilo.jpg` (blinks, glances aside) | Home intro portrait | Exists in Y3K. Alex to confirm it can ship in an open-source repo |
-| `p21.jpg` (portrait, dragonfly glasses) | About, top | Same |
-| `ilo-lake.jpg` (seen from behind, at the lake) | About, beside Hollow | Same |
-| Six moments (three stills, three loops) | `posts/moment-*.md` | To make. The `placeholder` lines are the brief |
+Beyond the Y3K story (Hollow, the lake, the glasses, cohort 02), these are
+invented and Alex's to change:
 
-Moments are what her glasses saw, so they are first person: her hands, her
-shadow, what she looked at. Never her face. Loops are 3–5 seconds, 720p, no
-sound, under 1.5 MB each; stills up to 2560px on the long edge. The whole
-seed stays under 15 MB so the repo stays light.
+- She grew up in the wetlands; her grandmother kept bees and gave her the
+  glasses; she worked a fruit stall at nineteen.
+- She keeps about one moment a week, and never faces.
+- Two Hollows a year on commission, listening walks, four-session "small
+  version" mentoring, talks and essays (Work with me).
+- The handles (@iloodena, @ilo.odena) and the address ilo@example.com
+  (`example.com` is reserved for examples, so it reaches nobody).
+- Three new essays: "Four in the morning", "Answering slowly", "What I
+  bring to the lake".

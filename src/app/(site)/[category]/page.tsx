@@ -29,7 +29,8 @@ async function publishedPage(slug: string) {
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
   const { category: slug } = await params;
   const categories = await listCategories();
-  if (categories.some((c) => c.slug === slug || c.id === slug)) return {};
+  const category = categories.find((c) => c.slug === slug || c.id === slug);
+  if (category) return { title: category.label, description: category.description || undefined };
   const page = await publishedPage(slug);
   if (!page) return {};
   return {

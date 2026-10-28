@@ -2,6 +2,13 @@ import { marked } from "marked";
 import TurndownService from "turndown";
 import { tables } from "turndown-plugin-gfm";
 import { DIVIDER_STYLES, GALLERY_LAYOUTS, GALLERY_WIDTHS, type Block, type Entry } from "@/lib/cms/types";
+import {
+  linesToLinks,
+  linksToLines,
+  pageSettings,
+  type HomeNewsletter,
+  type PageLink,
+} from "@/lib/cms/page-formats";
 
 /**
  * Posts as Markdown, for agents: shorter to read and write than the JSON
@@ -30,6 +37,16 @@ import { DIVIDER_STYLES, GALLERY_LAYOUTS, GALLERY_WIDTHS, type Block, type Entry
  *   ::divider
  *   ::video media=MEDIA_ID caption="…"
  *   ::youtube url="https://…" caption="…"
+ *
+ * A page's front matter also carries its format and place:
+ *
+ *   format: text            (blocks, text, home or links)
+ *   parent: about           (the page it sits under)
+ *   nav: yes                (top-level pages: in the site's nav)
+ *   posts: writing          (home: the category it lists)
+ *   newsletter: Letters | A few times a year.   (home: heading | line)
+ *   links:                  (links pages: one a line, Label | URL | note)
+ *     - YouTube | https://youtube.com/@me | @me
  *
  * `<!-- block:ID -->` marks where each block starts and keeps its identity
  * (the first 8 characters of its id are enough). Writing a post back, a
@@ -61,6 +78,13 @@ export type PostMeta = {
   description?: string;
   /** Attached doc ids (posts and pages). */
   docs?: string[];
+  /** Pages only: the format and its settings (lib/cms/page-formats.ts). */
+  format?: string;
+  parent?: string;
+  nav?: boolean;
+  links?: PageLink[];
+  postsCategory?: string;
+  newsletter?: HomeNewsletter;
 };
 
 /** A block parsed from Markdown, with the id prefix it was marked with, if any. */
@@ -120,6 +144,7 @@ export function postToMarkdown(entry: Entry, mediaLabel?: (id: string) => string
       ? [
           `description: ${String(data.description || "").replace(/\s+/g, " ")}`,
           `docs: ${((data.docs as string[]) || []).join(", ")}`,
+          ...pageFrontMatter(data),
         ]
       : [
           `categories: ${((data.categories as string[]) || []).join(", ")}`,
@@ -132,6 +157,21 @@ export function postToMarkdown(entry: Entry, mediaLabel?: (id: string) => string
   const front = ["---", `title: ${String(data.title || "")}`, `slug: ${entry.slug}`, status, ...fields, "---"].join("\n");
   const blocks = ((data.content as Block[]) || []).map((b) => `<!-- block:${shortId(b.id)} -->\n${blockToMarkdown(b, mediaLabel)}`);
   return `${front}\n\n${blocks.join("\n\n")}\n`;
+}
+
+/** A page's format lines, only those that say something. */
+function pageFrontMatter(data: Record<string, unknown>): string[] {
+  const settings = pageSettings(data);
+  return [
+    `format: ${settings.format}`,
+    ...(settings.parent ? [`parent: ${settings.parent}`] : []),
+    ...(settings.nav ? ["nav: yes"] : []),
+    ...(settings.postsCategory ? [`posts: ${settings.postsCategory}`] : []),
+    ...(settings.newsletter
+      ? [`newsletter: ${[settings.newsletter.heading ?? "", settings.newsletter.text ?? ""].join(" | ")}`]
+      : []),
+    ...(settings.links.length > 0 ? ["links:", ...linksToLines(settings.links).map((line) => `  - ${line}`)] : []),
+  ];
 }
 
 // ---------------------------------------------------------------------------
@@ -207,11 +247,30 @@ function splitFrontMatter(md: string): { meta: PostMeta; body: string } {
   const match = md.match(/^\s*---\n([\s\S]*?)\n---\n?/);
   if (!match) return { meta: {}, body: md };
   const meta: PostMeta = {};
+  // `links:` is followed by its links, one an indented `- ` line.
+  let linkLines: string[] | null = null;
   for (const line of match[1].split("\n")) {
+    if (linkLines && /^\s+-\s/.test(line)) {
+      linkLines.push(line.replace(/^\s+-\s+/, ""));
+      continue;
+    }
     const i = line.indexOf(":");
     if (i < 0) continue;
     const key = line.slice(0, i).trim();
     const value = line.slice(i + 1).trim();
+    if (key === "links") {
+      linkLines = [];
+      meta.links = [];
+      continue;
+    }
+    if (key === "format") meta.format = value;
+    if (key === "parent") meta.parent = value;
+    if (key === "nav") meta.nav = /^(yes|true)$/i.test(value);
+    if (key === "posts") meta.postsCategory = value;
+    if (key === "newsletter") {
+      const [heading, ...rest] = value.split("|").map((part) => part.trim());
+      meta.newsletter = { heading, text: rest.join(" | ") };
+    }
     if (key === "title") meta.title = value;
     if (key === "categories") meta.categories = value ? value.split(",").map((c) => c.trim()).filter(Boolean) : [];
     if (key === "tags") meta.tags = value;
@@ -220,6 +279,7 @@ function splitFrontMatter(md: string): { meta: PostMeta; body: string } {
     if (key === "description") meta.description = value;
     if (key === "docs") meta.docs = value ? value.split(",").map((d) => d.trim()).filter(Boolean) : [];
   }
+  if (linkLines) meta.links = linesToLinks(linkLines);
   return { meta, body: md.slice(match[0].length) };
 }
 

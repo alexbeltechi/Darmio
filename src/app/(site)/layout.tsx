@@ -6,18 +6,27 @@ import { getNavCounts } from "@/lib/db/nav-counts";
 import { DEFAULT_SETTINGS, getSiteSettings } from "@/lib/db/settings";
 import { listCategories } from "@/lib/db/categories";
 import { categoryGroups } from "@/lib/cms/category-groups";
+import { childPages, listSitePages } from "@/lib/db/site-pages";
 
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
-  const [navCounts, { siteName }, categories] = await Promise.all([
+  const [navCounts, { siteName }, categories, pages] = await Promise.all([
     getNavCounts(),
     // Without its database the page below fails into error.tsx; the frame around it still renders.
     getSiteSettings().catch(() => DEFAULT_SETTINGS),
     listCategories().catch(() => []),
+    listSitePages().catch(() => []),
   ]);
-  // The nav grows with the site: each top-level category marked for it (decisions, 2026-10-26).
-  const sections = categoryGroups(categories)
-    .filter((g) => g.nav)
-    .map(({ slug, label, members }) => ({ slug, label, members }));
+  // The nav grows with the site: each top-level category marked for it
+  // (decisions, 2026-10-26), then each top-level page marked for it, lit for
+  // the pages under it too (decisions, 2026-10-28).
+  const sections = [
+    ...categoryGroups(categories)
+      .filter((g) => g.nav)
+      .map(({ slug, label, members }) => ({ slug, label, members })),
+    ...pages
+      .filter((p) => p.settings.nav)
+      .map((p) => ({ slug: p.slug, label: p.title, members: [p.slug, ...childPages(pages, p.slug).map((c) => c.slug)] })),
+  ];
 
   return (
     <ThemeProvider

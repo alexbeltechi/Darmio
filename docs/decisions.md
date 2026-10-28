@@ -10,6 +10,31 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-28 — **Pages have a format, and a fresh install can start as
+  Ilo's site.** Alex: an out-of-the-box site shaped like nicksaraev.com,
+  presets of pages, "not a block editor". A page picks one of four
+  formats (`lib/cms/page-formats.ts`) and fills it with its blocks, by
+  hand or by agent: **Text** (a title, a line, the text in a reading
+  column, the pages under it at the end), **Home** (an intro, then the
+  latest posts of one category, each page with pages under it, each links
+  page and a newsletter, all made from the rest of the site, so nothing is
+  typed twice), **Links** (a title and links with a note each), and
+  **Blocks** (what every page was before; a page without a format is
+  this). A page can sit under one top-level page (Autobiography, Press kit
+  and FAQ under About), and a top-level page can be in the nav, after the
+  categories. A page at `home` is the homepage. A category's page gains a
+  **list** layout: its posts as lines by year, for writing. New page offers
+  presets (Home, About, Autobiography, Press kit, FAQ, Follow, Work with
+  me), each a starting text that says what goes there. The example site is
+  Ilo's: `npm run seed -- ilo` loads Writing (six essays), Home, About and
+  the three pages under it, Work with me and Follow, with three Y3K images
+  of her (Alex: "we can use one of the Y3K images"), all marked as
+  examples. Overrides 2026-10-24's seed in part: no Moments category,
+  since Alex's list didn't have one, and Follow instead of Elsewhere. The
+  layout pieces (a list of links with meta, a page title, a section
+  heading) stay with the site's pages until Alex designs them into
+  Parabola.
+
 - 2026-10-28 — **Three Darmios: self-hosted (free, MIT), the web version
   (paid, later), and themes (sold).** Replaces 2026-10-07's "no paid
   tiers" and the never-merged 2026-10-27 "no hosted plan".

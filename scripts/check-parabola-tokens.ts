@@ -9,7 +9,8 @@
  * Tailwind utility (`bg-ds-accent-*`), and vice versa; and that every spacing
  * in spacing.ts is a `--ds-space-*` token with the same value and a utility
  * (`gap-ds-*`), and vice versa; and that the type tokens (families, sizes,
- * line heights) are the default theme's in fonts.ts and theme.ts.
+ * line heights, each style's family and weight) are the default theme's in
+ * fonts.ts and theme.ts.
  */
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -43,8 +44,10 @@ for (const [token, id] of [["--ds-family-primary", DS_DEFAULT_FONT], ["--ds-fami
   if (!same(root.get(token) ?? "", dsFont(id).family)) problems.push(`${token} in tokens.css isn't the default font (${id}): ${dsFont(id).family}`);
 }
 for (const style of DS_TEXT_STYLES) {
-  const { size, lineHeight } = DS_TEXT_STYLE_DEFAULTS[style];
+  const { size, lineHeight, family, weight } = DS_TEXT_STYLE_DEFAULTS[style];
   if (root.get(`--ds-text-${style}`) !== `${size}px`) problems.push(`--ds-text-${style} isn't ${size}px (theme.ts)`);
+  if (root.get(`--ds-font-${style}`) !== `var(--ds-family-${family})`) problems.push(`--ds-font-${style} isn't the ${family} family (theme.ts)`);
+  if (root.get(`--ds-weight-${style}`) !== String(weight)) problems.push(`--ds-weight-${style} isn't ${weight} (theme.ts)`);
   if (root.get(`--ds-text-${style}-leading`) !== `${lineHeight}px`) problems.push(`--ds-text-${style}-leading isn't ${lineHeight}px (theme.ts)`);
 }
 

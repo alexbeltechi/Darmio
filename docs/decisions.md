@@ -10,12 +10,16 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
-- 2026-10-28 — **Parabola themes start with typography, and Instrument
-  Sans is the default.** A theme is data (`packages/parabola/theme.ts`):
-  two font families, **primary** and **display**, each from Parabola's
-  fonts (`fonts.ts`: Instrument Sans, Instrument Serif, System) or a Google
-  font added to the theme by its name or link; and for each text style
-  (Display to Small) its family, size and line height. The type tokens are
+- 2026-10-28 — **Parabola themes start with typography: Instrument Serif
+  for headlines, Instrument Sans for everything else.** A theme is data
+  (`packages/parabola/theme.ts`): two font families, **primary** and
+  **display**, each from Parabola's fonts (`fonts.ts`: Instrument Sans,
+  Instrument Serif, System) or a Google font added to the theme by its
+  name or link (a share link keeps the weights picked on Google Fonts); and
+  for each text style (Display to Small) its name, family, weight (one the
+  font has), size and line height. By default Display to H3 are in the
+  display family, Regular, and the rest in the primary, Medium, on the
+  site and in the admin alike. The type tokens are
   `--ds-*` variables, so a theme changes them at run time. A project stores
   its theme in its settings; the root layout applies it, so the site, the
   admin and `/parabola` all wear it. Settings › Design sets the two

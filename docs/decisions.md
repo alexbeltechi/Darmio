@@ -16,7 +16,11 @@ with the why. To change one, add a new line that overrides it.
   fields, side panels and borders are shades of it), **fonts and UI**
   (the text, and the quiet text, borders and shades drawn from it;
   Parabola's is black or white, whichever reads on the theme colour) and
-  the **accent colour** (the one highlight). Each is Parabola's own or a
+  the **accent colour** (the one highlight; Parabola's own is Purple, and
+  on a theme colour that colour's complement, deep on a light page and
+  pale on a dark one, Alex, 2026-10-28). Selected states (the current nav
+  item, a pressed button, a checked box) are the text colour, solid, as
+  Publish is. Each is Parabola's own or a
   custom colour from an inline picker (hue bar, a short shade square,
   hex): no preset lists, for a different look you make another theme
   (Alex, 2026-10-28). Each is picked for light; in dark, "Based on light

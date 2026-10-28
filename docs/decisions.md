@@ -12,19 +12,19 @@ with the why. To change one, add a new line that overrides it.
 
 - 2026-10-28 — **Parabola themes, made like shadcn's create page.** A
   theme is data (`packages/parabola/theme.ts`): three colours
-  (`colours.ts`), each a preset or a custom hex picked live in an inline
-  colour picker (hue bar, saturation and brightness square, hex): a
-  **base colour** (the greys: Stone, Parabola's own, Neutral, Zinc, Slate,
-  Gray; a custom one derives its shades), an **accent colour** (the one
-  highlight: Purple, Blue, Teal, Green, Orange, Rose; was "secondary"),
-  a **background colour** (the website's background, the base's own by
-  default, mid-tones like a bright yellow welcome; picked, it brings the
-  cards, fields, side panels and borders along as shades of itself, and
-  text turns black or white to read on it) and, optional, a **surface
-  colour** (cards, side panels, fields; Auto is shades of the
-  background). Every colour is picked once: the dark theme uses its
-  counterpart, the same hue at the other end of light, so light and dark
-  always contrast (Alex: "every colour should have an anti-colour"); **font families**,
+  (`colours.ts`): the **theme colour** (the website's background; cards,
+  fields, side panels and borders are shades of it), **fonts and UI**
+  (the text, and the quiet text, borders and shades drawn from it;
+  Parabola's is black or white, whichever reads on the theme colour) and
+  the **accent colour** (the one highlight). Each is Parabola's own or a
+  custom colour from an inline picker (hue bar, a short shade square,
+  hex): no preset lists, for a different look you make another theme
+  (Alex, 2026-10-28). Each is picked for light; in dark, "Based on light
+  theme" (on by default) keeps it the light one's counterpart, the same
+  hue at the other end of light, so light and dark always contrast
+  (Alex: "every colour should have an anti-colour"); off, it takes a dark
+  colour of its own. Since text and surfaces come from the same two
+  colours, text on a card reads as it does on the page; **font families**,
   Font (text) and Heading (headlines) to start and any more you add, each
   a name and a font; the fonts it can use, Parabola's (Instrument Sans,
   Instrument Serif, System) less any it took out, plus Google fonts added
@@ -46,8 +46,8 @@ with the why. To change one, add a new line that overrides it.
   Parabola's pieces stacked in one 600px column wearing the open theme,
   the theme as JSON last, and the panel on the right (a rule between its
   sections) with its main choices (which
-  theme, with Add theme, Rename and Remove; light or dark; base and
-  secondary colours; Heading and Font; radius; icons), 400px wide, about a
+  theme, with Add theme, Rename and Remove; light or dark; theme colour,
+  fonts and UI, accent colour; Heading and Font; radius; icons), 400px wide, about a
   phone's width. The preview cards float on the canvas, with no frame
   around them. **Typography** has the
   rest: Font families (stacked cards, an edit dialog each, Add family; the

@@ -39,9 +39,10 @@ with the why. To change one, add a new line that overrides it.
   counterpart, the same hue at the other end of light, so light and dark
   always contrast (Alex: "every colour should have an anti-colour"); off,
   it takes a dark colour of its own. A colour based on another (buttons on
-  the typography, every one in dark on the light one) hides its picker and
-  shows only a brightness bar, to make it lighter or darker than what it's
-  based on (buttons 10% darker than the text, say). Since text and surfaces come from the same two
+  the typography, every one in dark on the light one) shows a brightness
+  bar, how much lighter or darker it is than what it's based on, as it is
+  (the paper's cards read −4), and its picker faint underneath; touching
+  the picker gives it a colour of its own (Alex, 2026-10-28). Since text and surfaces come from the same two
   colours, text on a card reads as it does on the page; **font families**,
   Font (text) and Heading (headlines) to start and any more you add, each
   a name and a font; the fonts it can use, Parabola's (Instrument Sans,

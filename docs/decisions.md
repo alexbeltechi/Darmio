@@ -13,8 +13,10 @@ with the why. To change one, add a new line that overrides it.
 - 2026-10-28 — **Parabola themes, made like shadcn's create page.** A
   theme is data (`packages/parabola/theme.ts`): five colours
   (`colours.ts`), each based on the one before until given its own: the
-  **theme colour** (the website's background; Parabola's own is white, as
-  it has been since Parabola began, cards a barely-there #FAFAF9), the
+  **theme colour** (the website's background; Parabola's own is paper, a
+  warm off-white #FAF7EF, its cards a step darker #EFECE4 so they show;
+  it was white, cards a barely-there #FAFAF9, until 2026-10-28; its picker
+  has a warmth bar, cold to warm, between hue and brightness), the
   **surface** (cards, side panels, fields; based on the theme colour, a
   bar sets how much lighter or darker, so the contrast between page and
   cards is a choice; Alex, 2026-10-28), **typography**

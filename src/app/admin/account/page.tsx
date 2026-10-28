@@ -1,5 +1,6 @@
 "use client";
 
+import { DsTopBar } from "@beltechi/parabola";
 import { AdminMenuButton } from "@/components/admin/layout";
 import { AccountSettings } from "@/components/admin/settings/account-settings";
 import { InstallSettings } from "@/components/admin/settings/install-settings";
@@ -13,12 +14,12 @@ import { InstallSettings } from "@/components/admin/settings/install-settings";
 export default function AccountPage() {
   return (
     <div className="flex min-h-dvh flex-col">
-      <div className="pointer-events-none sticky top-0 z-20 flex flex-col ds-nav-fade pb-5 [&>*]:pointer-events-auto">
-        <div className="flex items-center gap-2 px-5 py-5">
+      <DsTopBar className="mb-5">
+        <div className="flex items-center gap-2 px-5 py-3">
           <h1 className="min-w-0 flex-1 truncate text-p text-ds-fg">Settings</h1>
           <AdminMenuButton />
         </div>
-      </div>
+      </DsTopBar>
 
       <div className="flex flex-col gap-5 px-5 pb-5">
         <AccountSettings />

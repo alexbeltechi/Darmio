@@ -10,6 +10,12 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-28 — **One top bar, solid by default.** Every admin page and
+  /parabola pin the same bar (`DsTopBar`, Parabola, Layout › Top bar):
+  compact rows (12px above and below), solid in the page colour with a rule
+  under it. It can also be transparent, or blur (the nav fade the admin
+  used until now). Fields are solid too, white on a light page, so they
+  read as places to type (Alex). The site's own nav is unchanged for now.
 - 2026-10-28 — **Parabola themes, made like shadcn's create page.** A
   theme is data (`packages/parabola/theme.ts`): five colours
   (`colours.ts`), each based on the one before until given its own: the
@@ -33,7 +39,7 @@ with the why. To change one, add a new line that overrides it.
   a colour picker (a short shade square, a hue bar and a brightness bar,
   the same bar, each with its name and value above it, hue in degrees and
   the rest out of 100, so a colour can be noted and made again; then the hex) sitting on the colour it is now, Parabola's
-  own until it's moved: no swatches or preset lists, for a different look
+  own until it's moved, and faint until you set it: no swatches or preset lists, for a different look
   you make another theme (Alex, 2026-10-28). Each is picked for light; in
   dark, "Based on light theme" (on by default) keeps it the light one's
   counterpart, the same hue at the other end of light, so light and dark
@@ -79,8 +85,7 @@ with the why. To change one, add a new line that overrides it.
   sections, no line of explanation under its fields; under the top bar,
   which runs the full width with a rule under it) with its main choices (which
   theme: a dropdown whose last option is Add theme, and a ⋮ at the
-  section header's right with Rename, Duplicate, Restore to Parabola and
-  Delete; light or dark; theme colour,
+  section header's right with Rename, Duplicate, Restore and Delete; light or dark; theme colour,
   typography, buttons, accent colour; Heading and Font; radius; icons), 400px wide, about a
   phone's width. The preview cards float on the canvas, with no frame
   around them. **Typography** has the
@@ -89,7 +94,8 @@ with the why. To change one, add a new line that overrides it.
   per style). Top right on every page: **Undo**
   (icon and label) and **Redo** (icon), **Publish** (asks first, since it
   changes every site that uses one of the themes), and a ⋮ menu to restore
-  defaults, asking first, with Undo in the toast: a page's part of the
+  defaults, asking first, with Undo in the toast (and each panel section,
+  Colours, Type, Radius, Icons, has a ⋮ with Restore for its part): a page's part of the
   open theme, or all of them, which goes back to Parabola (it opens, and
   is the site's again once published; other themes stay). Parabola reads
   "(default)" in the theme dropdown, no other theme does (Alex,

@@ -32,7 +32,8 @@ export async function PATCH(request: NextRequest) {
       sourceLabels: body.sourceLabels,
       sourceLine: body.sourceLine,
       imageQuality: body.imageQuality,
-      theme: body.theme,
+      themes: body.themes,
+      activeTheme: body.activeTheme,
     });
 
     // One name: the site's name is also its project's name in the menu behind the letter.

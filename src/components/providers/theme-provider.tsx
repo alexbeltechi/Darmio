@@ -6,31 +6,31 @@
  * Wraps the application with next-themes for dark/light mode support, and
  * hooks Parabola into Next: its links use next/link (client-side navigation,
  * prefetching) and its theme toggle saves the choice through next-themes.
- * Given the project's Parabola theme (`themeConfig`), Parabola's Theme page
- * can save a new one to Settings and reload the page in it.
+ * Given the project's Parabola themes (`themeLibrary`), /parabola can
+ * publish them to Settings and reload the page in the one in use.
  */
 
 import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ThemeProvider as NextThemesProvider, useTheme } from "next-themes";
-import { DsProvider, type DsThemeConfig } from "@beltechi/parabola";
+import { DsProvider, type DsThemeLibrary } from "@beltechi/parabola";
 
 function ParabolaNextProvider({
-  themeConfig,
+  themeLibrary,
   children,
 }: {
-  themeConfig?: DsThemeConfig;
+  themeLibrary?: DsThemeLibrary;
   children: React.ReactNode;
 }) {
   const { setTheme } = useTheme();
   const router = useRouter();
-  const saveThemeConfig = React.useCallback(
-    async (theme: DsThemeConfig) => {
+  const publishThemes = React.useCallback(
+    async (themes: DsThemeLibrary) => {
       const res = await fetch("/api/admin/settings", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ theme }),
+        body: JSON.stringify({ themes }),
       });
       if (res.status === 401 || res.status === 403) throw new Error("Sign in to the admin to save it");
       const json = await res.json().catch(() => ({}));
@@ -43,8 +43,8 @@ function ParabolaNextProvider({
     <DsProvider
       link={Link}
       onThemeChange={setTheme}
-      themeConfig={themeConfig}
-      onThemeConfigChange={themeConfig ? saveThemeConfig : undefined}
+      themeLibrary={themeLibrary}
+      onThemeLibraryChange={themeLibrary ? publishThemes : undefined}
     >
       {children}
     </DsProvider>
@@ -52,13 +52,13 @@ function ParabolaNextProvider({
 }
 
 export function ThemeProvider({
-  themeConfig,
+  themeLibrary,
   children,
   ...props
-}: React.ComponentProps<typeof NextThemesProvider> & { themeConfig?: DsThemeConfig }) {
+}: React.ComponentProps<typeof NextThemesProvider> & { themeLibrary?: DsThemeLibrary }) {
   return (
     <NextThemesProvider {...props}>
-      <ParabolaNextProvider themeConfig={themeConfig}>{children}</ParabolaNextProvider>
+      <ParabolaNextProvider themeLibrary={themeLibrary}>{children}</ParabolaNextProvider>
     </NextThemesProvider>
   );
 }

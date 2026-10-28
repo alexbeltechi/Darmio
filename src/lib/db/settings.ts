@@ -8,7 +8,7 @@
  */
 
 import { getDb, Collections } from "@/lib/db/mongodb";
-import { DS_DEFAULT_THEME, parseDsThemeConfig, type DsThemeConfig } from "@beltechi/parabola";
+import { DS_DEFAULT_LIBRARY, parseDsThemeLibrary, type DsThemeLibrary } from "@beltechi/parabola";
 import { DEFAULT_IMAGE_QUALITY } from "@/lib/cms/image-processing";
 import { parseHomeHero, parseSiteName, type HomeHero } from "@/lib/cms/site";
 import {
@@ -31,8 +31,8 @@ export interface SiteSettings {
   sourceLine: SourceLineSettings;
   /** AVIF quality for new uploads (50–90). Uploads already made keep theirs. */
   imageQuality: number;
-  /** The Parabola theme the site and admin wear: fonts for now (Settings › Design). */
-  theme: DsThemeConfig;
+  /** The site's Parabola themes, and the one its site and admin wear (Settings › Design, /parabola). */
+  themes: DsThemeLibrary;
   updatedAt: string;
 }
 
@@ -43,7 +43,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   sourceLabels: DEFAULT_SOURCE_LABELS,
   sourceLine: DEFAULT_SOURCE_LINE,
   imageQuality: DEFAULT_IMAGE_QUALITY,
-  theme: DS_DEFAULT_THEME,
+  themes: DS_DEFAULT_LIBRARY,
   updatedAt: new Date(0).toISOString(),
 };
 
@@ -110,7 +110,8 @@ export async function getSiteSettings(): Promise<SiteSettings> {
     sourceLabels: tryParse(parseSourceLabels, doc.sourceLabels, DEFAULT_SETTINGS.sourceLabels),
     sourceLine: tryParse(parseSourceLine, doc.sourceLine, DEFAULT_SETTINGS.sourceLine),
     imageQuality: tryParse(parseImageQuality, doc.imageQuality, DEFAULT_SETTINGS.imageQuality),
-    theme: parseDsThemeConfig(doc.theme),
+    // `theme` was one theme, before the library; it becomes Default.
+    themes: parseDsThemeLibrary(doc.themes, doc.theme),
     updatedAt: (doc.updatedAt as string) || DEFAULT_SETTINGS.updatedAt,
   };
 }
@@ -119,7 +120,10 @@ export async function getSiteSettings(): Promise<SiteSettings> {
  * Update (upsert) the site settings. Only known fields are persisted.
  */
 export async function updateSiteSettings(
-  updates: Partial<Omit<SiteSettings, "updatedAt">>
+  updates: Partial<Omit<SiteSettings, "updatedAt">> & {
+    /** The library theme the site wears, by id: one it has. */
+    activeTheme?: string;
+  }
 ): Promise<SiteSettings> {
   const db = await getDb();
   const collection = db.collection(Collections.SETTINGS);
@@ -148,8 +152,14 @@ export async function updateSiteSettings(
     set.imageQuality = parseImageQuality(updates.imageQuality);
   }
 
-  if (updates.theme !== undefined) {
-    set.theme = parseDsThemeConfig(updates.theme);
+  if (updates.themes !== undefined) {
+    set.themes = parseDsThemeLibrary(updates.themes);
+  }
+
+  if (updates.activeTheme !== undefined) {
+    const library = (set.themes as DsThemeLibrary | undefined) ?? (await getSiteSettings()).themes;
+    if (!library.themes.some((t) => t.id === updates.activeTheme)) throw new Error(`No theme "${updates.activeTheme}"`);
+    set.themes = { ...library, active: updates.activeTheme };
   }
 
   await collection.updateOne(

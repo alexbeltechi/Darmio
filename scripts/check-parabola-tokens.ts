@@ -17,7 +17,8 @@ import { join } from "node:path";
 import { DS_ACCENTS } from "../packages/parabola/accents";
 import { DS_SPACES } from "../packages/parabola/spacing";
 import { ROLES } from "../packages/parabola/showcase/colour-roles";
-import { DS_DEFAULT_FONT, DS_DEFAULT_SECONDARY_FONT, dsFont } from "../packages/parabola/fonts";
+import { DS_DEFAULT_FONT, DS_DEFAULT_HEADING_FONT, dsFont } from "../packages/parabola/fonts";
+import { DS_DEFAULT_BASE_COLOUR, DS_DEFAULT_SECONDARY_COLOUR, dsBaseColour, dsSecondaryColour } from "../packages/parabola/colours";
 import { DS_TEXT_STYLES, DS_TEXT_STYLE_DEFAULTS } from "../packages/parabola/theme";
 
 const css = readFileSync(join(__dirname, "../packages/parabola/tokens.css"), "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
@@ -39,8 +40,23 @@ const dark = block(".dark");
 const theme = block("@theme inline");
 const problems: string[] = [];
 
+// Colours: the default base and secondary colours (colours.ts) are tokens.css's, light and dark.
+{
+  const base = dsBaseColour(DS_DEFAULT_BASE_COLOUR);
+  const secondary = dsSecondaryColour(DS_DEFAULT_SECONDARY_COLOUR);
+  for (const [mode, tokens, values] of [
+    ["light", root, { ...base.light, highlight: secondary.light.highlight, "highlight-tint": secondary.light.tint }],
+    ["dark", dark, { ...base.dark, highlight: secondary.dark.highlight, "highlight-tint": secondary.dark.tint }],
+  ] as const) {
+    for (const [name, value] of Object.entries(values)) {
+      const css = tokens.get(`--ds-${name}`) ?? root.get(`--ds-${name}`);
+      if (!css || !same(css, value)) problems.push(`--ds-${name} (${mode}) isn't the default colours' ${value} (colours.ts): ${css}`);
+    }
+  }
+}
+
 // Typography: the default theme (fonts.ts, theme.ts) is what tokens.css sets.
-for (const [token, id] of [["--ds-family-primary", DS_DEFAULT_FONT], ["--ds-family-secondary", DS_DEFAULT_SECONDARY_FONT]]) {
+for (const [token, id] of [["--ds-family-body", DS_DEFAULT_FONT], ["--ds-family-heading", DS_DEFAULT_HEADING_FONT]]) {
   if (!same(root.get(token) ?? "", dsFont(id).family)) problems.push(`${token} in tokens.css isn't the default font (${id}): ${dsFont(id).family}`);
 }
 for (const style of DS_TEXT_STYLES) {

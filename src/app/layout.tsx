@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Instrument_Sans, Instrument_Serif } from "next/font/google";
-import { DS_FONTS, DsThemeStyle } from "@beltechi/parabola";
+import { DS_FONTS, DsThemeStyle, dsActiveTheme } from "@beltechi/parabola";
 import { DEFAULT_SETTINGS, getSiteSettings } from "@/lib/db/settings";
 import "./globals.css";
 
@@ -36,7 +36,8 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   // The project's Parabola theme (Settings › Design), for the site, the admin and /parabola alike.
-  const { theme } = await getSiteSettings().catch(() => DEFAULT_SETTINGS);
+  const { themes } = await getSiteSettings().catch(() => DEFAULT_SETTINGS);
+  const { theme } = dsActiveTheme(themes);
   return (
     <html lang="en" suppressHydrationWarning className={`${instrumentSans.variable} ${instrumentSerif.variable}`}>
       <head>

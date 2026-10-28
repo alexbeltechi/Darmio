@@ -10,11 +10,11 @@ export const metadata: Metadata = {
 };
 
 // Standalone from the (site) group so the site nav and footer stay out of the way.
-// The project's Parabola theme goes to the Theme page, which can save a new one.
+// The project's Parabola themes go to /parabola, which can publish them.
 export default async function DesignSystemLayout({ children }: { children: React.ReactNode }) {
-  const { theme } = await getSiteSettings().catch(() => DEFAULT_SETTINGS);
+  const { themes } = await getSiteSettings().catch(() => DEFAULT_SETTINGS);
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange themeConfig={theme}>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange themeLibrary={themes}>
       <div className="site-root min-h-screen bg-ds-bg text-ds-fg">
         <DsShell>{children}</DsShell>
       </div>

@@ -34,6 +34,7 @@ export async function PATCH(request: NextRequest) {
       sourceLine: body.sourceLine,
       imageQuality: body.imageQuality,
       themes: body.themes,
+      publishedTheme: body.publishedTheme,
       activeTheme: body.activeTheme,
     });
 

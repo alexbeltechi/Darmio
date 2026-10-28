@@ -8,7 +8,14 @@
  */
 
 import { getDb, Collections } from "@/lib/db/mongodb";
-import { DS_DEFAULT_LIBRARY, parseDsThemeLibrary, type DsThemeLibrary } from "@beltechi/parabola";
+import {
+  DS_DEFAULT_LIBRARY,
+  dsActiveTheme,
+  parseDsThemeConfig,
+  parseDsThemeLibrary,
+  type DsThemeEntry,
+  type DsThemeLibrary,
+} from "@beltechi/parabola";
 import { DEFAULT_IMAGE_QUALITY } from "@/lib/cms/image-processing";
 import { parseHomeHero, parseSiteName, type HomeHero } from "@/lib/cms/site";
 import {
@@ -31,8 +38,15 @@ export interface SiteSettings {
   sourceLine: SourceLineSettings;
   /** AVIF quality for new uploads (50–90). Uploads already made keep theirs. */
   imageQuality: number;
-  /** The site's Parabola themes, and the one its site and admin wear (Settings › Design, /parabola). */
+  /** The project's Parabola themes as saved on /parabola (Save), and which is the site's. */
   themes: DsThemeLibrary;
+  /**
+   * The theme the website wears, as it was published (Publish on /parabola,
+   * or a pick in Settings › Design): its own copy, so saving changes to a
+   * theme never touches the site until it's published. Null before the
+   * first: the site wears the library's own (`sitePublishedTheme`).
+   */
+  publishedTheme: DsThemeEntry | null;
   updatedAt: string;
 }
 
@@ -44,8 +58,21 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   sourceLine: DEFAULT_SOURCE_LINE,
   imageQuality: DEFAULT_IMAGE_QUALITY,
   themes: DS_DEFAULT_LIBRARY,
+  publishedTheme: null,
   updatedAt: new Date(0).toISOString(),
 };
+
+/** The theme the website wears: the one published, or (before any) the library's own. */
+export function sitePublishedTheme(settings: Pick<SiteSettings, "themes" | "publishedTheme">): DsThemeEntry {
+  return settings.publishedTheme ?? dsActiveTheme(settings.themes);
+}
+
+function parsePublishedTheme(value: unknown): DsThemeEntry | null {
+  if (!value || typeof value !== "object") return null;
+  const v = value as Record<string, unknown>;
+  if (typeof v.id !== "string" || typeof v.name !== "string") return null;
+  return { id: v.id, name: v.name, theme: parseDsThemeConfig(v.theme) };
+}
 
 /**
  * Clean a source label list: trimmed names (1–40 chars), unique ids, at most
@@ -112,6 +139,7 @@ export async function getSiteSettings(): Promise<SiteSettings> {
     imageQuality: tryParse(parseImageQuality, doc.imageQuality, DEFAULT_SETTINGS.imageQuality),
     // `theme` was one theme, before the library; it becomes Default.
     themes: parseDsThemeLibrary(doc.themes, doc.theme),
+    publishedTheme: parsePublishedTheme(doc.publishedTheme),
     updatedAt: (doc.updatedAt as string) || DEFAULT_SETTINGS.updatedAt,
   };
 }
@@ -121,7 +149,7 @@ export async function getSiteSettings(): Promise<SiteSettings> {
  */
 export async function updateSiteSettings(
   updates: Partial<Omit<SiteSettings, "updatedAt">> & {
-    /** The library theme the site wears, by id: one it has. */
+    /** The library theme the site wears, by id: one it has. It's published as it is. */
     activeTheme?: string;
   }
 ): Promise<SiteSettings> {
@@ -154,12 +182,26 @@ export async function updateSiteSettings(
 
   if (updates.themes !== undefined) {
     set.themes = parseDsThemeLibrary(updates.themes);
+    // Saving themes never changes the site: before anything was published on its own, what the site wears now is.
+    if (updates.publishedTheme === undefined) {
+      const current = await getSiteSettings();
+      if (!current.publishedTheme) set.publishedTheme = sitePublishedTheme(current);
+    }
+  }
+
+  if (updates.publishedTheme !== undefined) {
+    const entry = parsePublishedTheme(updates.publishedTheme);
+    if (!entry) throw new Error("A published theme needs an id, a name and a theme");
+    set.publishedTheme = entry;
   }
 
   if (updates.activeTheme !== undefined) {
     const library = (set.themes as DsThemeLibrary | undefined) ?? (await getSiteSettings()).themes;
-    if (!library.themes.some((t) => t.id === updates.activeTheme)) throw new Error(`No theme "${updates.activeTheme}"`);
+    const entry = library.themes.find((t) => t.id === updates.activeTheme);
+    if (!entry) throw new Error(`No theme "${updates.activeTheme}"`);
     set.themes = { ...library, active: updates.activeTheme };
+    // A pick in Settings › Design is live at once.
+    set.publishedTheme = entry;
   }
 
   await collection.updateOne(

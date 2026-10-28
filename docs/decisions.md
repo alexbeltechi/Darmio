@@ -69,10 +69,14 @@ with the why. To change one, add a new line that overrides it.
   (Alex, 2026-10-28); and an icon library (Lucide; the
   others shadcn offers need Parabola's icons in one place first). Themes
   live in a **library** in each project's settings: Parabola (Parabola's
-  own, read-only: the first change to it opens a copy, "Custom", and a
-  Create theme pinned at the panel's foot, on the panel's colour, names
-  and saves it; a created
-  theme with changes shows Save theme there; Alex, 2026-10-28) and any added, one of them the site's, picked in Settings › Design. Only the website
+  own, read-only: a change to it goes into Custom, the one working copy,
+  made if there's none and its contents replaced if there is, never Custom
+  2, 3…; Create theme, pinned at the panel's foot while Custom is open,
+  makes it a theme of its own; Alex, 2026-10-28) and any added, one of
+  them the site's. **Save** keeps the themes without touching the
+  website; **Publish** saves and puts the open theme on the website (the
+  site wears its own copy of the published theme, `publishedTheme`, so
+  saving never changes it); a pick in Settings › Design publishes too. Only the website
   wears it, and on `/parabola` only the canvas (the open theme): the admin
   and `/parabola`'s sidebar, header and panel always wear Parabola's own,
   published or not, so a theme that breaks the site never breaks the tools

@@ -335,8 +335,8 @@ function SourceLineCard() {
       title="Original post link"
       description="For posts that first appeared somewhere else. The post ends with a line like the one below, linking there. Each post picks its label in the editor; a post you share from here to X or LinkedIn takes that label by itself."
     >
-        <div className="flex items-center gap-3">
-          <label htmlFor="source-line-enabled" className="flex-1 text-p text-ds-fg">
+        <div className="flex items-center gap-ds-8">
+          <label htmlFor="source-line-enabled" className="text-p text-ds-fg">
             Show the link on posts
           </label>
           <DsSwitch

@@ -709,8 +709,8 @@ export function PageEditorForm({ slug, preset: presetId, onClose }: { slug?: str
           )}
 
           {!isHome && !settings.parent && (
-            <div className="flex w-(--ds-field-width) items-center gap-3 self-end py-2">
-              <label htmlFor="page-nav" className="flex-1 text-p text-ds-fg">
+            <div className="flex w-(--ds-field-width) items-center gap-ds-8 self-end py-2">
+              <label htmlFor="page-nav" className="text-p text-ds-fg">
                 In the site&apos;s nav
               </label>
               <DsSwitch id="page-nav" checked={settings.nav} onCheckedChange={(nav) => patchSettings({ nav })} />

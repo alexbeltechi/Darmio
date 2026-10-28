@@ -677,8 +677,8 @@ export default function CategoriesPage() {
               </DsField>
               {!form.parentId && (
                 <>
-                  <div className="flex items-center gap-3">
-                    <label htmlFor="category-nav" className="flex-1 text-p text-ds-fg">
+                  <div className="flex items-center gap-ds-8">
+                    <label htmlFor="category-nav" className="text-p text-ds-fg">
                       In the site&apos;s nav
                     </label>
                     <DsSwitch id="category-nav" checked={form.nav} onCheckedChange={(nav) => setForm({ ...form, nav })} />

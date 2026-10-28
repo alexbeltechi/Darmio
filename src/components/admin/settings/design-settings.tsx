@@ -7,7 +7,7 @@ import { SettingsSection } from "./settings-section";
 
 /**
  * The project's Parabola theme (decisions, 2026-10-28): here its two font
- * families, primary and secondary; the type scale and added fonts are on
+ * families, primary and display; the type scale and added fonts are on
  * /parabola. A pick shows at once across the admin
  * and is saved right away; the site and /parabola take it on their next
  * load. More of the theme (colours, corners) joins here as Parabola grows.

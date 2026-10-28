@@ -70,10 +70,12 @@ with the why. To change one, add a new line that overrides it.
   publishes to.
   `/parabola` opens on **Theme** ("Theme" over the open theme's name):
   a site's page in one 600px column wearing the open theme (its nav, a
-  post's opening on the page itself, buttons, a list of writing, one card
-  on the surface, as a site lays them out; Alex, 2026-10-28),
+  post's opening on the page itself, a subscribe card with the large
+  buttons above the fold, a list of writing, a draft's card with its note,
+  as a site and its admin lay them out; Alex, 2026-10-28),
   the theme as JSON last, and the panel on the right (a rule between its
-  sections, no line of explanation under its fields) with its main choices (which
+  sections, no line of explanation under its fields; under the top bar,
+  which runs the full width with a rule under it) with its main choices (which
   theme, with Add theme, Rename and Remove; light or dark; theme colour,
   typography, buttons, accent colour; Heading and Font; radius; icons), 400px wide, about a
   phone's width. The preview cards float on the canvas, with no frame

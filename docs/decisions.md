@@ -57,7 +57,8 @@ with the why. To change one, add a new line that overrides it.
   others shadcn offers need Parabola's icons in one place first). Themes
   live in a **library** in each project's settings: Parabola (Parabola's
   own, read-only: the first change to it opens a copy, "Custom", and a
-  sticky Create theme at the panel's foot names and saves it; a created
+  Create theme pinned at the panel's foot, on the panel's colour, names
+  and saves it; a created
   theme with changes shows Save theme there; Alex, 2026-10-28) and any added, one of them the site's, picked in Settings › Design. Only the website
   wears it, and on `/parabola` only the canvas (the open theme): the admin
   and `/parabola`'s sidebar, header and panel always wear Parabola's own,
@@ -86,7 +87,11 @@ with the why. To change one, add a new line that overrides it.
   per style). Top right on every page: **Undo**
   (icon and label) and **Redo** (icon), **Publish** (asks first, since it
   changes every site that uses one of the themes), and a ⋮ menu to restore
-  defaults, asking first, with Undo in the toast. The type and colour
+  defaults, asking first, with Undo in the toast: a page's part of the
+  open theme, or all of them, which goes back to Parabola (it opens, and
+  is the site's again once published; other themes stay). Parabola reads
+  "(default)" in the theme dropdown, no other theme does (Alex,
+  2026-10-28). The type and colour
   tokens are `--ds-*` variables, so a theme changes them at run time. The
   CMS hosts Parabola's fonts with next/font, so a visitor's browser calls
   Google only for a font a theme added. Font and Heading, as shadcn names

@@ -52,7 +52,9 @@ with the why. To change one, add a new line that overrides it.
   wears it, and on `/parabola` only the canvas (the open theme): the admin
   and `/parabola`'s sidebar, header and panel always wear Parabola's own,
   published or not, so a theme that breaks the site never breaks the tools
-  to fix it (Alex, 2026-10-28). In dark, text that's only based on the
+  to fix it (Alex, 2026-10-28). The panel's Light and Dark switch only the
+  preview; the UI's own light or dark is the sidebar's toggle (system by
+  default). In dark, text that's only based on the
   light one falls back to black or white if it wouldn't read.
   Publishing remakes the site's cached pages at once, and `/parabola`
   makes the themes of the project picked in the admin, the one it

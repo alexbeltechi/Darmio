@@ -35,7 +35,14 @@ function ParabolaNextProvider({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(publish ? { themes, publishedTheme: publish } : { themes }),
       });
-      if (res.status === 401 || res.status === 403) throw new Error("Sign in to the admin to save it");
+      if (res.status === 401 || res.status === 403) {
+        // Saving goes through the admin; /parabola opens without it. The error carries the way in (a new tab, so
+        // the changes here wait), which /parabola's toast offers.
+        const href = `/admin/login?callbackUrl=${encodeURIComponent(window.location.pathname)}`;
+        throw Object.assign(new Error("Sign in to the admin in the new tab, then try again here."), {
+          action: { label: "Sign in", onClick: () => window.open(href, "_blank") },
+        });
+      }
       const json = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(json.error || "The settings didn't save");
       router.refresh();

@@ -1,5 +1,5 @@
 ---
-reviewed: 2026-10-27
+reviewed: 2026-10-28
 owner: Alex
 ---
 
@@ -10,20 +10,68 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
-- 2026-10-27 — **Darmio stays MIT; the business is selling taste, not a
-  SaaS.** Everything that makes Darmio work is free and complete under MIT:
-  the core, the agent API, the MCP connector, Parabola and the skills, so
-  anyone can make their own design system on it. What's sold is Alex's
-  taste: Parabola themes, editorial pages, blog formats and experiences a
-  maker installs into their own Darmio and changes as they like, like
-  shadcn. One-off purchases from a store (darmio.io/store or similar), kept
-  outside the free repo: never a paid tier, a hosted plan or a lock inside
-  the code. The core gets the extension points (themes as data, blocks and
-  pages from outside the core) so a store can come later without a
-  rewrite. Refines 2026-10-07's "no paid tiers": still no tiers, but
-  designs are sold. Why: Alex wants Darmio to earn without running a SaaS;
-  features can be copied, taste is what he can sell. Possible features are
-  in Linear (project Darmio, milestone Feature roadmap).
+- 2026-10-28 — **Three Darmios: self-hosted (free, MIT), the web version
+  (paid, later), and themes (sold).** Replaces 2026-10-07's "no paid
+  tiers" and the never-merged 2026-10-27 "no hosted plan".
+  **Self-hosted** is the whole CMS, free under MIT, on the maker's own
+  Vercel, database and storage, with their own agent: nothing it needs runs
+  on a server of ours, so it costs us nothing per user (MCP traffic, the
+  activity log, a pasted key all stay between the maker, their site and
+  their agent). **The web version** is a separate paid app, like Ghost(Pro)
+  or Polsia: we host it and our agent works on it; the comfort of starting
+  without a terminal, our skills and our themes, not a lock. Our agent
+  only, no bring-your-own key. It is not built or announced before the
+  2026-11-25 release, which is the open-source version alone, "open source
+  under MIT, run it yourself". **Themes** come from us and from other
+  designers on commission, and every one works on both versions.
+  Rules that keep it honest: *paid is what costs us money or time (hosting,
+  our agent's tokens, design); code is never paid, and no feature moves
+  from free to paid.* The web version runs released public code, so the
+  repo is never behind it; its private code is only billing, accounts and
+  the agent runtime. Export is always there, never behind a paywall: one
+  file with a project's content, settings and agent documents, plus its
+  media, that any Darmio imports, and from the web version a self-hosted
+  copy of your exact site, code and theme included, ready to deploy. The
+  content schema is versioned from now so imports survive drift.
+  Legally, Ghost's shape: the LICENSE file is plain MIT; "Darmio" is
+  Alex's trademark with a short policy (others may host the code, nobody
+  else gets to be Darmio); contributors sign a CLA so the project stays
+  free to change course. No promise of "forever": MIT already lets anyone
+  keep what they have, and maintaining it is ours to stop one day. A
+  fair-use ask, not a licence term, in the README and on darmio.io:
+  "Darmio is MIT. Use it however you like. If you run it for clients on
+  more than 5 projects, please buy an agency licence. It keeps Darmio
+  going." One-off, perpetual, unlimited, unenforced. Why: Alex wants to
+  earn from the web version and from taste without betraying the people
+  who download the free one, and to be able to leave, as Polsia's users
+  can't. Tickets BEL-112, BEL-113, BEL-114.
+- 2026-10-28 — **Any agent, through MCP; the admin shows what it did.**
+  The self-hosted admin never locks to one agent: Claude Code, Claude
+  Desktop, Cursor, an agent in Slack, anything that speaks MCP works on the
+  site through its connector (BEL-111), and the admin shows every change
+  with a short summary each agent leaves at the end of a session. Chatting
+  to an agent inside the admin (our agent on the web version; a pasted key
+  on self-hosted, maybe, one day) and a web chat that drives a local agent
+  are later, and the latter only ever through the maker's own site, never
+  a bridge of ours. Why: transparency without cost to us, and no agent
+  lock-in.
+- 2026-10-27 — **Usage bars split by project.** Parabola's `DsProgress` takes
+  `segments`: parts of the fill side by side, each in one of Parabola's
+  accents in a fixed order (blue, orange, green, violet, pink, teal, sky,
+  stone, red), with a legend. Settings' Database and Image storage bars show
+  each project's share; a project keeps its colour everywhere (its place in
+  the project list), and its own Library section shows its share in that
+  colour against the others in grey.
+- 2026-10-27 — **Home › Settings shows what the install runs on.** After
+  you (account, password): Hosting (Vercel, its address, the repo it
+  deploys from), Database (the MongoDB cluster, how much the projects use
+  against Atlas's free 512 MB, per project) and Image storage (Vercel Blob,
+  the same against its free 1 GB, per project), each with a link to where
+  the plan is set. All three are set up once for the install and shared by
+  every project; the free tiers aren't split per project. A site can't see
+  its own plan, so the bars measure against the free tiers and say so. A
+  project's Library section keeps the image quality and shows that
+  project's share, linking to the whole.
 - 2026-10-27 — **A project card has a ⋮ menu**, the same as a post row:
   Settings, Rename (a dialog with the name; it renames the site too), and
   Delete project, which removes its library's files, its content and its

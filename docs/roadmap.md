@@ -1,5 +1,5 @@
 ---
-reviewed: 2026-10-27
+reviewed: 2026-10-28
 owner: Alex
 ---
 
@@ -108,11 +108,28 @@ When a task changes an item, update this file in the same change.
       (R2) when a brand's volume needs it.
    7. **Custom code pages.** A page kind whose body is a component in the
       repo, listed and deletable in the admin, for one-off editorial pages.
-   8. **Release pass:** the docs still name Alex as the maintainer and his
+   8. **Portable from day one** (decisions, 2026-10-28; BEL-113). A
+      `schemaVersion` on every stored thing (posts, pages, categories,
+      media, settings, agent documents) and one migration step an import
+      runs, so a file from an older or newer Darmio still comes in. Then
+      the export: one file with a project's content, settings and agent
+      documents, plus its media, and the import of it, in the admin and
+      through the agent API. WordPress and Ghost in, WordPress out: later,
+      their formats are documented.
+      Done: a project exported from one install imports into a fresh one
+      and looks the same, after a schema change in between.
+   9. **Release pass:** the docs still name Alex as the maintainer and his
       sites in examples; go through them, add a leak check to `verify`, and
-      neutral package scope (`@beltechi/parabola` today). Then the
-      **pre-release tag** on 2026-11-25, the end of Alex's Y3K cohort 2;
-      beltechi.com moves from Framer onto it, and Y3K testers install it.
+      neutral package scope (`@beltechi/parabola` today). The legal pages
+      (decisions, 2026-10-28): the fair-use ask in the README ("Darmio is
+      MIT. Use it however you like. If you run it for clients on more than
+      5 projects, please buy an agency licence. It keeps Darmio going."),
+      a one-page trademark policy in Ghost's shape, and a contributor
+      agreement in `CONTRIBUTING.md`; the release copy says "open source
+      under MIT, run it yourself" and nothing about hosting or forever.
+      Then the **pre-release tag** on 2026-11-25, the end of Alex's Y3K
+      cohort 2; beltechi.com moves from Framer onto it, and Y3K testers
+      install it.
 
    Started 2026-10-24: the site name setting (Settings › Site), the rail
    mark as the project menu, Settings › Account with change password, and
@@ -200,8 +217,9 @@ When a task changes an item, update this file in the same change.
   Regular passes through the app as a persona (a photographer, a painter, a
   designer) to find UX and bug issues. Results land here as items.
 - **Open-source readiness** — `shape`
-  MIT `LICENSE` added 2026-10-27. Done: a non-technical person can install it locally with their agent,
-  following a README and agent skills that ship with the repo.
+  MIT `LICENSE` added 2026-10-27; the legal pages are step 9 of the
+  pre-release. Done: a non-technical person can install it locally with
+  their agent, following a README and agent skills that ship with the repo.
 - **Swappable connectors** — `shape`
   Every outside service behind one interface, shipped with one connector
   set up (decisions, 2026-10-24). Already there: the newsletter list
@@ -225,16 +243,34 @@ When a task changes an item, update this file in the same change.
   `~/.claude/skills/`. Done (v1.0): survived a few real curation batches;
   Alex calls it stable.
 
-## Taste
+## Three Darmios
 
-Darmio stays MIT; what's sold is taste (decisions, 2026-10-27). These make
-room for it in the core. Each is a Feature in Linear (project Darmio,
-milestone Feature roadmap), unscheduled until Alex places it.
+Self-hosted free under MIT, a paid web version later, themes that work on
+both (decisions, 2026-10-28). These make room for it in the core without
+building the web version, which stays unannounced until the open-source
+release is out. Each is a Feature in Linear (project Darmio, milestone
+Feature roadmap), unscheduled until Alex places it.
 
 - **MCP connector** — `shape` (BEL-111)
   An MCP server on every install over the agent API that exists today.
+  Any agent that speaks it (Claude Code, Claude Desktop, Cursor, one in
+  Slack) works on the site; Darmio never locks to one.
   Done: from a fresh Claude Desktop, a maker connects their install in one
   step and publishes a post by asking.
+- **Agent activity** — `shape` (BEL-114)
+  The admin shows what agents did: every change through the API with the
+  agent's name, and a short summary each agent leaves at the end of a
+  session through one tool. The web version's chat panel, a pasted key on
+  self-hosted, and a web chat that drives a local agent are later, and the
+  last only through the maker's own site.
+  Done: after a Claude Code session on the site, the admin says what
+  changed and why, in the agent's words.
+- **Web version** — later, unannounced
+  Darmio hosted by us, one deployment per customer running released
+  public code, our agent inside, billed monthly; private code is only
+  billing, accounts and the agent runtime. "Take it with you": a
+  self-hosted copy of the exact site, code and theme included. Not before
+  the open-source release.
 - **Parabola themes, customizable like shadcn** — `shape` (BEL-109)
   A theme contract (which tokens and block variants a theme may set) and
   themes as data (`*.theme.json`), imported and switched in Settings ›
@@ -251,8 +287,11 @@ milestone Feature roadmap), unscheduled until Alex places it.
 - **Store-ready** — `shape` (BEL-112)
   Paid themes and formats live outside the free repo: themes apply as
   data, code installs from a registry with keys (as paid shadcn blocks do),
-  payments and keys through Polar. First a private repo sold through
-  Polar, then the registry, then a Design tab in the admin.
+  payments and keys through Polar. Ours, and other designers' on
+  commission; every theme installs on self-hosted and on the web version
+  alike. First a private repo sold through Polar, then the registry, then
+  a Design tab in the admin. The agency licence (one-off, perpetual,
+  unlimited) is sold the same way.
   Done: a maker buys a theme on darmio.io, tells their agent to install
   it, and their site has it.
 
@@ -262,6 +301,8 @@ milestone Feature roadmap), unscheduled until Alex places it.
   and collections.
 - **Post as email:** send a post to subscribers, publish it to the site, or
   both.
+- **Marketing, outreach and email** in both versions, the way Polsia covers
+  them: the list, posts to X and LinkedIn, follow-ups, one agent across it.
 - **Planner:** a Linear-like planner for makers.
 
 ## Done

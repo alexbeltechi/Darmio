@@ -5,6 +5,10 @@ date: 2026-04-30
 description: A short list, kept short on purpose.
 ---
 
+:::gallery layout=auto width=auto
+![Ilo in a sheer teal gown, walking along a black-sand shore, reflected in still water](file:ilo-black-sand.jpg)
+:::
+
 People ask what I take when I go to the lake to work. The list is short, and keeping it short is most of the method.
 
 - **A towel,** for sitting on the stone edge, which is cold until noon.

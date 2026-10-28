@@ -5,6 +5,10 @@ date: 2026-09-14
 description: Three summers, one stone, and the drop of water that does the work.
 ---
 
+:::gallery layout=auto width=auto
+![Ilo from behind, sitting at the edge of a still lake at sunrise](file:ilo-lake.jpg)
+:::
+
 I spent three summers at the same lake before I made anything for it. Most of that time I did nothing useful. I sat on the stone edge at the north end and noticed things.
 
 The frogs stop about twenty minutes before rain. Wind writes on the water before it reaches you, so you can watch it cross. The cold arrives before the clouds do. On still mornings the lake is louder than on windy ones, because you can hear all of it at once.

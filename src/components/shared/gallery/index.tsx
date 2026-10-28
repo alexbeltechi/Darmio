@@ -66,7 +66,7 @@ export function Gallery({
     }
   };
 
-  // Inline (up to 1024px, centred) or the page's whole width inside its side
+  // Inline (up to INLINE_GALLERY_MAX, 820px, centred) or the page's whole width inside its side
   // margins; Auto picks by how many images there are (galleryIsFull).
   return (
     <div

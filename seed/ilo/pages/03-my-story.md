@@ -1,6 +1,6 @@
 ---
-title: Autobiography
-slug: autobiography
+title: My story
+slug: my-story
 description: The longer story, in her own words.
 format: text
 parent: about

@@ -1,24 +1,25 @@
 import Link from "next/link";
+import { DsLinkList, type DsLinkListItem } from "@beltechi/parabola";
 import { DsNewsletterBlock } from "@beltechi/parabola/blocks";
 import { ArticleContent } from "@/components/site/article-content";
 import { categoryGroups } from "@/lib/cms/category-groups";
 import { getEntryMediaIds } from "@/lib/cms/entry-media";
 import { getMediaByIds } from "@/lib/cms/media";
-import { HOME_POSTS, pageSettings } from "@/lib/cms/page-formats";
+import { HOME_POSTS, homeMoreLabel, pageSettings } from "@/lib/cms/page-formats";
 import { entryDate, readMinutes } from "@/lib/cms/read-time";
 import type { Block, Entry } from "@/lib/cms/types";
 import { listCategories } from "@/lib/db/categories";
 import { getPublishedEntries } from "@/lib/db/entries";
 import { childPages, listSitePages, type SitePage } from "@/lib/db/site-pages";
-import { LinkRows, PageColumn, PageSection, type LinkRow } from "./link-rows";
+import { PageColumn, PageSection } from "./page-layout";
 
 /**
  * The pages that have a format (lib/cms/page-formats.ts): Text, Links and
  * Home. Each is a fixed layout around the page's own blocks, in one reading
- * column, built from Parabola's tokens and type scale.
+ * column, built from Parabola's tokens, type scale and link list.
  */
 
-const pageRow = (page: SitePage): LinkRow => ({ label: page.title, href: `/${page.slug}` });
+const pageItem = (page: SitePage): DsLinkListItem => ({ label: page.title, href: `/${page.slug}` });
 
 /** A page's blocks, in the column, with the media they use. */
 async function Blocks({ page, preview }: { page: Entry; preview: boolean }) {
@@ -62,7 +63,7 @@ export async function TextPage({ page, preview = false }: { page: Entry; preview
       <Blocks page={page} preview={preview} />
       {more.length > 0 && (
         <PageSection title="More">
-          <LinkRows rows={more.map(pageRow)} />
+          <DsLinkList items={more.map(pageItem)} />
         </PageSection>
       )}
     </PageColumn>
@@ -75,7 +76,7 @@ export async function LinksPage({ page, preview = false }: { page: Entry; previe
   return (
     <PageColumn>
       <PageTitle page={page} />
-      {links.length > 0 && <LinkRows divided rows={links.map((l) => ({ label: l.label, href: l.url, meta: l.note }))} />}
+      {links.length > 0 && <DsLinkList divided items={links.map((l) => ({ label: l.label, href: l.url, meta: l.note }))} />}
       <Blocks page={page} preview={preview} />
     </PageColumn>
   );
@@ -83,8 +84,9 @@ export async function LinksPage({ page, preview = false }: { page: Entry; previe
 
 /**
  * Home: the page's own blocks (a portrait, a few lines), then sections made
- * from the rest of the site, in this order: the latest posts of one category,
- * each top-level page that has pages under it, each links page, and the
+ * from the rest of the site, in this order: the latest posts of one category
+ * (ending in a link to all of them), each top-level page that has pages
+ * under it (ending in a link to that page), each links page, and the
  * newsletter. Nothing here is typed twice: a page added under About shows up
  * under About.
  */
@@ -111,30 +113,29 @@ export async function HomePage({ page, preview = false }: { page: Entry; preview
 
       {group && listed.length > 0 && (
         <PageSection title={group.label} href={`/${group.slug}`}>
-          <LinkRows
-            rows={listed.slice(0, HOME_POSTS).map((post) => ({
+          <DsLinkList
+            items={listed.slice(0, HOME_POSTS).map((post) => ({
               label: (post.data.title as string) || post.slug,
               href: `/post/${post.slug}`,
               meta: `${entryDate(post).getFullYear()} · ${readMinutes(post)} min`,
             }))}
+            more={{ label: `All ${listed.length} ${listed.length === 1 ? "post" : "posts"}`, href: `/${group.slug}` }}
           />
-          {listed.length > HOME_POSTS && (
-            <Link href={`/${group.slug}`} className="text-p text-ds-fg-muted hover:text-ds-fg">
-              All {listed.length} posts →
-            </Link>
-          )}
         </PageSection>
       )}
 
       {parents.map((parent) => (
         <PageSection key={parent.slug} title={parent.title} href={`/${parent.slug}`}>
-          <LinkRows rows={childPages(pages, parent.slug).map(pageRow)} />
+          <DsLinkList
+            items={childPages(pages, parent.slug).map(pageItem)}
+            more={{ label: homeMoreLabel(parent.slug, parent.title), href: `/${parent.slug}` }}
+          />
         </PageSection>
       ))}
 
       {linkPages.map((links) => (
         <PageSection key={links.slug} title={links.title} href={`/${links.slug}`}>
-          <LinkRows rows={links.settings.links.map((l) => ({ label: l.label, href: l.url, meta: l.note }))} />
+          <DsLinkList items={links.settings.links.map((l) => ({ label: l.label, href: l.url, meta: l.note }))} />
         </PageSection>
       ))}
 

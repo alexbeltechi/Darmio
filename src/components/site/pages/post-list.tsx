@@ -1,22 +1,30 @@
-import { entryDate } from "@/lib/cms/read-time";
-import type { Entry } from "@/lib/cms/types";
+import Link from "next/link";
+import { MediaImage } from "@/components/shared/media-image";
+import { entryDate, readMinutes } from "@/lib/cms/read-time";
+import type { Entry, MediaItem } from "@/lib/cms/types";
+import { getPostMediaItems, getPreviewText } from "../post-grid-shared";
 import type { ViewIntro } from "../site-views";
-import { LinkRows, PageColumn } from "./link-rows";
+import { PageColumn } from "./page-layout";
 
-const DAY = new Intl.DateTimeFormat("en", { month: "short", day: "numeric" });
+const DAY = new Intl.DateTimeFormat("en", { month: "short", day: "numeric", year: "numeric" });
 
 /**
- * A category's posts as lines of text, by year, newest first: the title and
- * how many posts, then each year with its posts (title left, day and month
- * right). The `list` category layout, for writing (nicksaraev.com/archive).
+ * A category's posts stacked like a blog, newest first, left-aligned in the
+ * reading column (the `list` category layout, decisions 2026-10-28): the
+ * title, its line and how many posts, then each post as its picture (when it
+ * has one; a video plays muted, on a loop), its title, the date and read
+ * time, and its description or the start of its text. Posts with and
+ * without pictures sit in the same stream.
  */
-export function PostList({ intro, posts }: { intro: ViewIntro; posts: Entry[] }) {
-  const years = new Map<number, Entry[]>();
-  for (const post of posts) {
-    const year = entryDate(post).getFullYear();
-    years.set(year, [...(years.get(year) ?? []), post]);
-  }
-
+export function PostList({
+  intro,
+  posts,
+  mediaMap,
+}: {
+  intro: ViewIntro;
+  posts: Entry[];
+  mediaMap: Map<string, MediaItem>;
+}) {
   return (
     <PageColumn>
       <header className="flex flex-col gap-ds-8">
@@ -26,21 +34,51 @@ export function PostList({ intro, posts }: { intro: ViewIntro; posts: Entry[] })
           {posts.length} {posts.length === 1 ? "post" : "posts"}
         </p>
       </header>
-      {[...years].map(([year, yearPosts]) => (
-        <section key={year} className="flex flex-col gap-ds-8">
-          <h2 className="text-h3 text-ds-fg">
-            {year} <span className="text-small text-ds-fg-subtle">{yearPosts.length}</span>
-          </h2>
-          <LinkRows
-            divided
-            rows={yearPosts.map((post) => ({
-              label: (post.data.title as string) || post.slug,
-              href: `/post/${post.slug}`,
-              meta: DAY.format(entryDate(post)),
-            }))}
-          />
-        </section>
-      ))}
+      <div className="flex flex-col gap-ds-80 pt-ds-40">
+        {posts.map((post) => (
+          <PostListEntry key={post.id} post={post} media={getPostMediaItems(post, mediaMap)[0]} />
+        ))}
+      </div>
     </PageColumn>
+  );
+}
+
+function PostListEntry({ post, media }: { post: Entry; media?: MediaItem }) {
+  const href = `/post/${post.slug}`;
+  const title = (post.data.title as string) || post.slug;
+  const text = getPreviewText(post);
+  const isVideo = media?.mime.startsWith("video/");
+
+  return (
+    <article className="flex flex-col gap-ds-16">
+      {media && (
+        <Link href={href} aria-label={title} className="block">
+          {isVideo ? (
+            <video
+              src={media.url}
+              poster={media.poster?.url}
+              autoPlay
+              muted
+              loop
+              playsInline
+              className="h-auto w-full"
+            />
+          ) : (
+            <MediaImage item={media} alt={media.alt || title} sizes="(max-width: 700px) 100vw, 661px" className="h-auto w-full" />
+          )}
+        </Link>
+      )}
+      <div className="flex flex-col gap-ds-8">
+        <h2 className="text-h2 text-ds-fg">
+          <Link href={href} className="hover:underline hover:underline-offset-4">
+            {title}
+          </Link>
+        </h2>
+        <p className="text-p text-ds-fg-subtle">
+          {DAY.format(entryDate(post))} · {readMinutes(post)} min
+        </p>
+        {text && <p className="text-prose text-ds-fg-muted">{text}</p>}
+      </div>
+    </article>
   );
 }

@@ -15,6 +15,6 @@ export interface ViewIntro {
  * - hero: a big headline above the feed, fading as it scrolls
  * - left: sticky text column to the left of the feed
  * - wall: no intro, just a masonry grid of every post
- * - list: a title, then every post as a line, by year
+ * - list: a title, then the posts stacked like a blog
  */
 export type IntroLayout = CategoryLayout;

@@ -7,7 +7,7 @@
  * - `blocks`: the page is its blocks, full width, with no header. What every
  *   page was before formats, so a page without one is this.
  * - `text`: a title, a line under it, then the blocks in a reading column,
- *   and the pages under it listed at the end. About, an autobiography, a press
+ *   and the pages under it listed at the end. About, your story, a press
  *   kit, a FAQ, ways to work with you.
  * - `home`: the blocks (a portrait, a few lines about you), then, made from
  *   the rest of the site: your latest posts, each page that has pages under
@@ -54,6 +54,15 @@ export type PageSettings = {
 
 /** How many posts a home page lists before "All N posts". */
 export const HOME_POSTS = 7;
+
+/**
+ * The link that ends a page's section on a home page, to the page itself:
+ * "Learn more about me" for About (Alex, 2026-10-28), "More from <title>"
+ * for any other.
+ */
+export function homeMoreLabel(slug: string, title: string): string {
+  return slug === "about" ? "Learn more about me" : `More from ${title}`;
+}
 
 const text = (value: unknown): string | undefined =>
   typeof value === "string" && value.trim() ? value.trim() : undefined;
@@ -156,13 +165,13 @@ export const PAGE_PRESETS: PagePreset[] = [
     format: "text",
     nav: true,
     description: "Who you are, in a few lines.",
-    starter: `A short page: who you are, what you make and why, in a few paragraphs, with an image or two. The longer story goes in Autobiography. ${ASK}`,
+    starter: `A short page: who you are, what you make and why, in a few paragraphs, with an image or two. The longer story goes in My story. ${ASK}`,
   },
   {
-    id: "autobiography",
-    label: "Autobiography",
-    title: "Autobiography",
-    slug: "autobiography",
+    id: "my-story",
+    label: "My story",
+    title: "My story",
+    slug: "my-story",
     format: "text",
     parent: "about",
     description: "The longer story.",

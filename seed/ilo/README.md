@@ -11,7 +11,8 @@ npm run seed -- ilo
 It loads into the database in `.env.local` and skips anything already
 there. Posts and pages are in the CMS's own agent format
 (`src/lib/agent/markdown.ts`); an image is written `![alt](file:name.jpg)`
-and becomes an upload of `media/name.jpg`. Pages are made in file-name
+and a video `::video media=file:name.mp4`, and each becomes an upload from
+`media/`. Pages are made in file-name
 order, which is the order they're listed in.
 
 ## Who she is
@@ -32,21 +33,21 @@ explains how.
 - Never says "the future", "year 3000", "Renaissance", "multi-sensory" or
   "AI". The reader should think "who is this?", not be told.
 - Home, About and the press kit are in the third person (like
-  nicksaraev.com); her writing, Autobiography and Work with me in the first.
+  nicksaraev.com); her writing, My story and Work with me in the first.
 - Y3K appears plainly in About, the press kit and Follow. Never as an ad.
 
 ## What's in here
 
 | File | Becomes |
 | --- | --- |
-| `site.json` | The site's name and the Writing category (list layout, in the nav) |
-| `media/` | Her portrait, the black-sand shore and the lake, from Y3K |
+| `site.json` | The site's name and the Writing category (stacked like a blog, in the nav) |
+| `media/` | Her portrait, the black-sand shore, the lake and an 8-second loop of her, from Y3K |
 | `pages/01-home.md` | Home: the portrait, three short paragraphs; the format adds Writing, About, Follow and the newsletter |
 | `pages/02-about.md` | About (in the nav): short, two images |
-| `pages/03…05` | Autobiography, Press kit, FAQ, under About |
+| `pages/03…05` | My story, Press kit, FAQ, under About |
 | `pages/06-work-with-me.md` | Work with me (in the nav): four ways |
 | `pages/07-follow.md` | Follow: YouTube, Newsletter, Instagram, X, Y3K Club |
-| `posts/*.md` | Six essays in Writing, 2025–2026 |
+| `posts/*.md` | Six essays in Writing, 2025–2026; three with a picture or the loop |
 
 ## Made up for the seed
 

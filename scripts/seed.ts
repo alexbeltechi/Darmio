@@ -9,7 +9,8 @@
  * categories), `media/` (the images), `posts/*.md` and `pages/*.md` in the
  * agent's Markdown format (src/lib/agent/markdown.ts), pages in file-name
  * order, which is the order they're listed in. An image is written
- * `![alt](file:name.jpg)` and becomes that upload. Everything is published
+ * `![alt](file:name.jpg)` and a video `::video media=file:name.mp4`, and each
+ * becomes that upload. Everything is published
  * and marked as an example (`metadata.example`). Anything already there (a
  * category or an entry with the same slug) is left alone, so running it
  * twice changes nothing.
@@ -33,7 +34,13 @@ type SeedSite = {
   }[];
 };
 
-const MIME: Record<string, string> = { ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png", ".webp": "image/webp" };
+const MIME: Record<string, string> = {
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".png": "image/png",
+  ".webp": "image/webp",
+  ".mp4": "video/mp4",
+};
 
 async function main() {
   const name = process.argv[2];
@@ -87,11 +94,15 @@ async function main() {
     return found.id;
   };
 
-  // `file:name` images → uploads, once each.
+  // `file:name` media → uploads, once each: images as `![alt](file:name)`,
+  // video as `::video media=file:name caption="…"`.
   const uploaded = new Map<string, string>();
   async function withMedia(md: string): Promise<string> {
-    for (const match of md.matchAll(/!\[([^\]]*)\]\(file:([^)\s]+)\)/g)) {
-      const [, alt, file] = match;
+    const refs = [
+      ...[...md.matchAll(/!\[([^\]]*)\]\(file:([^)\s]+)\)/g)].map(([, alt, file]) => ({ alt, file })),
+      ...[...md.matchAll(/media=file:(\S+)(?:\s+caption="([^"]*)")?/g)].map(([, file, caption]) => ({ alt: caption ?? "", file })),
+    ];
+    for (const { alt, file } of refs) {
       if (uploaded.has(file)) continue;
       const bytes = await fs.readFile(path.join(dir, "media", file));
       const { item, error } = await uploadMedia(bytes, file, MIME[path.extname(file).toLowerCase()] ?? "application/octet-stream", {
@@ -101,7 +112,9 @@ async function main() {
       if (!item) throw new Error(`Couldn't upload ${file}: ${error}`);
       uploaded.set(file, item.id);
     }
-    return md.replace(/\]\(file:([^)\s]+)\)/g, (_, file: string) => `](media:${uploaded.get(file)})`);
+    return md
+      .replace(/\]\(file:([^)\s]+)\)/g, (_, file: string) => `](media:${uploaded.get(file)})`)
+      .replace(/media=file:(\S+)/g, (_, file: string) => `media=${uploaded.get(file)}`);
   }
 
   async function seedFolder(collection: "posts" | "pages") {
@@ -137,7 +150,7 @@ async function main() {
 
   await seedFolder("posts");
   await seedFolder("pages");
-  console.log(`Done. ${uploaded.size} images; everything is published and marked as an example.`);
+  console.log(`Done. ${uploaded.size} media files; everything is published and marked as an example.`);
   process.exit(0);
 }
 

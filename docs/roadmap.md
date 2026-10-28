@@ -59,10 +59,10 @@ When a task changes an item, update this file in the same change.
    4. **First run: the launch package.** The seed is **Ilo Odena**, one
       of the Humans of Y3K (`seed/ilo/`, decisions 2026-10-24 and
       2026-10-28), shaped on nicksaraev.com: a **Writing** category (a list
-      by year), a **Home** page (her portrait, three short paragraphs, the
-      latest writing with year and read time, About's pages, Follow's
-      links, the newsletter), **About** with **Autobiography**, **Press
-      kit** and **FAQ** under it, **Work with me**, and **Follow**. Nav:
+      like a blog), a **Home** page (her portrait, three short paragraphs,
+      the latest writing with year and read time, About's pages, Follow's
+      links, the newsletter), **About** with **My story**, **Press kit**
+      and **FAQ** under it, **Work with me**, and **Follow**. Nav:
       Writing, About, Work with me. Everything is marked as an example and
       removed in one action, which leaves the plain feed.
       In order:
@@ -73,12 +73,11 @@ When a task changes an item, update this file in the same change.
       - **c. Page formats instead of new blocks.** Done 2026-10-28
         (decisions): Text, Home, Links and Blocks; pages under pages; pages
         in the nav; the category `list` layout; presets in New page; posts
-        have a read time. The Parabola gaps it found, kept with the site's
-        pages until Alex designs them: a list of links with meta on the
-        right (`LinkRows`), a page title with the page it sits under, a
-        section heading, a smaller image size for a portrait (a gallery is
-        the column's width or more), and a nav with the name on the left
-        (the site's nav is centred pills).
+        have a read time; the nav as a bar with the name on the left; a
+        square image fills an inline gallery. Parabola gained
+        `DsLinkList`, a ghost button's current state and a ghost theme
+        switch. Left with the site's pages: the page title (with the page
+        it sits under) and the section heading.
       - **d. Seed script.** Done 2026-10-28: `npm run seed -- ilo` loads the
         settings, categories, media, posts and pages, each marked as an
         example (`metadata.example`), and skips anything already there.
@@ -86,7 +85,8 @@ When a task changes an item, update this file in the same change.
         maker without a terminal gets Ilo's site (the owner comes from
         setup, not the script).
       - **e. Media.** Done 2026-10-28 with three Y3K images of Ilo (the
-        portrait, the black-sand shore, the lake), 730 KB in all. Moments
+        portrait, the black-sand shore, the lake) and an 8-second loop of
+        her, 1.2 MB in all; three essays carry one each. Moments
         are out of the seed (decisions, 2026-10-28).
       - **f. Install by AI** (decisions, 2026-10-26): `INSTALL.md`, the
         README's one prompt, the setup code. Done 2026-10-26; next, Alex

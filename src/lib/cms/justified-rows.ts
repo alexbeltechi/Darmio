@@ -49,16 +49,20 @@ export function galleryColumns(containerWidth: number, full: boolean, count: num
 /** Up to this many images, an inline gallery stacks them, one a row. */
 export const STACKED_GALLERY_COUNT = 3;
 
-/** No row is taller than this, about a laptop screen, so a stretched row never runs off screen. */
+/**
+ * No row is taller than this, about a laptop screen, so a stretched row never
+ * runs off screen. The inline width matches it, so a square fills an inline
+ * gallery edge to edge (decisions, 2026-10-28).
+ */
 const MAX_ROW_PX = 820;
 
 /**
- * How tall a row may get, in pixels: 70% of the gallery's width on a desktop
- * (717px inline), more on narrower screens so a lone image isn't left as a
- * thumbnail, and never more than MAX_ROW_PX.
+ * How tall a row may get, in pixels: as tall as the gallery is wide, so a
+ * square image fills the width (decisions, 2026-10-28); taller on a phone so
+ * a portrait isn't left as a thumbnail; never more than MAX_ROW_PX.
  */
 function rowCap(containerWidth: number): number {
-  const ratio = containerWidth < 640 ? 1.5 : containerWidth < 1024 ? 0.9 : 0.7;
+  const ratio = containerWidth < 640 ? 1.5 : 1;
   return Math.min(ratio * containerWidth, MAX_ROW_PX);
 }
 
@@ -104,8 +108,12 @@ export function justifiedRows(
   });
 }
 
-/** The widest an inline gallery runs (`large`/`normal`, and Auto under FULL_GALLERY_COUNT images). */
-export const INLINE_GALLERY_MAX = 1024;
+/**
+ * The widest an inline gallery runs (`large`/`normal`, and Auto under
+ * FULL_GALLERY_COUNT images): the tallest a row may be, so a square image
+ * reaches both edges. Was 1024px, where a square stopped at 717.
+ */
+export const INLINE_GALLERY_MAX = MAX_ROW_PX;
 
 /**
  * From this many images an Auto-width gallery runs the page's whole width:
@@ -130,7 +138,7 @@ const PAGE_MARGIN = DS_GUTTER_PX;
 
 /**
  * The width a gallery gets on the live post page in a window this wide: the
- * window less the page's margins, at most 1024px unless it runs full width.
+ * window less the page's margins, at most INLINE_GALLERY_MAX unless it runs full width.
  * The editor lays its rows out at this width, so it shows the rows a visitor
  * on the same screen sees, breakpoints included.
  */

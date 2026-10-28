@@ -21,7 +21,7 @@ import { ROLES } from "../packages/parabola/showcase/colour-roles";
 import { DS_DEFAULT_FONT, DS_DEFAULT_HEADING_FONT, dsFont } from "../packages/parabola/fonts";
 import { DS_DEFAULT_ACCENT_COLOUR, DS_DEFAULT_BASE_COLOUR, dsAccentColour, dsBaseColour } from "../packages/parabola/colours";
 import { DS_TEXT_STYLES, DS_TEXT_STYLE_DEFAULTS } from "../packages/parabola/theme";
-import { DS_DEFAULT_RADIUS, DS_RADIUS_TOKENS, dsRadius } from "../packages/parabola/radius";
+import { DS_DEFAULT_RADIUS, DS_RADIUS_TOKENS, dsRadiusPx } from "../packages/parabola/radius";
 
 const css = readFileSync(join(__dirname, "../packages/parabola/tokens.css"), "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
 
@@ -71,7 +71,7 @@ for (const style of DS_TEXT_STYLES) {
 
 // Corners: the default radius (radius.ts) is what tokens.css sets, each token with its utility.
 for (const token of DS_RADIUS_TOKENS) {
-  const px = `${dsRadius(DS_DEFAULT_RADIUS).px[token]}px`;
+  const px = `${dsRadiusPx(DS_DEFAULT_RADIUS)[token]}px`;
   if (root.get(`--ds-radius-${token}`) !== px) problems.push(`--ds-radius-${token} isn't ${px} (radius.ts)`);
   if (!same(theme.get(`--radius-ds-${token}`) ?? "", `var(--ds-radius-${token})`)) problems.push(`--radius-ds-${token} is missing from @theme`);
 }

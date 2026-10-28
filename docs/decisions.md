@@ -20,10 +20,11 @@ with the why. To change one, add a new line that overrides it.
   on a theme colour that colour's complement, deep on a light page and
   pale on a dark one, Alex, 2026-10-28). Selected states (the current nav
   item, a pressed button, a checked box) are the text colour, solid, as
-  Publish is. Each is Parabola's own or a
-  custom colour from an inline picker (hue bar, a short shade square,
-  hex): no preset lists, for a different look you make another theme
-  (Alex, 2026-10-28). Each is picked for light; in dark, "Based on light
+  Publish is. In the panel each is just
+  a colour picker (a short shade square, a hue bar, the hex) sitting on
+  the colour it is now, Parabola's own until it's moved: no swatches or
+  preset lists, for a different look you make another theme (Alex,
+  2026-10-28). Each is picked for light; in dark, "Based on light
   theme" (on by default) keeps it the light one's counterpart, the same
   hue at the other end of light, so light and dark always contrast
   (Alex: "every colour should have an anti-colour"); off, it takes a dark
@@ -35,8 +36,8 @@ with the why. To change one, add a new line that overrides it.
   by name or link (a share link keeps the weights picked there); for each
   text style its name, family, weight (one its font has), size and line
   height (Display to H2 in Heading, Instrument Serif Regular; H3 and the
-  rest in Font, Instrument Sans Medium); a **radius**, None, Small, Medium
-  or Large (the default), for every corner, cards, fields and buttons
+  rest in Font, Instrument Sans Medium); a **radius**, None, Small, Medium,
+  Large (the default) or Custom (pixels typed in), for every corner, cards, fields and buttons
   alike: buttons are fully round only because Large is the default
   (Alex, 2026-10-28); and an icon library (Lucide; the
   others shadcn offers need Parabola's icons in one place first). Themes
@@ -49,7 +50,7 @@ with the why. To change one, add a new line that overrides it.
   `/parabola` opens on **Theme** ("Theme" over the open theme's name):
   Parabola's pieces stacked in one 600px column wearing the open theme,
   the theme as JSON last, and the panel on the right (a rule between its
-  sections) with its main choices (which
+  sections, no line of explanation under its fields) with its main choices (which
   theme, with Add theme, Rename and Remove; light or dark; theme colour,
   fonts and UI, accent colour; Heading and Font; radius; icons), 400px wide, about a
   phone's width. The preview cards float on the canvas, with no frame

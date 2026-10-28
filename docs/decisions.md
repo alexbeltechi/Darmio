@@ -31,7 +31,8 @@ with the why. To change one, add a new line that overrides it.
   item, a pressed button, a checked box) are the text colour, solid, as
   Publish is. In the panel each is just
   a colour picker (a short shade square, a hue bar and a brightness bar,
-  the same bar, then the hex) sitting on the colour it is now, Parabola's
+  the same bar, each with its name and value above it, hue in degrees and
+  the rest out of 100, so a colour can be noted and made again; then the hex) sitting on the colour it is now, Parabola's
   own until it's moved: no swatches or preset lists, for a different look
   you make another theme (Alex, 2026-10-28). Each is picked for light; in
   dark, "Based on light theme" (on by default) keeps it the light one's

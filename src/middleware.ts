@@ -44,16 +44,27 @@ function forward(request: NextRequest, actor: "agent" | "user", userId?: string)
   if (userId) headers.set("x-cms-user-id", userId);
   // Which project: a person's from the switcher's cookie; an agent names it
   // in the header itself (no header means the first project).
-  if (actor === "user") {
-    headers.delete(PROJECT_HEADER);
-    const project = request.cookies.get(PROJECT_COOKIE)?.value;
-    if (project) headers.set(PROJECT_HEADER, project);
-  }
+  if (actor === "user") withPickedProject(request, headers);
   return NextResponse.next({ request: { headers } });
+}
+
+/** The project the switcher picked (its cookie), for the request's header; none means the first. */
+function withPickedProject(request: NextRequest, headers: Headers) {
+  headers.delete(PROJECT_HEADER);
+  const project = request.cookies.get(PROJECT_COOKIE)?.value;
+  if (project) headers.set(PROJECT_HEADER, project);
 }
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // /parabola is open to anyone, but makes the themes of the project the
+  // admin has picked, so what it publishes is what it shows.
+  if (pathname === "/parabola" || pathname.startsWith("/parabola/")) {
+    const headers = new Headers(request.headers);
+    withPickedProject(request, headers);
+    return NextResponse.next({ request: { headers } });
+  }
 
   // Always allow these routes without authentication
   if (
@@ -86,7 +97,7 @@ export async function middleware(request: NextRequest) {
   return forward(request, "user", typeof token.id === "string" ? token.id : token.sub);
 }
 
-// Apply middleware to admin routes and admin API routes
+// Admin routes and their API, and /parabola (for the picked project)
 export const config = {
-  matcher: ["/admin/:path*", "/api/admin/:path*"],
+  matcher: ["/admin/:path*", "/api/admin/:path*", "/parabola", "/parabola/:path*"],
 };

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { getSiteSettings, updateSiteSettings } from "@/lib/db/settings";
 import { getCurrentProject } from "@/lib/db/mongodb";
 import { updateProject } from "@/lib/db/projects";
@@ -41,6 +42,9 @@ export async function PATCH(request: NextRequest) {
       const project = await getCurrentProject();
       if (project && project.name !== settings.siteName) await updateProject(project.slug, { name: settings.siteName });
     }
+
+    // The site's name, home and theme are on every page: cached pages are made again with them.
+    revalidatePath("/", "layout");
 
     return NextResponse.json({ data: settings });
   } catch (error) {

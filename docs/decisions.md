@@ -39,6 +39,9 @@ with the why. To change one, add a new line that overrides it.
   live in a **library** in each project's settings: Parabola (the default
   theme, can't go) and any added, one of them the site's, picked in Settings › Design; the root layout
   applies it, so the site, the admin and `/parabola` all wear it.
+  Publishing remakes the site's cached pages at once, and `/parabola`
+  makes the themes of the project picked in the admin, the one it
+  publishes to.
   `/parabola` opens on **Theme** ("Theme" over the open theme's name):
   Parabola's pieces stacked in one 600px column wearing the open theme,
   the theme as JSON last, and the panel on the right (a rule between its

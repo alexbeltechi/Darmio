@@ -279,7 +279,7 @@ Feature roadmap), unscheduled until Alex places it.
   the open-source release.
 - **Parabola themes, customizable like shadcn** — `doing` (BEL-109)
   Started 2026-10-28 (decisions): themes as data in a library per
-  project (Default and any added, one in use, picked in Settings › Design),
+  project (Parabola and any added, one in use, picked in Settings › Design),
   made on `/parabola` like shadcn's create page: base and secondary
   colours, light and dark, font families (Font, Heading, more), added
   Google fonts, the type scale with weights, and the icon library (Lucide

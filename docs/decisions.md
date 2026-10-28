@@ -23,16 +23,18 @@ with the why. To change one, add a new line that overrides it.
   height (Display to H2 in Heading, Instrument Serif Regular; H3 and the
   rest in Font, Instrument Sans Medium); and an icon library (Lucide; the
   others shadcn offers need Parabola's icons in one place first). Themes
-  live in a **library** in each project's settings: Default and any added,
-  one of them the site's, picked in Settings › Design; the root layout
+  live in a **library** in each project's settings: Parabola (the default
+  theme, can't go) and any added, one of them the site's, picked in Settings › Design; the root layout
   applies it, so the site, the admin and `/parabola` all wear it.
-  `/parabola` opens on **Theme**: Parabola's pieces in a grid wearing the
-  open theme, and the panel on the right with its main choices (which
+  `/parabola` opens on **Theme** ("Theme" over the open theme's name):
+  Parabola's pieces stacked in one 600px column wearing the open theme,
+  the theme as JSON last, and the panel on the right (a rule between its
+  sections) with its main choices (which
   theme, with Add theme, Rename and Remove; light or dark; base and
   secondary colours; Heading and Font; icons). **Typography** has the
   rest: Font families (stacked cards, an edit dialog each, Add family; the
   fonts, linked to Google Fonts; Add font) and Type scale (an edit dialog
-  per style). Top right on every page: the theme being edited, **Undo**
+  per style). Top right on every page: **Undo**
   (icon and label) and **Redo** (icon), **Publish** (asks first, since it
   changes every site that uses one of the themes), and a ⋮ menu to restore
   defaults, asking first, with Undo in the toast. The type and colour

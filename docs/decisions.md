@@ -19,7 +19,7 @@ with the why. To change one, add a new line that overrides it.
   see-through surface, so they show on a card as well (Alex). The panel's
   sections are a Parabola accordion (`DsAccordion`, Layout › Accordion,
   32px headers), and each colour is one nested inside Colours, set in
-  16px. The site's own nav is unchanged for now.
+  16px; the top bar's Collapse all / Expand all folds or opens them all. The site's own nav is unchanged for now.
 - 2026-10-28 — **Parabola themes, made like shadcn's create page.** A
   theme is data (`packages/parabola/theme.ts`): five colours
   (`colours.ts`), each based on the one before until given its own: the
@@ -100,7 +100,7 @@ with the why. To change one, add a new line that overrides it.
   changes every site that uses one of the themes), and a ⋮ menu to restore
   defaults, asking first, with Undo in the toast (and each panel section,
   Colours, Type, Radius, Icons, has a ⋮ with Restore for its part): a page's part of the
-  open theme, or all of them, which goes back to Parabola (it opens, and
+  open theme, or all settings ("Restore all settings"), which goes back to Parabola (it opens, and
   is the site's again once published; other themes stay). Parabola reads
   "(default)" in the theme dropdown, no other theme does (Alex,
   2026-10-28). The type and colour

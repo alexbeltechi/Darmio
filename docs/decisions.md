@@ -93,9 +93,11 @@ with the why. To change one, add a new line that overrides it.
   post's opening on the page itself, a subscribe card with the large
   buttons above the fold, a list of writing, a draft's card with its note,
   as a site and its admin lay them out; Alex, 2026-10-28),
-  and the panel on the right (the theme as code last, folded: its
-  settings and every colour in light and dark, to copy, or paste one in to
-  apply it) (a rule between its
+  and the panel on the right (the theme as code last, folded: a full
+  export a person or an AI can build a site from as it is, every colour by
+  its role in light and dark, the fonts with a Google Fonts link, the type
+  scale, the corners in pixels, and the settings, so pasting one back in
+  applies it; `dsThemeExport`; Alex, 2026-10-28) (a rule between its
   sections, no line of explanation under its fields; under the top bar,
   which runs the full width with a rule under it) with its main choices (which
   theme: a dropdown whose last option is Add theme, and a ⋮ at the

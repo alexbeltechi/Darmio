@@ -7,6 +7,9 @@
       "layout": "list",
       "nav": true,
       "description": "Essays on making things slowly and finishing them anyway."
-    }
+    },
+    { "slug": "listening", "label": "Listening", "parent": "writing" },
+    { "slug": "making", "label": "Making", "parent": "writing" },
+    { "slug": "habits", "label": "Habits", "parent": "writing" }
   ]
 }

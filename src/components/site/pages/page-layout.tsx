@@ -35,11 +35,11 @@ export function PageSection({
   );
 }
 
-/** The column every formatted page reads in, with the room the fixed nav needs above it. */
+/** The column every formatted page reads in (READING_WIDTH), with the room the fixed nav needs above it. */
 export function PageColumn({ children }: { children: React.ReactNode }) {
   return (
     <main className="flex w-full flex-1 flex-col px-5 pt-24 pb-ds-80 sm:pt-36">
-      <div data-content-start="" className="mx-auto flex w-full max-w-[661px] flex-col gap-ds-40">
+      <div data-content-start="" className="mx-auto flex w-full max-w-[600px] flex-col gap-ds-40">
         {children}
       </div>
     </main>

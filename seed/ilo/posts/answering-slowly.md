@@ -1,6 +1,6 @@
 ---
 title: Answering slowly
-categories: writing
+categories: habits
 date: 2025-08-21
 description: I read everything. I answer about a week later, and the answers are better for it.
 ---

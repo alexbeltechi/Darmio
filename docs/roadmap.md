@@ -74,7 +74,7 @@ When a task changes an item, update this file in the same change.
         (decisions): Text, Home, Links and Blocks; pages under pages; pages
         in the nav; the category `list` layout; presets in New page; posts
         have a read time; the nav as a bar with the name on the left; a
-        square image fills an inline gallery. Parabola gained
+        square image fills an inline gallery; text reads at 600px. Parabola gained
         `DsLinkList`, a ghost button's current state and a ghost theme
         switch. Left with the site's pages: the page title (with the page
         it sits under) and the section heading.

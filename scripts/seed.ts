@@ -31,6 +31,8 @@ type SeedSite = {
     nav?: boolean;
     headline?: string;
     description?: string;
+    /** The top-level category it sits inside (its slug), listed before it. */
+    parent?: string;
   }[];
 };
 
@@ -75,6 +77,8 @@ async function main() {
       console.log(`Category ${c.slug}: already there`);
       continue;
     }
+    const parentId = c.parent ? categories.find((existing) => existing.slug === c.parent)?.id : undefined;
+    if (c.parent && !parentId) throw new Error(`Category ${c.slug}: no "${c.parent}" to sit inside (list it first)`);
     await createCategory({
       slug: c.slug,
       name: c.label,
@@ -84,8 +88,10 @@ async function main() {
       headline: c.headline,
       description: c.description,
       layout: parseCategoryLayout(c.layout),
+      ...(parentId ? { parentId } : {}),
     });
     console.log(`Category ${c.slug}: made`);
+    categories = await listCategories();
   }
   categories = await listCategories();
   const categoryId = (slug: string) => {

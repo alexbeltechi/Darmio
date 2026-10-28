@@ -94,16 +94,20 @@ function useLogoOpacity(
 
 const LOGO_CLASS = "text-h3 text-ds-fg";
 
+/** The desktop nav's ghost links: muted, the page colour on hover, no current highlight. */
+const NAV_LINK_CLASS = "bg-transparent text-ds-fg-muted hover:bg-ds-surface/40 hover:text-ds-fg";
+
 /**
  * Site nav, rendered once in the persistent site layout so it never
  * unmounts (and never flickers) between route changes.
  *
  * From `sm` up it's the conventional bar (decisions, 2026-10-28): the site's
- * name on the left in H3, a little bigger than the links, and on the right
- * the sections as ghost `DsButton`s (muted text, a grey surface on hover and
- * on the page you're on), then the theme switch, a ghost icon that flips to
- * the other theme. It's fixed to the top over a fade, so the page scrolls
- * under it. Below `sm` it's the site's name top-left (fading out as the page
+ * name on the left in H3, a little bigger than the links, the way home; on
+ * the right the sections as ghost `DsButton`s 4px apart (muted text, a light
+ * surface on hover, the current page not highlighted), then the theme
+ * switch, a ghost icon that flips to the other theme. It's as wide as the
+ * reading column and fixed to the top over a fade, so the page scrolls under
+ * it. Below `sm` it's the site's name top-left (fading out as the page
  * content scrolls up to it) and an "Explore" button top-right that opens the
  * Parabola `DsMenu`, which also holds the theme switch.
  */
@@ -118,10 +122,8 @@ export function SiteNav({
   const pathname = usePathname();
   const override = useSyncExternalStore(subscribe, () => highlightOverride, () => null);
   const active = override ?? activeSlugForPath(pathname, sections);
-  const NAV_ITEMS = [
-    { slug: "home", label: "Home", href: "/" },
-    ...sections.map((c) => ({ slug: c.slug, label: c.label, href: `/${c.slug}` })),
-  ];
+  // No Home: the site's name is the way home (decisions, 2026-10-28).
+  const NAV_ITEMS = sections.map((c) => ({ slug: c.slug, label: c.label, href: `/${c.slug}` }));
   const [mobileOpen, setMobileOpen] = useState(false);
   const closeMobile = useCallback(() => setMobileOpen(false), []);
   const logoRef = useRef<HTMLAnchorElement>(null);
@@ -159,18 +161,21 @@ export function SiteNav({
 
   return (
     <>
-      {/* Sits above the page content; the page fades out beneath it. */}
-      <header className="fixed inset-x-0 top-0 z-(--ds-z-nav) hidden items-center justify-between gap-4 ds-nav-fade px-5 py-5 sm:flex">
-        <Link href="/" onClick={handleClick("home")} className={`min-w-0 truncate ${LOGO_CLASS}`}>
-          {siteName}
-        </Link>
-        <nav className="flex shrink-0 flex-wrap items-center justify-end gap-1">
-          {NAV_ITEMS.map((item) =>
-            navButton(item, active === item.slug ? "" : "text-ds-fg-muted hover:text-ds-fg", undefined, "text")
-          )}
-          {/* On mobile the theme switch lives in the menu. */}
-          <DsThemeToggle variant="text" className="text-ds-fg-muted hover:text-ds-fg" />
-        </nav>
+      {/* Sits above the page content; the page fades out beneath it. The bar is
+          as wide as the reading column, so the name and links line up with the text. */}
+      <header className="fixed inset-x-0 top-0 z-(--ds-z-nav) hidden ds-nav-fade px-5 py-5 sm:block">
+        <div className="mx-auto flex w-full max-w-[600px] items-center justify-between gap-4">
+          <Link href="/" onClick={handleClick("home")} className={`min-w-0 truncate ${LOGO_CLASS}`}>
+            {siteName}
+          </Link>
+          <nav className="flex shrink-0 items-center gap-1">
+            {/* The page you're on isn't highlighted (only aria-current marks it): every link is
+                muted, with the ghost's light surface on hover. */}
+            {NAV_ITEMS.map((item) => navButton(item, NAV_LINK_CLASS, undefined, "text"))}
+            {/* On mobile the theme switch lives in the menu. */}
+            <DsThemeToggle variant="text" className={NAV_LINK_CLASS} />
+          </nav>
+        </div>
       </header>
 
       <Link

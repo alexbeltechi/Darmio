@@ -1,6 +1,6 @@
 ---
 title: How to listen to a lake
-categories: writing
+categories: listening
 date: 2026-09-14
 description: Three summers, one stone, and the drop of water that does the work.
 ---

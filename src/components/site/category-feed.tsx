@@ -51,7 +51,14 @@ export function CategoryFeed({ layout, sections, mediaItems, categories }: Categ
   }
 
   if (layout === "list") {
-    return <PostList intro={sections[0].intro} posts={sections.flatMap((section) => section.posts)} mediaMap={mediaMap} />;
+    return (
+      <PostList
+        intro={sections[0].intro}
+        posts={sections.flatMap((section) => section.posts)}
+        mediaMap={mediaMap}
+        categoryMap={categoryMap}
+      />
+    );
   }
 
   if (layout === "wall") {

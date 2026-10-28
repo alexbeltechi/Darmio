@@ -1,6 +1,6 @@
 ---
 title: What I bring to the lake
-categories: writing
+categories: listening
 date: 2026-04-30
 description: A short list, kept short on purpose.
 ---

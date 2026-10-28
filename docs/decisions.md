@@ -10,16 +10,25 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
-- 2026-10-28 — **The site's nav is a conventional bar**: the site's name
-  on the left in H3, the sections on the right as ghost buttons (muted,
-  a grey surface on hover and on the page you're on), then the theme
-  switch as a ghost icon that flips to the other theme. No post counts.
-  Phones keep the name and Explore. Overrides the centred pills with
-  counts (Alex, after nicksaraev.com).
-- 2026-10-28 — **A square image fills an inline gallery**: a row may be as
-  tall as the gallery is wide (was 70%), and the inline width matches the
-  tallest row, 820px (was 1024), so a square reaches both edges on every
-  post and page. Phones keep their taller rows.
+- 2026-10-28 — **The site's nav is a conventional bar** as wide as the
+  reading column: the site's name on the left in H3, which is the way
+  home (no Home button); the sections on the right as ghost buttons 4px
+  apart, muted, with a light surface on hover and no highlight for the
+  page you're on; then the theme switch as a ghost icon that flips to the
+  other theme. No post counts. Phones keep the name and Explore.
+  Overrides the centred pills with counts (Alex, after nicksaraev.com).
+- 2026-10-28 — **The ghost button's hover is one light surface**
+  (`ds-surface` at 40%, no darkening tint), the same as its current
+  state; it was too dark in the light theme. Everywhere the text variant
+  is used, admin included.
+- 2026-10-28 — **Text reads at 600px** (was 661) on posts and pages, and
+  **a square image fills its gallery**: a row may be as tall as the
+  gallery is wide (was 70%). A gallery that shows one image a row (Auto up
+  to three, Stacked) is the reading width, so pictures line up with the
+  text; one with images side by side (Auto from four, grid, masonry,
+  Inline) runs to 820px (was 1024), the tallest a row may be, so three
+  across stay big enough to see. Alex's message lost the exact width;
+  600px is the agent's pick, closer to Nick's column.
 - 2026-10-28 — **Pages have a format, and a fresh install can start as
   Ilo's site.** Alex: an out-of-the-box site shaped like nicksaraev.com,
   presets of pages, "not a block editor". A page picks one of four
@@ -35,8 +44,9 @@ with the why. To change one, add a new line that overrides it.
   categories. A page at `home` is the homepage. Home's sections list in
   the body copy's size, each ending in a link to its page ("All 6 posts",
   "Learn more about me"). A category's page gains a **list** layout: its
-  posts stacked like a blog, left-aligned, each with its picture or video
-  when it has one. New page offers presets (Home, About, My story, Press
+  posts stacked like a blog, left-aligned: the picture or video when there
+  is one, the title in the home lists' size, the start of the text, and a
+  row with the post's own categories (links) and its date. New page offers presets (Home, About, My story, Press
   kit, FAQ, Follow, Work with me), each a starting text that says what
   goes there. The example site is
   Ilo's: `npm run seed -- ilo` loads Writing (six essays), Home, About and

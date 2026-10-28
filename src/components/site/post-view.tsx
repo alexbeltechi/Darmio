@@ -110,7 +110,7 @@ function SourceLine({ post, settings }: { post: Entry; settings: SourceLineSetti
   if (!label) return null;
 
   return (
-    <p className="mx-auto mt-ds-40 w-full max-w-[661px] text-p text-ds-fg-muted">
+    <p className="mx-auto mt-ds-40 w-full max-w-[600px] text-p text-ds-fg-muted">
       {settings.prefix && <>{settings.prefix} </>}
       {url ? (
         <a

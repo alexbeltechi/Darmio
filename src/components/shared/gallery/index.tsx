@@ -4,7 +4,7 @@ import type { GalleryProps } from "./types";
 import { AutoLayout } from "./layouts/auto-layout";
 import { GridLayout } from "./layouts/grid-layout";
 import { MasonryLayout } from "./layouts/masonry-layout";
-import { galleryIsFull, INLINE_GALLERY_MAX } from "@/lib/cms/justified-rows";
+import { galleryIsFull, galleryMaxWidth } from "@/lib/cms/justified-rows";
 
 /**
  * Universal Gallery Component
@@ -66,13 +66,11 @@ export function Gallery({
     }
   };
 
-  // Inline (up to INLINE_GALLERY_MAX, 820px, centred) or the page's whole width inside its side
-  // margins; Auto picks by how many images there are (galleryIsFull).
+  // Stacked at the reading width, side by side up to INLINE_GALLERY_MAX (centred), or the
+  // page's whole width inside its side margins (galleryMaxWidth).
+  const maxWidth = galleryMaxWidth(layout, width, mediaItems.length);
   return (
-    <div
-      className="mx-auto w-full"
-      style={galleryIsFull(width, mediaItems.length) ? undefined : { maxWidth: INLINE_GALLERY_MAX }}
-    >
+    <div className="mx-auto w-full" style={maxWidth === undefined ? undefined : { maxWidth }}>
       {renderLayout()}
     </div>
   );

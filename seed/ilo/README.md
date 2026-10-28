@@ -40,7 +40,7 @@ explains how.
 
 | File | Becomes |
 | --- | --- |
-| `site.json` | The site's name and the Writing category (stacked like a blog, in the nav) |
+| `site.json` | The site's name; Writing (stacked like a blog, in the nav) with Listening, Making and Habits inside it |
 | `media/` | Her portrait, the black-sand shore, the lake and an 8-second loop of her, from Y3K |
 | `pages/01-home.md` | Home: the portrait, three short paragraphs; the format adds Writing, About, Follow and the newsletter |
 | `pages/02-about.md` | About (in the nav): short, two images |

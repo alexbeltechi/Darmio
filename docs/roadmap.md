@@ -282,9 +282,9 @@ Feature roadmap), unscheduled until Alex places it.
   project (Parabola and any added, one in use, picked in Settings › Design),
   made on `/parabola` like shadcn's create page: base and secondary
   colours, light and dark, font families (Font, Heading, more), added
-  Google fonts, the type scale with weights, and the icon library (Lucide
-  only). Next: icons through one Parabola component so other libraries
-  work, uploading a font file, corners and spacing in the theme, import of
+  Google fonts, the type scale with weights, the radius (None to Large)
+  and the icon library (Lucide only). Next: icons through one Parabola
+  component so other libraries work, uploading a font file, spacing in the theme, import of
   a theme file, and an agent setting it through the API.
   A theme contract (which tokens and block variants a theme may set) and
   themes as data (`*.theme.json`), imported and switched in Settings ›

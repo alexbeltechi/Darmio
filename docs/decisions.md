@@ -31,7 +31,10 @@ with the why. To change one, add a new line that overrides it.
   by name or link (a share link keeps the weights picked there); for each
   text style its name, family, weight (one its font has), size and line
   height (Display to H2 in Heading, Instrument Serif Regular; H3 and the
-  rest in Font, Instrument Sans Medium); and an icon library (Lucide; the
+  rest in Font, Instrument Sans Medium); a **radius**, None, Small, Medium
+  or Large (the default), for every corner, cards, fields and buttons
+  alike: buttons are fully round only because Large is the default
+  (Alex, 2026-10-28); and an icon library (Lucide; the
   others shadcn offers need Parabola's icons in one place first). Themes
   live in a **library** in each project's settings: Parabola (the default
   theme, can't go) and any added, one of them the site's, picked in Settings › Design; the root layout
@@ -41,7 +44,9 @@ with the why. To change one, add a new line that overrides it.
   the theme as JSON last, and the panel on the right (a rule between its
   sections) with its main choices (which
   theme, with Add theme, Rename and Remove; light or dark; base and
-  secondary colours; Heading and Font; icons). **Typography** has the
+  secondary colours; Heading and Font; radius; icons), 400px wide, about a
+  phone's width. The preview cards float on the canvas, with no frame
+  around them. **Typography** has the
   rest: Font families (stacked cards, an edit dialog each, Add family; the
   fonts, linked to Google Fonts; Add font) and Type scale (an edit dialog
   per style). Top right on every page: **Undo**

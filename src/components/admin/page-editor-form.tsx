@@ -554,7 +554,7 @@ export function PageEditorForm({ slug, preset: presetId, onClose }: { slug?: str
   if (loading) {
     return (
       <div className="flex h-full flex-col gap-4 p-5">
-        <Skeleton className="size-9 rounded-full" />
+        <Skeleton className="size-9 rounded-ds-pill" />
         <Skeleton className="h-10 w-full" />
         <Skeleton className="h-24 w-full" />
         <Skeleton className="h-64 w-full" />

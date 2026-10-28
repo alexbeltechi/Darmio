@@ -10,7 +10,8 @@
  * in spacing.ts is a `--ds-space-*` token with the same value and a utility
  * (`gap-ds-*`), and vice versa; and that the type tokens (families, sizes,
  * line heights, each style's family and weight) are the default theme's in
- * fonts.ts and theme.ts.
+ * fonts.ts and theme.ts; and that the corner tokens are the default radius's
+ * (radius.ts), each with its utility (`rounded-ds-*`).
  */
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -20,6 +21,7 @@ import { ROLES } from "../packages/parabola/showcase/colour-roles";
 import { DS_DEFAULT_FONT, DS_DEFAULT_HEADING_FONT, dsFont } from "../packages/parabola/fonts";
 import { DS_DEFAULT_ACCENT_COLOUR, DS_DEFAULT_BASE_COLOUR, dsAccentColour, dsBaseColour } from "../packages/parabola/colours";
 import { DS_TEXT_STYLES, DS_TEXT_STYLE_DEFAULTS } from "../packages/parabola/theme";
+import { DS_DEFAULT_RADIUS, DS_RADIUS_TOKENS, dsRadius } from "../packages/parabola/radius";
 
 const css = readFileSync(join(__dirname, "../packages/parabola/tokens.css"), "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
 
@@ -65,6 +67,13 @@ for (const style of DS_TEXT_STYLES) {
   if (root.get(`--ds-font-${style}`) !== `var(--ds-family-${family})`) problems.push(`--ds-font-${style} isn't the ${family} family (theme.ts)`);
   if (root.get(`--ds-weight-${style}`) !== String(weight)) problems.push(`--ds-weight-${style} isn't ${weight} (theme.ts)`);
   if (root.get(`--ds-text-${style}-leading`) !== `${lineHeight}px`) problems.push(`--ds-text-${style}-leading isn't ${lineHeight}px (theme.ts)`);
+}
+
+// Corners: the default radius (radius.ts) is what tokens.css sets, each token with its utility.
+for (const token of DS_RADIUS_TOKENS) {
+  const px = `${dsRadius(DS_DEFAULT_RADIUS).px[token]}px`;
+  if (root.get(`--ds-radius-${token}`) !== px) problems.push(`--ds-radius-${token} isn't ${px} (radius.ts)`);
+  if (!same(theme.get(`--radius-ds-${token}`) ?? "", `var(--ds-radius-${token})`)) problems.push(`--radius-ds-${token} is missing from @theme`);
 }
 
 // UI palette: /parabola/colours/main against :root and .dark.

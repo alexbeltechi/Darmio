@@ -18,8 +18,8 @@ with the why. To change one, add a new line that overrides it.
   read as places to type on a card; info cards take the default button's
   see-through surface, so they show on a card as well (Alex). The panel's
   sections are a Parabola accordion (`DsAccordion`, Layout › Accordion,
-  32px headers), and each colour is one nested inside Colours, set in
-  16px; the top bar's Collapse all / Expand all folds or opens them all. The site's own nav is unchanged for now.
+  32px headers, what's under each set in 16px), and each colour is one
+  nested inside Colours; the top bar's Collapse all / Expand all folds or opens them all. The site's own nav is unchanged for now.
 - 2026-10-28 — **Parabola themes, made like shadcn's create page.** A
   theme is data (`packages/parabola/theme.ts`): five colours
   (`colours.ts`), each based on the one before until given its own: the
@@ -46,7 +46,10 @@ with the why. To change one, add a new line that overrides it.
   own until it's moved, and faint while it's based on another (ticked; Theme colour and Typography, with no tick in light, are always clear): no swatches or preset lists, for a different look
   you make another theme (Alex, 2026-10-28). Each is picked for light; in
   dark, "Based on light theme" (on by default) keeps it the light one's
-  counterpart, the same hue at the other end of light, so light and dark
+  counterpart: for the page and cards the same hue at the other end of
+  light; text, buttons and the accent keep their hue and richness and move
+  only as far as they need to read on the dark page (a red stays a red, a
+  navy a blue; Alex, 2026-10-28), so light and dark
   always contrast (Alex: "every colour should have an anti-colour"); off,
   it takes a dark colour of its own. A colour based on another (buttons on
   the typography, every one in dark on the light one) shows a brightness

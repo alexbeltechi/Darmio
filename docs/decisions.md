@@ -11,11 +11,14 @@ with the why. To change one, add a new line that overrides it.
 ## Product
 
 - 2026-10-28 — **Parabola themes, made like shadcn's create page.** A
-  theme is data (`packages/parabola/theme.ts`): three colours
+  theme is data (`packages/parabola/theme.ts`): four colours
   (`colours.ts`): the **theme colour** (the website's background; cards,
-  fields, side panels and borders are shades of it), **fonts and UI**
+  fields, side panels and borders are shades of it), **typography**
   (the text, and the quiet text, borders and shades drawn from it;
-  Parabola's is black or white, whichever reads on the theme colour) and
+  Parabola's is black or white, whichever reads on the theme colour),
+  **buttons** (solid buttons and selected states: the current nav item, a
+  pressed button, a checked box, the Published pill, with black or white
+  on them; "Based on typography" by default; Alex, 2026-10-28) and
   the **accent colour** (the one highlight; Parabola's own is Purple, and
   on a theme colour that colour's complement, deep on a light page and
   pale on a dark one, Alex, 2026-10-28). Selected states (the current nav
@@ -52,7 +55,7 @@ with the why. To change one, add a new line that overrides it.
   the theme as JSON last, and the panel on the right (a rule between its
   sections, no line of explanation under its fields) with its main choices (which
   theme, with Add theme, Rename and Remove; light or dark; theme colour,
-  fonts and UI, accent colour; Heading and Font; radius; icons), 400px wide, about a
+  typography, buttons, accent colour; Heading and Font; radius; icons), 400px wide, about a
   phone's width. The preview cards float on the canvas, with no frame
   around them. **Typography** has the
   rest: Font families (stacked cards, an edit dialog each, Add family; the

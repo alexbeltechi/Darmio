@@ -280,7 +280,7 @@ Feature roadmap), unscheduled until Alex places it.
 - **Parabola themes, customizable like shadcn** — `doing` (BEL-109)
   Started 2026-10-28 (decisions): themes as data in a library per
   project (Parabola and any added, one in use, picked in Settings › Design),
-  made on `/parabola` like shadcn's create page: theme colour, fonts and UI
+  made on `/parabola` like shadcn's create page: theme colour, typography, buttons
   and accent colour, light and dark, font families (Font, Heading, more), added
   Google fonts, the type scale with weights, the radius (None to Large)
   and the icon library (Lucide only). Next: icons through one Parabola

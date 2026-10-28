@@ -11,10 +11,14 @@ with the why. To change one, add a new line that overrides it.
 ## Product
 
 - 2026-10-28 — **Parabola themes, made like shadcn's create page.** A
-  theme is data (`packages/parabola/theme.ts`): a **base colour** (the
-  greys: Stone, Parabola's own, or Neutral, Zinc, Slate, Gray) and a
-  **secondary colour** (the one highlight: Purple, Blue, Teal, Green,
-  Orange, Rose), each in light and dark (`colours.ts`); **font families**,
+  theme is data (`packages/parabola/theme.ts`): three colours
+  (`colours.ts`), each a preset or a custom hex picked live in an inline
+  colour picker (hue bar, saturation and brightness square, hex): a
+  **base colour** (the greys: Stone, Parabola's own, Neutral, Zinc, Slate,
+  Gray; a custom one derives its shades), an **accent colour** (the one
+  highlight: Purple, Blue, Teal, Green, Orange, Rose; was "secondary"),
+  and a **background colour** (the page, set apart for light and dark,
+  the base's own by default, mid-tones like a bright yellow welcome); **font families**,
   Font (text) and Heading (headlines) to start and any more you add, each
   a name and a font; the fonts it can use, Parabola's (Instrument Sans,
   Instrument Serif, System) less any it took out, plus Google fonts added

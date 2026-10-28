@@ -18,7 +18,7 @@ import { DS_ACCENTS } from "../packages/parabola/accents";
 import { DS_SPACES } from "../packages/parabola/spacing";
 import { ROLES } from "../packages/parabola/showcase/colour-roles";
 import { DS_DEFAULT_FONT, DS_DEFAULT_HEADING_FONT, dsFont } from "../packages/parabola/fonts";
-import { DS_DEFAULT_BASE_COLOUR, DS_DEFAULT_SECONDARY_COLOUR, dsBaseColour, dsSecondaryColour } from "../packages/parabola/colours";
+import { DS_DEFAULT_ACCENT_COLOUR, DS_DEFAULT_BASE_COLOUR, dsAccentColour, dsBaseColour } from "../packages/parabola/colours";
 import { DS_TEXT_STYLES, DS_TEXT_STYLE_DEFAULTS } from "../packages/parabola/theme";
 
 const css = readFileSync(join(__dirname, "../packages/parabola/tokens.css"), "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
@@ -40,10 +40,10 @@ const dark = block(".dark");
 const theme = block("@theme inline");
 const problems: string[] = [];
 
-// Colours: the default base and secondary colours (colours.ts) are tokens.css's, light and dark.
+// Colours: the default base and accent colours (colours.ts) are tokens.css's, light and dark.
 {
   const base = dsBaseColour(DS_DEFAULT_BASE_COLOUR);
-  const secondary = dsSecondaryColour(DS_DEFAULT_SECONDARY_COLOUR);
+  const secondary = dsAccentColour(DS_DEFAULT_ACCENT_COLOUR);
   for (const [mode, tokens, values] of [
     ["light", root, { ...base.light, highlight: secondary.light.highlight, "highlight-tint": secondary.light.tint }],
     ["dark", dark, { ...base.dark, highlight: secondary.dark.highlight, "highlight-tint": secondary.dark.tint }],

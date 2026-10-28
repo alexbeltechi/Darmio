@@ -14,8 +14,12 @@ with the why. To change one, add a new line that overrides it.
   /parabola pin the same bar (`DsTopBar`, Parabola, Layout › Top bar):
   compact rows (12px above and below), solid in the page colour with a rule
   under it. It can also be transparent, or blur (the nav fade the admin
-  used until now). Fields are solid too, white on a light page, so they
-  read as places to type (Alex). The site's own nav is unchanged for now.
+  used until now). Fields are solid too, in the page's own colour, so they
+  read as places to type on a card; info cards take the default button's
+  see-through surface, so they show on a card as well (Alex). The panel's
+  sections are a Parabola accordion (`DsAccordion`, Layout › Accordion,
+  32px headers), and each colour is one nested inside Colours, set in
+  16px. The site's own nav is unchanged for now.
 - 2026-10-28 — **Parabola themes, made like shadcn's create page.** A
   theme is data (`packages/parabola/theme.ts`): five colours
   (`colours.ts`), each based on the one before until given its own: the

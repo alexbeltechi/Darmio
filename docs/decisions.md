@@ -24,14 +24,17 @@ with the why. To change one, add a new line that overrides it.
   pale on a dark one, Alex, 2026-10-28). Selected states (the current nav
   item, a pressed button, a checked box) are the text colour, solid, as
   Publish is. In the panel each is just
-  a colour picker (a short shade square, a hue bar, the hex) sitting on
-  the colour it is now, Parabola's own until it's moved: no swatches or
-  preset lists, for a different look you make another theme (Alex,
-  2026-10-28). Each is picked for light; in dark, "Based on light
-  theme" (on by default) keeps it the light one's counterpart, the same
-  hue at the other end of light, so light and dark always contrast
-  (Alex: "every colour should have an anti-colour"); off, it takes a dark
-  colour of its own. Since text and surfaces come from the same two
+  a colour picker (a short shade square, a hue bar and a brightness bar,
+  the same bar, then the hex) sitting on the colour it is now, Parabola's
+  own until it's moved: no swatches or preset lists, for a different look
+  you make another theme (Alex, 2026-10-28). Each is picked for light; in
+  dark, "Based on light theme" (on by default) keeps it the light one's
+  counterpart, the same hue at the other end of light, so light and dark
+  always contrast (Alex: "every colour should have an anti-colour"); off,
+  it takes a dark colour of its own. A colour based on another (buttons on
+  the typography, every one in dark on the light one) hides its picker and
+  shows only a brightness bar, to make it lighter or darker than what it's
+  based on (buttons 10% darker than the text, say). Since text and surfaces come from the same two
   colours, text on a card reads as it does on the page; **font families**,
   Font (text) and Heading (headlines) to start and any more you add, each
   a name and a font; the fonts it can use, Parabola's (Instrument Sans,

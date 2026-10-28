@@ -23,9 +23,12 @@ with the why. To change one, add a new line that overrides it.
   Parabola's pieces on white tiles, and the theme as JSON), and
   **Typography** has Font families and Type scale, where each family and
   each style has an edit button that opens its settings in a dialog (Save,
-  Restore default). **Restore default, Undo and Publish** sit top right on
-  every page; Publish asks first, since it changes every site that uses
-  the theme, and its admin. A page's other options sit in a panel on the
+  Restore default). **Undo and Publish** sit top right on every page,
+  then a ⋮ menu (a ghost button) to restore Parabola's defaults for this
+  page's part of the theme (the font families, or the type scale) or all of
+  it; each restore asks first and then shows a toast with Undo. Publish
+  asks first too, since it changes every site that uses the theme, and its
+  admin. A page's other options sit in a panel on the
   right, set apart by a rule, in collapsible sections like Linear's
   properties. The CMS hosts Parabola's fonts with next/font, so a
   visitor's browser calls Google only for a font a theme added. The start

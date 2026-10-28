@@ -53,8 +53,10 @@ with the why. To change one, add a new line that overrides it.
   alike: buttons are fully round only because Large is the default
   (Alex, 2026-10-28); and an icon library (Lucide; the
   others shadcn offers need Parabola's icons in one place first). Themes
-  live in a **library** in each project's settings: Parabola (the default
-  theme, can't go) and any added, one of them the site's, picked in Settings › Design. Only the website
+  live in a **library** in each project's settings: Parabola (Parabola's
+  own, read-only: the first change to it opens a copy, "Custom", and a
+  sticky Create theme at the panel's foot names and saves it; a created
+  theme with changes shows Save theme there; Alex, 2026-10-28) and any added, one of them the site's, picked in Settings › Design. Only the website
   wears it, and on `/parabola` only the canvas (the open theme): the admin
   and `/parabola`'s sidebar, header and panel always wear Parabola's own,
   published or not, so a theme that breaks the site never breaks the tools
@@ -66,7 +68,9 @@ with the why. To change one, add a new line that overrides it.
   makes the themes of the project picked in the admin, the one it
   publishes to.
   `/parabola` opens on **Theme** ("Theme" over the open theme's name):
-  Parabola's pieces stacked in one 600px column wearing the open theme,
+  a site's page in one 600px column wearing the open theme (its nav, a
+  post's opening on the page itself, buttons, a list of writing, one card
+  on the surface, as a site lays them out; Alex, 2026-10-28),
   the theme as JSON last, and the panel on the right (a rule between its
   sections, no line of explanation under its fields) with its main choices (which
   theme, with Add theme, Rename and Remove; light or dark; theme colour,

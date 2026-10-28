@@ -78,7 +78,9 @@ with the why. To change one, add a new line that overrides it.
   the theme as JSON last, and the panel on the right (a rule between its
   sections, no line of explanation under its fields; under the top bar,
   which runs the full width with a rule under it) with its main choices (which
-  theme, with Add theme, Rename and Remove; light or dark; theme colour,
+  theme: a dropdown whose last option is Add theme, and a ⋮ at the
+  section header's right with Rename, Duplicate, Restore to Parabola and
+  Delete; light or dark; theme colour,
   typography, buttons, accent colour; Heading and Font; radius; icons), 400px wide, about a
   phone's width. The preview cards float on the canvas, with no frame
   around them. **Typography** has the

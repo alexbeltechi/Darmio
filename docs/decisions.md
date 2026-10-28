@@ -43,7 +43,7 @@ with the why. To change one, add a new line that overrides it.
   a colour picker (a short shade square, a hue bar and a brightness bar,
   the same bar, each with its name and value above it, hue in degrees and
   the rest out of 100, so a colour can be noted and made again; then the hex) sitting on the colour it is now, Parabola's
-  own until it's moved, and faint until you set it: no swatches or preset lists, for a different look
+  own until it's moved, and faint while it's based on another (ticked; Theme colour and Typography, with no tick in light, are always clear): no swatches or preset lists, for a different look
   you make another theme (Alex, 2026-10-28). Each is picked for light; in
   dark, "Based on light theme" (on by default) keeps it the light one's
   counterpart, the same hue at the other end of light, so light and dark
@@ -60,8 +60,8 @@ with the why. To change one, add a new line that overrides it.
   by name or link (a share link keeps the weights picked there); for each
   text style its name, family, weight (one its font has), size and line
   height (Display to H2 in Heading, Instrument Serif Regular; H3 and the
-  rest in Font, Instrument Sans Medium); a **radius**, None, Small, Medium,
-  Large (the default) or Custom (pixels typed in), for every corner, cards, fields and buttons
+  rest in Font, Instrument Sans Medium); a **radius**, None, Medium,
+  Large (the default) or Custom (pixels typed in; Small is no longer offered, an older theme's still reads), for every corner, cards, fields and buttons
   alike: buttons are fully round only because Large is the default
   (Alex, 2026-10-28); and an icon library (Lucide; the
   others shadcn offers need Parabola's icons in one place first). Themes

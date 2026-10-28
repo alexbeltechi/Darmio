@@ -17,10 +17,14 @@ with the why. To change one, add a new line that overrides it.
   **base colour** (the greys: Stone, Parabola's own, Neutral, Zinc, Slate,
   Gray; a custom one derives its shades), an **accent colour** (the one
   highlight: Purple, Blue, Teal, Green, Orange, Rose; was "secondary"),
-  and a **background colour** (the website's background, set apart for
-  light and dark, the base's own by default, mid-tones like a bright
-  yellow welcome; picked, it brings the cards, fields, side panels and
-  borders along as darker or lighter shades of itself); **font families**,
+  a **background colour** (the website's background, the base's own by
+  default, mid-tones like a bright yellow welcome; picked, it brings the
+  cards, fields, side panels and borders along as shades of itself, and
+  text turns black or white to read on it) and, optional, a **surface
+  colour** (cards, side panels, fields; Auto is shades of the
+  background). Every colour is picked once: the dark theme uses its
+  counterpart, the same hue at the other end of light, so light and dark
+  always contrast (Alex: "every colour should have an anti-colour"); **font families**,
   Font (text) and Heading (headlines) to start and any more you add, each
   a name and a font; the fonts it can use, Parabola's (Instrument Sans,
   Instrument Serif, System) less any it took out, plus Google fonts added

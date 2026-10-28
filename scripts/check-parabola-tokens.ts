@@ -8,13 +8,15 @@
  * accent in accents.ts is a `--ds-accent-*` token with the same value and a
  * Tailwind utility (`bg-ds-accent-*`), and vice versa; and that every spacing
  * in spacing.ts is a `--ds-space-*` token with the same value and a utility
- * (`gap-ds-*`), and vice versa.
+ * (`gap-ds-*`), and vice versa; and that `--ds-font` is the default font's
+ * stack in fonts.ts.
  */
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { DS_ACCENTS } from "../packages/parabola/accents";
 import { DS_SPACES } from "../packages/parabola/spacing";
 import { ROLES } from "../packages/parabola/showcase/colour-roles";
+import { DS_DEFAULT_FONT, dsFont } from "../packages/parabola/fonts";
 
 const css = readFileSync(join(__dirname, "../packages/parabola/tokens.css"), "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
 
@@ -34,6 +36,12 @@ const root = block(":root");
 const dark = block(".dark");
 const theme = block("@theme inline");
 const problems: string[] = [];
+
+// Fonts: the default theme's face (fonts.ts) is the --ds-font tokens.css sets.
+const defaultFamily = dsFont(DS_DEFAULT_FONT).family;
+if (!same(root.get("--ds-font") ?? "", defaultFamily)) {
+  problems.push(`--ds-font in tokens.css isn't the default font (${DS_DEFAULT_FONT}): ${defaultFamily}`);
+}
 
 // UI palette: /parabola/colours/main against :root and .dark.
 const shown = new Set<string>();

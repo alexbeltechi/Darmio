@@ -8,6 +8,7 @@
  */
 
 import { getDb, Collections } from "@/lib/db/mongodb";
+import { DS_DEFAULT_THEME, parseDsThemeConfig, type DsThemeConfig } from "@beltechi/parabola";
 import { DEFAULT_IMAGE_QUALITY } from "@/lib/cms/image-processing";
 import { parseHomeHero, parseSiteName, type HomeHero } from "@/lib/cms/site";
 import {
@@ -30,6 +31,8 @@ export interface SiteSettings {
   sourceLine: SourceLineSettings;
   /** AVIF quality for new uploads (50–90). Uploads already made keep theirs. */
   imageQuality: number;
+  /** The Parabola theme the site and admin wear: fonts for now (Settings › Design). */
+  theme: DsThemeConfig;
   updatedAt: string;
 }
 
@@ -40,6 +43,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   sourceLabels: DEFAULT_SOURCE_LABELS,
   sourceLine: DEFAULT_SOURCE_LINE,
   imageQuality: DEFAULT_IMAGE_QUALITY,
+  theme: DS_DEFAULT_THEME,
   updatedAt: new Date(0).toISOString(),
 };
 
@@ -106,6 +110,7 @@ export async function getSiteSettings(): Promise<SiteSettings> {
     sourceLabels: tryParse(parseSourceLabels, doc.sourceLabels, DEFAULT_SETTINGS.sourceLabels),
     sourceLine: tryParse(parseSourceLine, doc.sourceLine, DEFAULT_SETTINGS.sourceLine),
     imageQuality: tryParse(parseImageQuality, doc.imageQuality, DEFAULT_SETTINGS.imageQuality),
+    theme: parseDsThemeConfig(doc.theme),
     updatedAt: (doc.updatedAt as string) || DEFAULT_SETTINGS.updatedAt,
   };
 }
@@ -141,6 +146,10 @@ export async function updateSiteSettings(
 
   if (updates.imageQuality !== undefined) {
     set.imageQuality = parseImageQuality(updates.imageQuality);
+  }
+
+  if (updates.theme !== undefined) {
+    set.theme = parseDsThemeConfig(updates.theme);
   }
 
   await collection.updateOne(

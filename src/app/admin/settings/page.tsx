@@ -2,6 +2,7 @@
 
 import { AdminMenuButton } from "@/components/admin/layout";
 import { SiteSettings } from "@/components/admin/settings/site-settings";
+import { DesignSettings } from "@/components/admin/settings/design-settings";
 import { LibrarySettings } from "@/components/admin/settings/library-settings";
 import { IntegrationsSettings } from "@/components/admin/settings/integrations-settings";
 import { AgentSettings } from "@/components/admin/settings/agent-settings";
@@ -11,7 +12,8 @@ import { AgentSettings } from "@/components/admin/settings/agent-settings";
  * in the order you'd set them up: the site, its library, the accounts it
  * works with, the agent's brain and rules (decisions, 2026-10-24). Your own
  * account is at /admin/account, for the whole install (decisions,
- * 2026-10-26). Each section has an anchor (`#site`, `#library`,
+ * 2026-10-26). Design, the project's Parabola theme, follows the site
+ * (decisions, 2026-10-28). Each section has an anchor (`#site`, `#design`, `#library`,
  * `#integrations`, `#agent`).
  */
 export default function SettingsPage() {
@@ -28,6 +30,7 @@ export default function SettingsPage() {
 
       <div className="flex flex-col gap-5 px-5 pb-5">
         <SiteSettings />
+        <DesignSettings />
         <LibrarySettings />
         <IntegrationsSettings />
         <AgentSettings />

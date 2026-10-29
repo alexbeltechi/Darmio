@@ -18,8 +18,11 @@ with the why. To change one, add a new line that overrides it.
   Editorial, Luxury, Tech, Warm, Bold, Playful, Wacky; `taste.ts`), each a
   recipe of ranges, not a fixed look (where on the Mood bar, where the dials
   may go, the bases, button colours and font pairs it reaches for). Pick
-  one or several and **Shuffle** draws a whole look inside them, again for
-  another take; with none, from any; **Default** is Parabola's own. A
+  one and the look changes at once, drawn inside it; pick more and it's
+  drawn inside all of them; **Shuffle** draws again for another take, and
+  with none picked picks one and shows it picked; unpicking the last brings
+  back the look from before the first; **Default** is Parabola's own. The
+  pills picked are kept on the theme (`character.tastes`, in the export). A
   shuffle starts the look over (colours, corners and buttons back to Auto),
   and never lands a button the colour of the page. **Mood** now runs
   Serious, Balanced, Playful and on to **Wacky** (everything turned up, a
@@ -121,9 +124,12 @@ with the why. To change one, add a new line that overrides it.
   nested inside Colours; the top bar's Collapse all / Expand all folds or opens them all. The site's own nav is unchanged for now.
 - 2026-10-28 — **Parabola themes, made like shadcn's create page.** A
   theme is data (`packages/parabola/theme.ts`): six colours
-  (`colours.ts`), named for what they colour (Alex, 2026-10-29; they were
-  primary, secondary, tertiary, quaternary and surface for a day), each
-  based on another until given its own: **base** (the website's
+  (`colours.ts`), named for what they colour, in the order they're thought
+  through (Alex, 2026-10-29): **Background**, **Primary** and
+  **Secondary** (the text and the quieter text; "base", "type: primary"
+  and "type: secondary" for a day), **Button: primary**, **Button:
+  secondary**, **Field**, **Surface**. Each is based on another until
+  given its own: **background** (the website's
   background; Parabola's own is white, its cards a warm off-white
   #F7F5F2, 4 darker, the same step a picked base's cards take; paper,
   #FAF7EF, for a day on 2026-10-28, until Alex wanted white back),

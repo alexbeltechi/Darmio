@@ -83,7 +83,9 @@ with the why. To change one, add a new line that overrides it.
   of its colour with a faint see-through edge, so a white one still shows; each sits exactly where its colour is, the base at the
   centre by default, stacked in order (base on top, the chosen one above
   all; Alex, 2026-10-29). A tick across the hue ring points to the
-  chosen colour's hue, even for a white or grey one at the centre, and
+  chosen colour's hue, even for a white or grey one at the centre (which
+  points to paper's warm 40°, not red, so adding saturation or colour to
+  it warms it; Alex, 2026-10-29), and
   dragging round the ring turns the hue, as on any colour wheel (Alex,
   2026-10-29). The arcs are their gradient alone, no outline. You choose a colour in the list (or press its
   point), then drag its point to move it; a click on the wheel itself

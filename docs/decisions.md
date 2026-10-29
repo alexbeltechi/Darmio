@@ -10,6 +10,20 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-29 — **Tracks: one pick each, in light pills that slide.** Alex:
+  some pills exclude each other (Restrained and Bold can't both be true),
+  so a group of pills is a **track** and takes one pick, as tabs do
+  (`dsPickTaste`): picking replaces the track's pick, picking it again takes
+  it off. Two tracks, **Feel** (Approachable, Restrained, Luxurious, Bold,
+  Candid) and **World** (Editorial, Playful, Wacky, Tech, Sci-fi, Fashion,
+  Natural; Editorial moved here), so Parabola's own, Restrained +
+  Editorial, is one of each; the dice picks at most one per track. The same
+  in every section's pills. Each track is one row that **slides sideways**
+  with its edge fading where there's more (`DsScrollRow`, a Parabola
+  primitive). The pills are the **light kind**: text buttons, no fill at
+  rest, a soft fill when picked (the filled kind turns black when picked).
+  **Expression** now also sizes the headlines, 90% of Parabola's when quiet
+  to 130% when loud, so the bar shows on any page.
 - 2026-10-29 — **Three levers define a taste; a slider in the system; the
   player is variations.** Alex asked for a serious think about the sliders
   as the foundation of the taste engine, and found Expression doing nothing

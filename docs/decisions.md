@@ -19,8 +19,9 @@ with the why. To change one, add a new line that overrides it.
   recipe of ranges, not a fixed look (where on the Mood bar, where the dials
   may go, the bases, button colours and font pairs it reaches for). Pick
   one and the look changes at once, drawn inside it; pick more and it's
-  drawn inside all of them; **Shuffle** draws again for another take, and
-  with none picked picks one and shows it picked; unpicking the last brings
+  drawn inside all of them; **Shuffle**, a plain action (not a pill, so it
+  doesn't read as one that's on), picks one or two pills at random, shows
+  them picked and draws from them, again for another mix; unpicking the last brings
   back the look from before the first; **Default** is Parabola's own. The
   pills picked are kept on the theme (`character.tastes`, in the export). A
   shuffle starts the look over (colours, corners and buttons back to Auto),

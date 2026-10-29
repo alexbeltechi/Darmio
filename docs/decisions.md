@@ -10,6 +10,17 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-29 — **Radius became Buttons.** In /parabola's theme panel the
+  Radius section is Buttons (Alex): a fill, Solid or Gradient (the button
+  colour lighter at the top and darker at the bottom, a contrast bar from a
+  hint of sheen to a strong one), an Outline (1px inside the edge, a step
+  darker, lighter on a near-black button), a 3D label (a 1px shadow on the
+  label only, never the icon: darker above light text, lighter below dark
+  text, the other way where that one wouldn't show) and Roundness, which
+  still rounds every corner. Small is back as a crisp 2px on everything.
+  It's `buttons` in the theme (`button-style.ts`); only the primary
+  button wears it, and each part is off until turned on, so a theme
+  without it looks as before. Destructive buttons stay plain red.
 - 2026-10-28 — **One top bar, solid by default.** Every admin page and
   /parabola pin the same bar (`DsTopBar`, Parabola, Layout › Top bar):
   compact rows (12px above and below), solid in the page colour with a rule

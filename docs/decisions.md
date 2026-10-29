@@ -34,8 +34,18 @@ with the why. To change one, add a new line that overrides it.
   list of `overrides`, so an agent reads and sets a look at that level. The
   mapping from dials to values is the taste, kept in the one file with a
   line per dial on what it's for, for a later model to improve a rule
-  rather than a number. Not yet: loudness and formality, presets, themed
-  sections, the brand brief (roadmap).
+  rather than a number. Not yet: loudness, presets, themed sections, the
+  brand brief (roadmap). Same day, Alex: it's **Style**, not character, in
+  two parts. **Mood** first, one bar from Serious to Playful in plain words
+  ("Serious", "Composed", "Balanced", "Lively", "Playful"), which moves the
+  Appearance dials and the fonts together (`DS_MOODS`): Serious is crisp
+  corners, a little cooler, firmer contrast, flat, Newsreader over IBM Plex
+  Sans; Balanced is Parabola's own; Playful is round, warmer, a touch
+  softer, some depth, Fredoka over Nunito. Then **Appearance**: the base
+  colour, white to start, shown as Figma and Paper show a colour
+  (`DsColourField`: its swatch and hex; the swatch opens the picker), and
+  the dials. Warmth on white tints toward paper (and coolness toward ice),
+  not lemon or blue.
 - 2026-10-29 — **Radius became Buttons.** In /parabola's theme panel the
   Radius section is Buttons (Alex): a fill, Solid or Gradient, whose
   **contrast** runs -50 to +50 from a flat 0 in the middle (above 0 the

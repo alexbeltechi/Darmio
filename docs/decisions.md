@@ -10,6 +10,10 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-29 — **Back to Parabola's own is Parabola.** Alex: after
+  restoring, the panel still said Custom. Now when the working copy comes
+  back to Parabola's own look (a section restored, say), Parabola (default)
+  opens again and Custom goes, unless Custom is the theme the site wears.
 - 2026-10-29 — **Platform cards are outlined; Email is Gmail.** Alex: the
   social posts sit on their platform's white in a grey outline, and the
   email "looks nothing like an email": it's now a message open in Gmail,

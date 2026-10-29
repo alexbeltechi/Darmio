@@ -65,12 +65,15 @@ with the why. To change one, add a new line that overrides it.
   different look you make another theme (Alex, 2026-10-28). Each is picked
   for light; in dark it's based on the light one until given a dark
   colour of its own. **Dark is a dark version, not a flip** (Alex,
-  2026-10-29): the page and cards keep their hue and colour and are about
-  90% dark (the page at most 8% bright, cards a step above), however light
-  or dark the light theme is, and a light page darker than that stays as
-  it is; paper becomes a warm charcoal. Text, buttons and the accent keep
-  their hue and richness and move only as far as they need to read on the
-  dark page (a red stays a red, a navy a blue; Alex, 2026-10-28). Until
+  2026-10-29): the page and cards keep their hue, with a little more
+  colour than in light so it shows, and are about 87% dark (the page at
+  most 13% bright, cards a step above; 8% was too dark, the colour lost),
+  however light or dark the light theme is, and a light page darker than
+  that stays as it is; paper becomes a warm charcoal, a pale green a dark
+  green. Text, buttons and the accent keep their hue and richness and move
+  only as far as they need to read on the dark page (a red stays a red, a
+  navy a blue; Alex, 2026-10-28): text to 7:1, so its quieter steps (also
+  a little closer to it in dark) still read, the accent to 4.5:1. Until
   2026-10-29 each colour was its own picker with a brightness bar, and a
   light colour's dark one was its opposite (a dark page went pale). Since text and surfaces come from the same two
   colours, text on a card reads as it does on the page; **font families**,

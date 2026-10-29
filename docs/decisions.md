@@ -10,6 +10,15 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-29 — **Pills first, fine-tuning folded.** Alex: the sliders and
+  choices are fine-tuning, not where you start. In Appearance, Typography,
+  Buttons and Fields the pills come first and **"Show advanced options"**
+  opens the rest: Appearance's Brightness, Hue, Contrast and the colours
+  themselves (Light and Dark, the wheel; no separate colour toggle any
+  more); Typography's Heading and Font (plain Parabola selects of font
+  names: the "Aa" previews were drawing twice in the closed field) and the
+  link to font families and the type scale; Buttons' Roundness and button
+  choices; Fields' outline.
 - 2026-10-29 — **Tracks: one pick each, in light pills that slide.** Alex:
   some pills exclude each other (Restrained and Bold can't both be true),
   so a group of pills is a **track** and takes one pick, as tabs do

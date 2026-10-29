@@ -25,11 +25,11 @@ export const dsNavItemVariants = cva(
   {
     variants: {
       size: {
-        default: "h-9 gap-2 rounded-full px-3 text-p",
+        default: "h-9 gap-2 rounded-ds-pill px-3 text-p",
         small: "h-6 gap-1 rounded-ds-control px-2 text-small",
       },
       selected: {
-        true: "bg-ds-surface-inverse text-ds-bg ds-hover-inverse",
+        true: "bg-ds-button text-ds-on-button ds-hover-inverse",
         false: "text-ds-fg hover:bg-ds-surface/70 data-[state=open]:bg-ds-surface/70",
       },
     },
@@ -95,7 +95,8 @@ export function DsNavItem({
 
 /**
  * A collapsible group of nav items: a default-size row with a chevron that
- * opens and closes its small child rows, indented 12px. Radix Collapsible
+ * opens and closes its small child rows, indented 12px and 4px apart
+ * (`ds-4`, the smallest spacing) as nav rows are. Radix Collapsible
  * handles the open state and its announcement.
  */
 export function DsNavGroup({
@@ -122,7 +123,7 @@ export function DsNavGroup({
           {label}
         </DsNavItem>
       </Collapsible.Trigger>
-      <Collapsible.Content className="flex flex-col pl-3">{children}</Collapsible.Content>
+      <Collapsible.Content className="flex flex-col gap-ds-4 pt-ds-4 pl-3">{children}</Collapsible.Content>
     </Collapsible.Root>
   );
 }

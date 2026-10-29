@@ -1,19 +1,21 @@
+import { DS_FONTS, DsThemeStyle } from "@beltechi/parabola";
 import { Footer } from "@/components/site/footer";
 import { ScrollToTop } from "@/components/site/scroll-to-top";
 import { SiteNav } from "@/components/site/site-nav";
 import { ThemeProvider } from "@/components/providers/theme-provider";
-import { DEFAULT_SETTINGS, getSiteSettings } from "@/lib/db/settings";
+import { DEFAULT_SETTINGS, getSiteSettings, sitePublishedTheme } from "@/lib/db/settings";
 import { listCategories } from "@/lib/db/categories";
 import { categoryGroups } from "@/lib/cms/category-groups";
 import { childPages, listSitePages } from "@/lib/db/site-pages";
 
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
-  const [{ siteName }, categories, pages] = await Promise.all([
+  const [settings, categories, pages] = await Promise.all([
     // Without its database the page below fails into error.tsx; the frame around it still renders.
     getSiteSettings().catch(() => DEFAULT_SETTINGS),
     listCategories().catch(() => []),
     listSitePages().catch(() => []),
   ]);
+  const { siteName } = settings;
   // The nav grows with the site: each top-level category marked for it
   // (decisions, 2026-10-26), then each top-level page marked for it, lit for
   // the pages under it too (decisions, 2026-10-28).
@@ -33,6 +35,9 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       enableSystem
       disableTransitionOnChange
     >
+      {/* The project's Parabola theme (Settings › Design), the website's alone. Parabola's
+          own fonts are hosted (root layout); a font the theme added loads from Google. */}
+      <DsThemeStyle theme={sitePublishedTheme(settings).theme} hosted={DS_FONTS.map((f) => f.id)} />
       <div className="site-root min-h-screen bg-ds-bg flex flex-col">
         {/* Rendered once here, not per-page, so it never unmounts (and never
             flickers) when navigating between views. */}

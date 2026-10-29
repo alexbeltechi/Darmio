@@ -11,7 +11,8 @@ import { DsLink, type DsLinkProps } from "../provider";
  * Variants (style):
  * - default: fully rounded, on `ds-surface` at 70% with a blur behind, so it
  *   reads over images.
- * - primary: the same shape, solid `ds-fg`; the one main action on a screen
+ * - primary: the same shape, solid `ds-button` (the theme's button colour,
+ *   the text's by default); the one main action on a screen
  *   (Publish, Save).
  * - danger: solid `ds-error`, for a confirmed destructive action (Delete).
  * - text: the ghost button. No surface at rest, for quiet actions like
@@ -21,11 +22,17 @@ import { DsLink, type DsLinkProps } from "../provider";
  *   the others to give that room.
  *
  * Sizes, for every variant, labelled or icon-only:
- * - default: 36px tall, fully rounded, 12px side padding (36px square icon-only).
+ * - large: 56px tall, `text-prose` (18px) label, 20px icons, 20px side
+ *   padding (56px square icon-only). For the one big call to action on a
+ *   page (a landing page's "Book a call").
+ * - default: 36px tall, 12px side padding (36px square icon-only).
  * - small (Figma 699:6154, the image row actions): 24px tall, 8px corners
  *   (`rounded-ds-control`, squarer than the pill), 8px side padding,
  *   `text-small` label, 4px gaps (24px square icon-only). Icons stay 16px.
  *   For dense rows of secondary actions.
+ *
+ * Corners: large and default are pills (`rounded-ds-pill`), fully round at
+ * the theme's Large radius and rounded rectangles below it (radius.ts).
  *
  * Destructive (`destructive` prop): the same button in shadcn's red
  * (`ds-error`), for actions that delete or discard. On the default variant
@@ -33,7 +40,7 @@ import { DsLink, type DsLinkProps } from "../provider";
  * red button is the `danger` variant. There's no warning (yellow) style.
  *
  * State (props, not variants); on the default variant both are drawn in
- * `ds-surface-inverse`, on the text variant as its hover surface:
+ * `ds-button`, as primary is, on the text variant as its hover surface:
  * - `pressed`: a toggle that's on; sets `aria-pressed`.
  * - `current`: the link to the page you're on; sets `aria-current="page"`.
  *
@@ -57,13 +64,14 @@ export const dsButtonVariants = cva(
     variants: {
       variant: {
         default: "backdrop-blur-[24px] bg-ds-surface/70 text-ds-fg ds-hover disabled:text-ds-fg-subtle",
-        primary: "backdrop-blur-[24px] bg-ds-fg text-ds-bg ds-hover-inverse disabled:opacity-40",
+        primary: "backdrop-blur-[24px] bg-ds-button text-ds-on-button ds-hover-inverse disabled:opacity-40",
         danger: "backdrop-blur-[24px] bg-ds-error text-ds-bg ds-hover-inverse disabled:opacity-40",
         // The ghost: one light surface on hover, no tint, the same as when it's current.
         text: "text-ds-fg hover:bg-ds-surface/40 disabled:bg-transparent disabled:text-ds-fg-subtle",
       },
       size: {
-        default: "gap-2 rounded-full text-p",
+        large: "gap-2 rounded-ds-pill text-prose [&_svg]:size-5",
+        default: "gap-2 rounded-ds-pill text-p",
         small: "gap-1 rounded-ds-control text-small",
       },
       /** Pressed or current: set from those props rather than passed directly. */
@@ -79,9 +87,11 @@ export const dsButtonVariants = cva(
       },
     },
     compoundVariants: [
+      { variant: PADDED, size: "large", className: "h-14 px-5" },
       { variant: PADDED, size: "default", className: "h-9 px-3" },
       { variant: PADDED, size: "small", className: "h-6 px-2" },
-      // Icon-only is square at either size, text variant included (its hit area).
+      // Icon-only is square at every size, text variant included (its hit area).
+      { iconOnly: true, size: "large", className: "size-14 px-0" },
       { iconOnly: true, size: "default", className: "size-9 px-0" },
       { iconOnly: true, size: "small", className: "size-6 px-0" },
       {
@@ -102,7 +112,7 @@ export const dsButtonVariants = cva(
       {
         variant: "default",
         inverse: true,
-        className: "bg-ds-surface-inverse text-ds-bg ds-hover-inverse disabled:text-ds-bg disabled:opacity-40",
+        className: "bg-ds-button text-ds-on-button ds-hover-inverse disabled:text-ds-on-button disabled:opacity-40",
       },
       {
         variant: "text",

@@ -35,6 +35,7 @@ import { DsEmptyState,
   DsTooltip,
   dsToast,
   useDsConfirm,
+  DsTopBar,
 } from "@beltechi/parabola";
 import { AdminMenuButton } from "@/components/admin/layout";
 import { publishPosts, useOnPublished, useOnSaved } from "@/components/admin/publish/events";
@@ -495,8 +496,8 @@ export function PostsWorkspace({ children }: { children: React.ReactNode }) {
               20px under the search and the list starts right below it, so no row
               sits under the fade until it scrolls there. The bar bleeds over the
               pane's side padding (-mx-5/px-5), so the fade spans the full width. */}
-          <div className="pointer-events-none sticky top-0 z-20 -mx-5 flex flex-col ds-nav-fade px-5 pb-5 [&>*]:pointer-events-auto">
-            <div className="flex items-center gap-2 py-5">
+          <DsTopBar className="mb-5 -mx-5 px-5 pb-3">
+            <div className="flex items-center gap-2 py-3">
               <h1 className="min-w-0 flex-1 truncate text-p text-ds-fg">
                 Posts {!loading && `(${filteredEntries.length})`}
               </h1>
@@ -616,7 +617,7 @@ export function PostsWorkspace({ children }: { children: React.ReactNode }) {
               </DsDropdown>
 
             </div>
-          </div>
+          </DsTopBar>
 
           {loading ? (
             <div className="flex justify-center py-20">

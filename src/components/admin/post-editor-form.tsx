@@ -795,7 +795,7 @@ export function PostEditorForm({
     return (
       <div className="flex flex-col h-full">
         <div className="flex shrink-0 items-center p-5">
-          <Placeholder className="size-9 rounded-full" />
+          <Placeholder className="size-9 rounded-ds-pill" />
         </div>
         <div className="flex-1 overflow-y-auto">
           <div className="px-4 py-4 space-y-4">

@@ -1,8 +1,6 @@
 "use client";
 
 import { useId, useState } from "react";
-import { createPortal } from "react-dom";
-import * as Popover from "@radix-ui/react-popover";
 import {
   Calendar,
   Check,
@@ -47,19 +45,22 @@ import { DsRadio, DsRadioGroup, DsRadioMark } from "../primitives/radio";
 import { DsSelect } from "../primitives/select";
 import { DS_ACCENTS } from "../accents";
 import { DsSwitch } from "../primitives/switch";
-import { DsToast, DsToastAction, DsToaster, dsToast } from "../primitives/toast";
+import { DsToast, DsToastAction, dsToast } from "../primitives/toast";
+import { DsTopBar } from "../primitives/top-bar";
+import { DsAccordion } from "../primitives/accordion";
 import { DsTooltip } from "../primitives/tooltip";
 import { cn } from "../cn";
-import { DS_TRAY_CLASS, DsColourDot, DsMenuItem, DsMenuSeparator, DsTray } from "../primitives/tray";
+import { DsColourDot, DsMenuItem, DsMenuSeparator, DsTray } from "../primitives/tray";
 import { DsMediaTile } from "../components/media-tile";
 import { DsNewsletterBlock } from "../blocks/newsletter";
 import { DsPlaceholder } from "../components/placeholder";
 import { DsEmptyState } from "../components/empty-state";
 import { DsInfoCard } from "../components/info-card";
 import { DsLinkList } from "../components/link-list";
+import { DsColourPicker } from "../components/colour-picker";
 import { DsCopyField } from "../primitives/copy-field";
 import { DsProgress } from "../primitives/progress";
-import { useDsOptionsSlot } from "./ds-shell";
+import { InPanel, PanelSection } from "./theme-editor";
 
 const CATEGORIES = ["Design", "Product", "Design Systems", "Photography", "Portrait", "Still life"].map((label) => ({
   value: label.toLowerCase().replace(/\s+/g, "-"),
@@ -93,7 +94,7 @@ function Controls<T extends Record<string, boolean>>({
   return (
     <div className="flex min-w-48 flex-col">
       {(Object.keys(labels) as (keyof T & string)[]).map((key) => (
-        <div key={key} className="flex h-9 items-center justify-between gap-6 px-3">
+        <div key={key} className="flex h-9 items-center gap-ds-8">
           <label htmlFor={`${baseId}-${key}`} className="text-p text-ds-fg">
             {labels[key]}
           </label>
@@ -110,8 +111,7 @@ function Controls<T extends Record<string, boolean>>({
 
 /*
  * A specimen fills the /parabola canvas: the component centred. Its options sit in
- * an "Options" dropdown (a regular button opening a tray) at the right of the
- * page header; see DsCanvas.
+ * the Options section of the panel on the right; see DsCanvas.
  */
 function Specimen({
   preview,
@@ -124,35 +124,23 @@ function Specimen({
   /** Let the preview use the canvas width instead of a 360px column. */
   wide?: boolean;
 }) {
-  const slot = useDsOptionsSlot();
-
   return (
     <div className="flex w-full flex-col items-center gap-4">
       <div className={cn("flex w-full flex-col items-center", !wide && "max-w-[360px]")}>{preview}</div>
-      {controls &&
-        slot &&
-        createPortal(
-          <Popover.Root>
-            <Popover.Trigger asChild>
-              <DsButton iconRight={ChevronDown}>Options</DsButton>
-            </Popover.Trigger>
-            <Popover.Portal>
-              <Popover.Content align="end" sideOffset={6} className={DS_TRAY_CLASS}>
-                {controls}
-              </Popover.Content>
-            </Popover.Portal>
-          </Popover.Root>,
-          slot
-        )}
+      {controls && (
+        <InPanel>
+          <PanelSection title="Options">{controls}</PanelSection>
+        </InPanel>
+      )}
     </div>
   );
 }
 
 export function IconOnlyButton() {
-  const [o, setO] = useState({ small: false, destructive: false, pressed: false, tooltip: true, focus: false });
+  const [o, setO] = useState({ large: false, small: false, destructive: false, pressed: false, tooltip: true, focus: false });
   const button = (
     <DsButton
-      size={o.small ? "small" : "default"}
+      size={o.large ? "large" : o.small ? "small" : "default"}
       destructive={o.destructive}
       iconLeft={o.destructive ? Trash2 : Filter}
       aria-label={o.destructive ? "Delete" : "Filter"}
@@ -164,7 +152,11 @@ export function IconOnlyButton() {
     <Specimen
       preview={o.tooltip ? <DsTooltip content="Filter">{button}</DsTooltip> : button}
       controls={
-        <Controls options={o} labels={{ small: "Small", destructive: "Destructive", pressed: "Pressed", tooltip: "Tooltip", focus: "Focus" }} onChange={setO} />
+        <Controls
+          options={o}
+          labels={{ large: "Large", small: "Small", destructive: "Destructive", pressed: "Pressed", tooltip: "Tooltip", focus: "Focus" }}
+          onChange={(next) => setO(exclusive(o, next, ["large", "small"]))}
+        />
       }
     />
   );
@@ -172,6 +164,7 @@ export function IconOnlyButton() {
 
 export function LabelButton() {
   const [o, setO] = useState({
+    large: false,
     small: false,
     destructive: false,
     primary: false,
@@ -189,7 +182,7 @@ export function LabelButton() {
       preview={
         <DsButton
           variant={o.danger ? "danger" : o.primary ? "primary" : "default"}
-          size={o.small ? "small" : "default"}
+          size={o.large ? "large" : o.small ? "small" : "default"}
           destructive={o.destructive}
           pressed={o.pressed}
           iconLeft={o.iconLeft ? File : undefined}
@@ -206,6 +199,7 @@ export function LabelButton() {
         <Controls
           options={o}
           labels={{
+            large: "Large",
             small: "Small",
             destructive: "Destructive",
             primary: "Primary",
@@ -218,7 +212,7 @@ export function LabelButton() {
             loading: "Loading",
             focus: "Focus",
           }}
-          onChange={(next) => setO(exclusive(o, next, ["primary", "danger", "pressed"]))}
+          onChange={(next) => setO(exclusive(o, exclusive(o, next, ["primary", "danger", "pressed"]), ["large", "small"]))}
         />
       }
     />
@@ -226,13 +220,13 @@ export function LabelButton() {
 }
 
 export function TextButton() {
-  const [o, setO] = useState({ small: false, destructive: false, iconLeft: false, iconRight: false, meta: false, focus: false });
+  const [o, setO] = useState({ large: false, small: false, destructive: false, iconLeft: false, iconRight: false, meta: false, focus: false });
   return (
     <Specimen
       preview={
         <DsButton
           variant="text"
-          size={o.small ? "small" : "default"}
+          size={o.large ? "large" : o.small ? "small" : "default"}
           destructive={o.destructive}
           iconLeft={o.iconLeft ? File : undefined}
           iconRight={o.iconRight ? ChevronRight : undefined}
@@ -245,8 +239,8 @@ export function TextButton() {
       controls={
         <Controls
           options={o}
-          labels={{ small: "Small", destructive: "Destructive", iconLeft: "Icon left", iconRight: "Icon right", meta: "Meta", focus: "Focus" }}
-          onChange={setO}
+          labels={{ large: "Large", small: "Small", destructive: "Destructive", iconLeft: "Icon left", iconRight: "Icon right", meta: "Meta", focus: "Focus" }}
+          onChange={(next) => setO(exclusive(o, next, ["large", "small"]))}
         />
       }
     />
@@ -736,6 +730,71 @@ export function NavFade() {
   );
 }
 
+export function Accordion() {
+  const [o, setO] = useState({ nested: true, actions: true });
+  const more = o.actions ? <DsButton size="small" variant="text" iconLeft={MoreVertical} aria-label="More" /> : undefined;
+  return (
+    <Specimen
+      preview={
+        <div className="flex w-full max-w-[360px] flex-col">
+          <DsAccordion title="Colours" actions={more}>
+            {o.nested ? (
+              <>
+                <DsAccordion title="Theme colour" inset>
+                  <p className="text-small text-ds-fg-muted">The page, and what&apos;s on it.</p>
+                </DsAccordion>
+                <DsAccordion title="Surface" inset defaultOpen={false}>
+                  <p className="text-small text-ds-fg-muted">Cards, panels and fields.</p>
+                </DsAccordion>
+              </>
+            ) : (
+              <p className="text-small text-ds-fg-muted">What the section holds.</p>
+            )}
+          </DsAccordion>
+        </div>
+      }
+      controls={<Controls options={o} labels={{ nested: "Nested", actions: "Actions" }} onChange={setO} />}
+    />
+  );
+}
+
+export function TopBar() {
+  const [o, setO] = useState({ solid: true, transparent: false, blur: false, filters: false });
+  const surface = o.blur ? "blur" : o.transparent ? "transparent" : "solid";
+  const rows = Array.from({ length: 12 }, (_, i) => `Row ${i + 1}`);
+  return (
+    <Specimen
+      wide
+      preview={
+        <div className="relative h-[360px] w-full max-w-[420px] overflow-y-auto rounded-ds-lg border border-ds-border bg-ds-bg">
+          <DsTopBar surface={surface} className={cn(o.filters && "pb-3")}>
+            <div className="flex items-center gap-2 px-5 py-3">
+              <h1 className="min-w-0 flex-1 truncate text-p text-ds-fg">Posts</h1>
+              <DsButton iconLeft={Plus}>Post</DsButton>
+              <DsButton iconLeft={MoreVertical} aria-label="More" />
+            </div>
+            {o.filters && <DsSearch aria-label="Search" className="mx-5 w-auto" />}
+          </DsTopBar>
+          <ul className="flex flex-col px-5 pb-5">
+            {rows.map((row) => (
+              <li key={row} className="py-3 text-p text-ds-fg-muted">
+                {row}
+              </li>
+            ))}
+          </ul>
+        </div>
+      }
+      controls={
+        <Controls
+          options={o}
+          labels={{ solid: "Solid", transparent: "Transparent", blur: "Blur", filters: "Filters row" }}
+          onChange={(next) => setO(exclusive(o, next, ["solid", "transparent", "blur"]))}
+        />
+      }
+    />
+  );
+}
+
 export function ListRow() {
   const [o, setO] = useState({ checkbox: false, thumbnail: false, pill: false, detail: false, actions: false, selected: false });
   const [checked, setChecked] = useState(false);
@@ -837,7 +896,6 @@ export function Toast() {
           >
             Show a toast
           </DsButton>
-          <DsToaster />
         </div>
       }
       controls={
@@ -1068,6 +1126,17 @@ export function Progress() {
       {[0, 45, 100].map((value) => (
         <DsProgress key={value} value={value} label={`${value}% done`} />
       ))}
+    </div>
+  );
+}
+
+/** Components › Colour › Colour picker: inline, its swatch following along. */
+export function ColourPicker() {
+  const [colour, setColour] = useState("#FFE35A");
+  return (
+    <div className="flex w-full max-w-[300px] flex-col gap-ds-16">
+      <div className="h-16 rounded-ds-lg border border-ds-border" style={{ backgroundColor: colour }} />
+      <DsColourPicker value={colour} onChange={setColour} />
     </div>
   );
 }

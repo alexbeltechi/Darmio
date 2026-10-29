@@ -113,6 +113,66 @@ namespace, short and brand-free, so a rename never touches code:
 | Tailwind utilities | `*-ds-*` | `bg-ds-surface`, `text-ds-fg-muted`, `rounded-ds-lg` |
 | CSS utilities | `ds-*` | `ds-focus`, `ds-hover`, `ds-nav-fade` |
 
+## Themes
+
+A theme is data (`theme.ts`), much as shadcn's create page sets a style:
+
+- **Colours** (`colours.ts`, `DsThemeColours`): the theme colour (the
+  website's background; Parabola's is white, its cards a warm off-white #F7F5F2; `dsWithWarmth` makes
+  one warmer or colder), the surface (cards, panels and fields; a shade of
+  the theme colour by default), typography (the text, and the quiet text, borders and shades drawn
+  from it; Parabola's is black or white, whichever reads on the page),
+  buttons (`ds-button` and `ds-on-button`: solid buttons and selected
+  states; the typography's by default) and
+  the accent colour (the highlight; the buttons' by default). Each is Parabola's own (null) or a
+  hex, picked for light; in dark it's based on the light one (its
+  counterpart, `dsCounterpart`) unless a dark colour is picked for it. A
+  colour based on another can be shifted lighter or darker (`lightShift`,
+  `darkShift`, `dsShift`). `dsColourTokens` turns the four into every
+  colour token; `DsColourPicker` picks one inline, and `DsColourBar` is its
+  hue and brightness bars, and the shift.
+- **Font families** (`families`): Font (text, always there) and Heading
+  (headlines) to start, and any the theme adds, each a name and a font.
+- **Fonts**: Parabola's (`DS_FONTS` in `fonts.ts`: Instrument Sans,
+  Instrument Serif, System), less any the theme took out (`hiddenFonts`;
+  never System), plus Google fonts it added (`customFonts`, from a name or a
+  link: `dsCustomFontFromInput`). Each font lists its weights.
+- **The type scale**: for each text style (`DS_TEXT_STYLES`) its name,
+  family, weight, size and line height. By default Display to H2 are in
+  Heading (Instrument Serif, Regular) and the rest, H3 included, in Font
+  (Instrument Sans, Medium).
+- **Radius** (`radius.ts`): None, Small, Medium, Large (the default) or a
+  custom number of pixels (the cards' and pills' corner, the rest scaled),
+  for every corner (`rounded-ds-sm` … `rounded-ds-lg`) and the pill
+  (`rounded-ds-pill`: buttons, nav items, tooltips), which is fully round
+  only at Large. Switches, radios, progress bars and avatars stay round.
+- **Icons**: the library, Lucide for now.
+
+Themes are kept in a **library** (`DsThemeLibrary`): Parabola (the default)
+and any added, one of them in use. A style's weight snaps to the nearest one its family's
+font has (`dsNearestWeight`). The tokens a theme sets are `--ds-*` variables
+(`--ds-bg`… `--ds-highlight`, `--ds-family-<id>`, `--ds-font-<style>`,
+`--ds-text-<style>`, `--ds-text-<style>-leading`, `--ds-weight-<style>`,
+`--ds-radius-<sm|control|md|lg|pill>`), light
+on `:root` and dark on `.dark`, so a theme changes them at run time. Make
+themes on `/parabola`: Theme (the pieces in one 600px column, and the main
+choices in the panel on the right) and Typography (Font families, Type
+scale), with Undo, Redo, Publish and a ⋮ menu to restore defaults top right
+on every page. An app applies the theme in use once, on its website's
+pages (not its admin, which stays in Parabola's own), or on part of a page
+with `scope` (`DS_THEME_SCOPE`, as /parabola's canvas does):
+
+```tsx
+<DsThemeStyle theme={dsActiveTheme(library).theme} />                          {/* loads its Google fonts */}
+<DsThemeStyle theme={…} hosted={["instrument-sans", "instrument-serif", "system"]} />  {/* the app hosts these */}
+<DsThemeStyle theme={…} scope={DS_THEME_SCOPE} />                              {/* only <div className="ds-theme"> */}
+```
+
+An app that hosts Parabola's fonts (the CMS does, with next/font) sets
+`--ds-font-<id>` to its family names; each stack tries it first. Pass the
+library and a saver to `DsProvider` (`themeLibrary`, `onThemeLibraryChange`)
+and `/parabola` publishes too.
+
 ## Using it
 
 ```tsx
@@ -137,6 +197,9 @@ left-aligned in a row that wraps, never stretched. Opt out deliberately:
   `DsDialog` and `DsSidePanel` already do.
 
 Don't size fields with `max-w-[…]` per screen. See `/parabola/fields/form`.
+
+A switch sits right after its label (`gap-ds-8`), never pushed to the far
+edge of the row. Rows in a nav are 4px apart (`ds-4`).
 
 Colours come from tokens only. No raw Tailwind palette (`bg-zinc-100`,
 `text-emerald-600`) and no hex values in components. Content that carries a

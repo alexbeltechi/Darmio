@@ -1,5 +1,5 @@
 ---
-reviewed: 2026-10-28
+reviewed: 2026-10-29
 owner: Alex
 ---
 
@@ -10,6 +10,122 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-28 — **One top bar, solid by default.** Every admin page and
+  /parabola pin the same bar (`DsTopBar`, Parabola, Layout › Top bar):
+  compact rows (12px above and below), solid in the page colour with a rule
+  under it. It can also be transparent, or blur (the nav fade the admin
+  used until now). Fields are solid too, in the page's own colour, so they
+  read as places to type on a card; info cards take the default button's
+  see-through surface, so they show on a card as well (Alex). The panel's
+  sections are a Parabola accordion (`DsAccordion`, Layout › Accordion,
+  32px headers, what's under each set in 16px), and each colour is one
+  nested inside Colours; the top bar's Collapse all / Expand all folds or opens them all. The site's own nav is unchanged for now.
+- 2026-10-28 — **Parabola themes, made like shadcn's create page.** A
+  theme is data (`packages/parabola/theme.ts`): five colours
+  (`colours.ts`), each based on the one before until given its own: the
+  **primary colour** (was "theme colour") (the website's background; Parabola's own is white, its
+  cards a warm off-white #F7F5F2, 4 darker, the same step a picked primary
+  colour's cards take (paper, #FAF7EF, for a day on 2026-10-28; Alex wanted
+  white back, 2026-10-29); every picker
+  has a warmth bar, cold to warm, between hue and brightness), the
+  **surface** (cards, side panels, fields; based on the primary colour, a
+  bar sets how much lighter or darker, so the contrast between page and
+  cards is a choice; Alex, 2026-10-28), the **secondary colour** (was
+  "typography")
+  (the text, and the quiet text, borders and shades drawn from it;
+  Parabola's is black or white, whichever reads on the theme colour),
+  **buttons** (solid buttons and selected states: the current nav item, a
+  pressed button, a checked box, the Published pill, with black or white
+  on them; "Based on secondary colour" by default; Alex, 2026-10-28) and
+  the **accent colour** (the one highlight; "Based on buttons" by default,
+  so Parabola's own highlight is black, white in dark, no longer purple,
+  the admin's included; Alex, 2026-10-28). Selected states (the current nav
+  item, a pressed button, a checked box) are the text colour, solid, as
+  Publish is. In the panel each is just
+  a colour picker (a short shade square, a hue bar and a brightness bar,
+  the same bar, each with its name and value above it, hue in degrees and
+  the rest out of 100, so a colour can be noted and made again; then the hex) sitting on the colour it is now, Parabola's
+  own until it's moved, and faint while it's based on another (ticked; Theme colour and Typography, with no tick in light, are always clear): no swatches or preset lists, for a different look
+  you make another theme (Alex, 2026-10-28). Each is picked for light; in
+  dark, "Based on light theme" (on by default) keeps it the light one's
+  counterpart: for the page and cards the same hue at the other end of
+  light; text, buttons and the accent keep their hue and richness and move
+  only as far as they need to read on the dark page (a red stays a red, a
+  navy a blue; Alex, 2026-10-28), so light and dark
+  always contrast (Alex: "every colour should have an anti-colour"); off,
+  it takes a dark colour of its own. A colour based on another (buttons on
+  the typography, every one in dark on the light one) shows a brightness
+  bar, how much lighter or darker it is than what it's based on, as it is
+  (Parabola's cards read −4), and its picker faint underneath; touching
+  the picker gives it a colour of its own (Alex, 2026-10-28). Since text and surfaces come from the same two
+  colours, text on a card reads as it does on the page; **font families**,
+  Font (text) and Heading (headlines) to start and any more you add, each
+  a name and a font; the fonts it can use, Parabola's (Instrument Sans,
+  Instrument Serif, System) less any it took out, plus Google fonts added
+  by name or link (a share link keeps the weights picked there); for each
+  text style its name, family, weight (one its font has), size and line
+  height (Display to H2 in Heading, Instrument Serif Regular; H3 and the
+  rest in Font, Instrument Sans Medium); a **radius**, None, Medium,
+  Large (the default) or Custom (pixels typed in; Small is no longer offered, an older theme's still reads), for every corner, cards, fields and buttons
+  alike: buttons are fully round only because Large is the default
+  (Alex, 2026-10-28); and an icon library (Lucide; the
+  others shadcn offers need Parabola's icons in one place first). Themes
+  live in a **library** in each project's settings: Parabola (Parabola's
+  own, read-only: a change to it goes into Custom, the one working copy,
+  made if there's none and its contents replaced if there is, never Custom
+  2, 3…; Create theme, pinned at the panel's foot while Custom is open,
+  makes it a theme of its own; Alex, 2026-10-28) and any added, one of
+  them the site's. **Save** keeps the themes without touching the
+  website; **Publish** saves and puts the open theme on the website (the
+  site wears its own copy of the published theme, `publishedTheme`, so
+  saving never changes it); a pick in Settings › Design publishes too. Only the website
+  wears it, and on `/parabola` only the canvas (the open theme): the admin
+  and `/parabola`'s sidebar, header and panel always wear Parabola's own,
+  published or not, so a theme that breaks the site never breaks the tools
+  to fix it (Alex, 2026-10-28). The panel's Light and Dark switch only the
+  preview; the UI's own light or dark is the sidebar's toggle (system by
+  default). In dark, text that's only based on the
+  light one falls back to black or white if it wouldn't read.
+  Publishing remakes the site's cached pages at once, and `/parabola`
+  makes the themes of the project picked in the admin, the one it
+  publishes to.
+  `/parabola` opens on **Theme** ("Theme" over the open theme's name):
+  a site's page in one 600px column wearing the open theme (its nav, a
+  post's opening on the page itself, a subscribe card with the large
+  buttons above the fold, a list of writing, a draft's card with its note,
+  as a site and its admin lay them out; Alex, 2026-10-28),
+  and the panel on the right (the theme as code last, folded: a full
+  export a person or an AI can build a site from as it is, every colour by
+  its role in light and dark, the fonts with a Google Fonts link, the type
+  scale, the corners in pixels, and the settings, so pasting one back in
+  applies it; `dsThemeExport`; Alex, 2026-10-28) (a rule between its
+  sections, no line of explanation under its fields; under the top bar,
+  which runs the full width with a rule under it) with its main choices (which
+  theme: a dropdown whose last option is Add theme, and a ⋮ at the
+  section header's right with Rename, Duplicate, Restore and Delete; light or dark; theme colour,
+  typography, buttons, accent colour; Heading and Font; radius; icons), 400px wide, about a
+  phone's width. The preview cards float on the canvas, with no frame
+  around them. **Typography** has the
+  rest: Font families (stacked cards, an edit dialog each, Add family; the
+  fonts, linked to Google Fonts; Add font) and Type scale (an edit dialog
+  per style). Top right on every page: **Undo**
+  (icon and label) and **Redo** (icon), **Publish** (asks first, since it
+  changes every site that uses one of the themes), and a ⋮ menu to restore
+  defaults, asking first, with Undo in the toast (and each panel section,
+  Colours, Type, Radius, Icons, has a ⋮ with Restore for its part): a page's part of the
+  open theme, or all settings ("Restore all settings"), which goes back to Parabola (it opens, and
+  is the site's again once published; other themes stay). Parabola reads
+  "(default)" in the theme dropdown, no other theme does (Alex,
+  2026-10-28). The type and colour
+  tokens are `--ds-*` variables, so a theme changes them at run time. The
+  CMS hosts Parabola's fonts with next/font, so a visitor's browser calls
+  Google only for a font a theme added. Font and Heading, as shadcn names
+  them (Alex, 2026-10-28; was Primary and Secondary, briefly Display).
+  BEL-109; uploading a font file and an icon component come next. Why:
+  anyone should be able to make a Parabola theme quickly and give each of
+  their sites its own.
+- 2026-10-28 — **A switch sits right after its label**, never pushed to the
+  far edge of its row; nav rows are 4px apart (`ds-4`).
 - 2026-10-28 — **The site's nav is a conventional bar** as wide as the
   reading column: the site's name on the left in H3, which is the way
   home (no Home button); the sections on the right as ghost buttons 4px

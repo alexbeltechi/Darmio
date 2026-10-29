@@ -40,6 +40,9 @@ When a task changes an item, update this file in the same change.
       and runs `npm publish` from `packages/parabola` when a project
       outside the CMS needs it.
       Done: another project installs Parabola from npm and renders a block.
+      The CMS always carries the Parabola in its own repo, so a release has
+      the latest by construction; publishing it (and, if it earns it, its
+      own repo) is for other projects, such as y3k.club (Alex, 2026-10-28).
    2. **Blank slate.** Done 2026-10-26 in `darmio` (decisions,
       2026-10-26), with the first-run setup screen. Was: category groups and the nav come from categories (a
       group and a nav flag), not code; hero and intro copy, site name,
@@ -274,7 +277,15 @@ Feature roadmap), unscheduled until Alex places it.
   billing, accounts and the agent runtime. "Take it with you": a
   self-hosted copy of the exact site, code and theme included. Not before
   the open-source release.
-- **Parabola themes, customizable like shadcn** — `shape` (BEL-109)
+- **Parabola themes, customizable like shadcn** — `doing` (BEL-109)
+  Started 2026-10-28 (decisions): themes as data in a library per
+  project (Parabola and any added, one in use, picked in Settings › Design),
+  made on `/parabola` like shadcn's create page: theme colour, typography, buttons
+  and accent colour, light and dark, font families (Font, Heading, more), added
+  Google fonts, the type scale with weights, the radius (None to Large)
+  and the icon library (Lucide only). Next: icons through one Parabola
+  component so other libraries work, uploading a font file, spacing in the theme, import of
+  a theme file, and an agent setting it through the API.
   A theme contract (which tokens and block variants a theme may set) and
   themes as data (`*.theme.json`), imported and switched in Settings ›
   Design or by an agent. Anyone can make their own design system from it.

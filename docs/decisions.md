@@ -10,6 +10,11 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-29 — **Each style has its own type contrast.** Alex: rerolling
+  should change the type's contrast too, "different styles have different
+  contrast levels". A style holds a range (Classic and Sport full, Minimal
+  and Tech nearly, Elegant 55–85, Natural 45–75, Retro 40–70); picking it
+  takes the middle, Shuffle, Next and the dice draw inside it.
 - 2026-10-29 — **Temperature and a true brightness; type contrast; chips in
   the button grey; rails follow.** Alex: the Saturation bar "makes it
   darker", so Temperature is back in its place (cooler or warmer) and

@@ -87,7 +87,7 @@ with the why. To change one, add a new line that overrides it.
   point), then drag its point to move it; a click on the wheel itself
   changes nothing, so a stray click never recolours anything (for a day a
   click put the chosen colour there; Alex, 2026-10-29). There's a point for each of
-  the six and no more. Delete or Backspace restores the chosen colour (back
+  the six and no more. Delete or Backspace, or a double click on a point, restores the chosen colour (back
   to what it's based on; the base back to Parabola's). Under the wheel the chosen colour's hex and the six as Parabola nav
   items (`DsNavItem`, which now takes a `leading` swatch and `actions`),
   each with a ⋮: Copy hex, Paste hex (to give two the same colour) and

@@ -10,6 +10,45 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-29 — **Radius became Buttons.** In /parabola's theme panel the
+  Radius section is Buttons (Alex): a fill, Solid or Gradient, whose
+  **contrast** runs -50 to +50 from a flat 0 in the middle (above 0 the
+  top lighter, below it darker; the bar drawn in the button colour); an
+  **Outline**, off by default (inside the edge, 1px or 2px or a width typed
+  beside them up to 8, and a transparency bar; a step darker than the
+  button, lighter on a near-black one); a **Text shadow** on the label only, never the
+  icon, 1px, cast away from a light whose direction a dial sets as in
+  Photoshop (90° from above); and **Roundness**, which still rounds every
+  corner, with "Same for buttons and pills" ticked by default: the pills
+  (New, Published) take the buttons' corner, so they're fully round at
+  Large; unticked, they get a roundness of their own (`--ds-radius-chip`).
+  Small is back as a crisp 2px on everything. It's `buttons` and
+  `pillRadius` in the theme (`button-style.ts`); only the primary button
+  wears the look, each part off until turned on. Destructive buttons stay
+  plain red. **Fields** have their own section and outline, on by default
+  (2px, the same width, typed and transparency settings; off, a field has
+  no outline but still shows a 2px red one when invalid; `fields`,
+  `--ds-field-border-width`). Icons offer only Lucide, the one that works.
+- 2026-10-29 — **A small field, and the wheel in numbers.** Parabola's
+  field has a small size (`DsInput size="small"`, and a DsField of that
+  size with a small label): the small button's 24px, its corners and
+  `text-small`, for dense rows of numbers and codes (Alex). Under the colour
+  wheel, the chosen colour's Saturation, Hue and Brightness are small
+  labelled fields in a row, labels and numbers left-aligned as any field's
+  are, typed in as well as read; they're Parabola's number field
+  (`DsNumberInput`): the up and down arrows step it, Shift by 10, the hue
+  coming round past 359; and its hex a small field under them
+  named for the colour ("Colour: Base").
+- 2026-10-29 — **Two button colours.** The colours list has **Button:
+  primary** (the solid buttons, selected states, the highlight) and
+  **Button: secondary** (the quiet buttons like Learn more, and the pills'
+  background, `surface`): by default a wash of the primary button colour
+  on the page, or Parabola's stone while the primary is its own. Its label
+  (`--ds-on-surface`) is light on a dark one and dark on a light one, as
+  the primary button's is. On the
+  right of each colour the list says **Auto** (worked out from another)
+  or **Custom** (its own), not the hex, and a Custom one has a Restore
+  icon beside its ⋮ (Alex).
 - 2026-10-28 — **One top bar, solid by default.** Every admin page and
   /parabola pin the same bar (`DsTopBar`, Parabola, Layout › Top bar):
   compact rows (12px above and below), solid in the page colour with a rule
@@ -54,13 +93,15 @@ with the why. To change one, add a new line that overrides it.
   of its colour with a faint see-through edge, so a white one still shows; each sits exactly where its colour is, the base at the
   centre by default, stacked in order (base on top, the chosen one above
   all; Alex, 2026-10-29). A tick across the hue ring points to the
-  chosen colour's hue, even for a white or grey one at the centre, and
+  chosen colour's hue, even for a white or grey one at the centre (which
+  points to paper's warm 40°, not red, so adding saturation or colour to
+  it warms it; Alex, 2026-10-29), and
   dragging round the ring turns the hue, as on any colour wheel (Alex,
   2026-10-29). The arcs are their gradient alone, no outline. You choose a colour in the list (or press its
   point), then drag its point to move it; a click on the wheel itself
   changes nothing, so a stray click never recolours anything (for a day a
   click put the chosen colour there; Alex, 2026-10-29). There's a point for each of
-  the six and no more. Delete or Backspace restores the chosen colour (back
+  the six and no more. Delete or Backspace, or a double click on a point, restores the chosen colour (back
   to what it's based on; the base back to Parabola's). Under the wheel the chosen colour's hex and the six as Parabola nav
   items (`DsNavItem`, which now takes a `leading` swatch and `actions`),
   each with a ⋮: Copy hex, Paste hex (to give two the same colour) and

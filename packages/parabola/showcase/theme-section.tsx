@@ -15,8 +15,13 @@ import { DsThemeToggle } from "../primitives/theme-toggle";
 import { DsInfoCard } from "../components/info-card";
 import { DsLinkList } from "../components/link-list";
 import { dsFontOptions } from "../components/font-pairing";
-import { DS_DEFAULT_COLOURS, DS_ICON_LIBRARIES, dsColourShown, dsNormalizeHex, type DsColourKind, type DsThemeColour, type DsThemeColours } from "../colours";
+import { DS_DEFAULT_COLOURS, DS_ICON_LIBRARIES, dsColourShown, dsColourTokens, dsHexToHsl, dsNormalizeHex, dsShift, type DsColourKind, type DsThemeColour, type DsThemeColours } from "../colours";
 import { DsColourWheel } from "../components/colour-wheel";
+import { DsColourBar } from "../components/colour-picker";
+import { DsSwitch } from "../primitives/switch";
+import { DS_DEFAULT_BUTTON_STYLE, DS_DEFAULT_FIELD_STYLE, DS_OUTLINE_MAX, DS_OUTLINE_WIDTHS, type DsButtonStyle } from "../button-style";
+import { DsAngleDial } from "../components/angle-dial";
+import { DsCheckbox } from "../primitives/checkbox";
 import { DS_DEFAULT_RADIUS, DS_RADII, DS_RADIUS_MAX, dsRadiusPx, type DsRadius } from "../radius";
 import {
   DS_BODY_FAMILY,
@@ -35,24 +40,26 @@ const WHEEL: { kind: DsColourKind; label: string }[] = [
   { kind: "theme", label: "Base" },
   { kind: "text", label: "Type: primary" },
   { kind: "muted", label: "Type: secondary" },
-  { kind: "accent", label: "Button" },
+  { kind: "accent", label: "Button: primary" },
+  { kind: "buttonSecondary", label: "Button: secondary" },
   { kind: "field", label: "Field" },
   { kind: "surface", label: "Surface" },
 ];
 
 /**
- * The theme's six colours on one wheel, for the light or the dark theme
+ * The theme's seven colours on one wheel, for the light or the dark theme
  * (whichever the preview is in): each a point of one size, the chosen one
  * filled with its colour, the others a thin ring. Each is based on another
  * until given its own (the primary type, the field and the surface on the
- * base; the secondary type and the button on the primary type; in dark,
- * each on the light one). Pick one in the list under the wheel (or press
+ * base; the secondary type and the primary button on the primary type;
+ * the secondary button on the primary button; in dark, each on the light
+ * one). The list says Auto while it's based, Custom once it's its own. Pick one in the list under the wheel (or press
  * its point), then drag its point to move it; clicking the wheel itself
  * changes nothing. The list: the six as nav items, each a solid dot of its
  * colour, its hex or what it's based on, and a ⋮ to copy or paste its hex
  * (to give two the same colour) and restore it (back to what it's based
- * on; the base to Parabola's). Delete or Backspace on the chosen point
- * does the same.
+ * on; the base to Parabola's). Delete or Backspace on the chosen point,
+ * or a double click on any point, does the same.
  */
 function ColourWheelChoice({
   colours,
@@ -99,21 +106,25 @@ function ColourWheelChoice({
         onChange={(id, hex) => set(id as DsColourKind, { [pick]: hex })}
         onRemove={(id) => remove(id as DsColourKind)}
       />
-      <DsInput
-        aria-label={`${chosen.label} hex`}
-        className="w-full font-mono"
-        value={editing ? text : shown(chosen.kind)}
-        onFocus={() => {
-          setText(shown(chosen.kind));
-          setEditing(true);
-        }}
-        onBlur={() => setEditing(false)}
-        onChange={(e) => {
-          setText(e.target.value);
-          const hex = dsNormalizeHex(e.target.value);
-          if (hex) set(chosen.kind, { [pick]: hex });
-        }}
-      />
+      {/* Named for the colour it is, its hex inside. */}
+      <DsField size="small" label={`Colour: ${chosen.label}`} className="w-full">
+        <DsInput
+          size="small"
+          aria-label={`${chosen.label} hex`}
+          className="font-mono"
+          value={editing ? text : shown(chosen.kind)}
+          onFocus={() => {
+            setText(shown(chosen.kind));
+            setEditing(true);
+          }}
+          onBlur={() => setEditing(false)}
+          onChange={(e) => {
+            setText(e.target.value);
+            const hex = dsNormalizeHex(e.target.value);
+            if (hex) set(chosen.kind, { [pick]: hex });
+          }}
+        />
+      </DsField>
       <div className="flex flex-col gap-ds-4">
         {WHEEL.map((w) => (
           <DsNavItem
@@ -128,38 +139,57 @@ function ColourWheelChoice({
                 style={{ backgroundColor: shown(w.kind) }}
               />
             }
-            meta={own(w.kind) || !basis(w.kind) ? shown(w.kind) : `Based on ${basis(w.kind)}`}
+            // Auto while it's worked out from another (or Parabola's own); Custom once it has a colour of its own.
+            meta={own(w.kind) ? "Custom" : "Auto"}
+            // Room for two actions: Restore and the ⋮.
+            className="pr-[4.5rem]"
             actions={
-              <DsDropdown>
-                <DsDropdownTrigger asChild>
-                  <DsButton size="small" variant="text" iconLeft={MoreVertical} aria-label={`More for ${w.label}`} />
-                </DsDropdownTrigger>
-                <DsDropdownContent align="end">
-                  <DsDropdownItem
-                    iconLeft={Copy}
-                    onSelect={() => navigator.clipboard.writeText(shown(w.kind)).then(() => dsToast.success(`${shown(w.kind)} copied`))}
-                  >
-                    Copy hex
-                  </DsDropdownItem>
-                  <DsDropdownItem
-                    iconLeft={ClipboardPaste}
-                    onSelect={() =>
-                      navigator.clipboard.readText().then((value) => {
-                        const hex = dsNormalizeHex(value);
-                        if (hex) set(w.kind, { [pick]: hex });
-                        else dsToast.error("No hex to paste");
-                      })
-                    }
-                  >
-                    Paste hex
-                  </DsDropdownItem>
-                  <DsDropdownSeparator />
-                  {/* Back to what it's based on (the base back to Parabola's); there's nothing to restore while it is. */}
-                  <DsDropdownItem iconLeft={RotateCcw} disabled={!own(w.kind)} onSelect={() => remove(w.kind)}>
-                    Restore
-                  </DsDropdownItem>
-                </DsDropdownContent>
-              </DsDropdown>
+              <>
+                {/* Restore, beside the ⋮ only once it has a colour of its own; a space the same size till then, so
+                    the Auto and Custom line up. */}
+                {own(w.kind) ? (
+                  <DsButton
+                    size="small"
+                    variant="text"
+                    iconLeft={RotateCcw}
+                    aria-label={`Restore ${w.label}`}
+                    title="Restore"
+                    onClick={() => remove(w.kind)}
+                  />
+                ) : (
+                  <span aria-hidden className="size-6" />
+                )}
+                <DsDropdown>
+                  <DsDropdownTrigger asChild>
+                    <DsButton size="small" variant="text" iconLeft={MoreVertical} aria-label={`More for ${w.label}`} />
+                  </DsDropdownTrigger>
+                  <DsDropdownContent align="end">
+                    <DsDropdownItem
+                      iconLeft={Copy}
+                      onSelect={() => navigator.clipboard.writeText(shown(w.kind)).then(() => dsToast.success(`${shown(w.kind)} copied`))}
+                    >
+                      Copy hex
+                    </DsDropdownItem>
+                    <DsDropdownItem
+                      iconLeft={ClipboardPaste}
+                      onSelect={() =>
+                        navigator.clipboard.readText().then((value) => {
+                          const hex = dsNormalizeHex(value);
+                          if (hex) set(w.kind, { [pick]: hex });
+                          else dsToast.error("No hex to paste");
+                        })
+                      }
+                    >
+                      Paste hex
+                    </DsDropdownItem>
+                    <DsDropdownSeparator />
+                    {/* Back to what it's based on (the base back to Parabola's); there's nothing to restore while it is. */}
+                    <DsDropdownItem iconLeft={RotateCcw} disabled={!own(w.kind)} onSelect={() => remove(w.kind)}>
+                      Restore
+                    </DsDropdownItem>
+                  </DsDropdownContent>
+                </DsDropdown>
+              </>
             }
           >
             {w.label}
@@ -280,23 +310,199 @@ const LIGHT_BASIS: Record<DsColourKind, string | null> = {
   text: "base",
   muted: "type: primary",
   accent: "type: primary",
+  // A wash of the primary button colour on the page, until it's given its own.
+  buttonSecondary: "button: primary",
   field: "base",
   surface: "base",
 };
 
 /**
- * The theme's radius: None, Small, Medium, Large and Custom in one row, the
- * five sharing its width; Custom opens a field for the pixels (the cards'
- * and buttons' corner, the smaller ones scaled from it).
+ * An outline's settings, for buttons and fields alike: a switch, then its
+ * thickness, 1px or 2px or any other typed in the field to their right (up
+ * to 8), and its transparency, a bar from solid (0) to gone (100), drawn in
+ * the outline's colour.
  */
-function RadiusChoice({ radius, onChange }: { radius: DsRadius; onChange: (radius: DsRadius) => void }) {
+function OutlineChoice({
+  label,
+  on,
+  width,
+  opacity,
+  colour,
+  onChange,
+}: {
+  /** Names the controls for assistive tech ("Field outline"). */
+  label: string;
+  on: boolean;
+  width: number;
+  opacity: number;
+  /** The outline's colour, for the transparency bar. */
+  colour: string;
+  onChange: (next: { outline?: boolean; outlineWidth?: number; outlineOpacity?: number }) => void;
+}) {
+  const preset = (DS_OUTLINE_WIDTHS as readonly number[]).includes(width);
+  const [text, setText] = React.useState(preset ? "" : String(width));
+  const transparency = Math.round((1 - opacity) * 100);
+  return (
+    <div className="flex flex-col gap-ds-16">
+      {/* The switch right after its label (decisions, 2026-10-28). */}
+      <label className="inline-flex items-center gap-ds-8 self-start text-p text-ds-fg">
+        Outline
+        <DsSwitch aria-label={label} checked={on} onCheckedChange={(outline) => onChange({ outline })} />
+      </label>
+      {on && (
+        <>
+          <div className="flex items-center gap-ds-4" role="group" aria-label={`${label} thickness`}>
+            {DS_OUTLINE_WIDTHS.map((w) => (
+              <DsButton
+                key={w}
+                size="small"
+                className="min-w-0 flex-1 px-0"
+                pressed={width === w}
+                onClick={() => {
+                  setText("");
+                  onChange({ outlineWidth: w });
+                }}
+              >
+                {w}px
+              </DsButton>
+            ))}
+            <DsInput
+              size="small"
+              aria-label={`${label} thickness in pixels`}
+              inputMode="numeric"
+              className="min-w-0 flex-1"
+              value={text}
+              placeholder="Custom"
+              meta="px"
+              onChange={(e) => {
+                setText(e.target.value);
+                const px = Number.parseInt(e.target.value, 10);
+                if (Number.isFinite(px)) onChange({ outlineWidth: Math.min(DS_OUTLINE_MAX, Math.max(1, px)) });
+              }}
+            />
+          </div>
+          <DsColourBar
+            label={`${label} transparency`}
+            title="Transparency"
+            readout={String(transparency)}
+            value={1 - opacity}
+            onChange={(x) => onChange({ outlineOpacity: Math.round((1 - x) * 100) / 100 })}
+            valueText={transparency === 0 ? "Solid" : `${transparency}% see-through`}
+            track={`linear-gradient(to right, ${colour}, transparent)`}
+            thumb={colour}
+          />
+        </>
+      )}
+    </div>
+  );
+}
+
+/**
+ * The theme's buttons (button-style.ts; Alex, 2026-10-29): their fill,
+ * Solid or Gradient, and a gradient's contrast, a bar from -50 to +50 that
+ * starts at 0 (flat) in the middle, drawn in the button colour, darker at
+ * the top to the left of 0 and lighter at the top to the right; an outline
+ * and its thickness; a text shadow on the label and the direction its
+ * light comes from (a dial, as in Photoshop); and their roundness, which
+ * rounds every corner of the theme, with the pills the same or their own.
+ */
+function ButtonChoice({
+  style,
+  button,
+  radius,
+  pillRadius,
+  onStyle,
+  onRadius,
+  onPillRadius,
+}: {
+  style: DsButtonStyle;
+  /** The primary button colour in the mode shown, for the contrast bar. */
+  button: string;
+  radius: DsRadius;
+  pillRadius: DsRadius | null;
+  onStyle: (style: DsButtonStyle) => void;
+  onRadius: (radius: DsRadius) => void;
+  onPillRadius: (radius: DsRadius | null) => void;
+}) {
+  const set = (next: Partial<DsButtonStyle>) => onStyle({ ...style, ...next });
+  const toggle = (label: string, on: boolean, change: (on: boolean) => void) => (
+    // The switch right after its label (decisions, 2026-10-28).
+    <label className="inline-flex items-center gap-ds-8 self-start text-p text-ds-fg">
+      {label}
+      <DsSwitch checked={on} onCheckedChange={change} />
+    </label>
+  );
+  const contrast = Math.round(style.contrast * 50);
+  return (
+    <div className="flex flex-col gap-ds-16">
+      <div className="flex items-center gap-ds-4" role="group" aria-label="Fill">
+        {(["solid", "gradient"] as const).map((fill) => (
+          <DsButton key={fill} size="small" className="min-w-0 flex-1 px-0" pressed={style.fill === fill} onClick={() => set({ fill })}>
+            {fill === "solid" ? "Solid" : "Gradient"}
+          </DsButton>
+        ))}
+      </div>
+      {style.fill === "gradient" && (
+        <DsColourBar
+          label="Gradient contrast"
+          title="Contrast"
+          // -50 to +50 from a flat 0 in the middle, as the colours' brightness reads.
+          readout={contrast === 0 ? "0" : `${contrast > 0 ? "+" : "−"}${Math.abs(contrast)}`}
+          value={(style.contrast + 1) / 2}
+          onChange={(x) => set({ contrast: Math.round((x * 2 - 1) * 50) / 50 })}
+          valueText={contrast === 0 ? "Flat" : contrast > 0 ? `${contrast}, lighter at the top` : `${-contrast}, darker at the top`}
+          // The top of the button across the range: darker on the left, the colour itself at 0, lighter on the right.
+          track={`linear-gradient(to right, ${dsShift(button, -0.2)}, ${button}, ${dsShift(button, 0.2)})`}
+          thumb={button}
+        />
+      )}
+      <OutlineChoice
+        label="Button outline"
+        on={style.outline}
+        width={style.outlineWidth}
+        opacity={style.outlineOpacity}
+        colour={dsShift(button, dsHexToHsl(button)[2] < 0.25 ? 0.2 : -0.15)}
+        onChange={(next) => set(next)}
+      />
+      {toggle("Text shadow", style.shadow, (shadow) => set({ shadow }))}
+      {style.shadow && (
+        <DsField label="Direction">
+          <DsAngleDial label="Text shadow direction" value={style.shadowAngle} onChange={(shadowAngle) => set({ shadowAngle })} />
+        </DsField>
+      )}
+      <DsField label="Roundness">
+        <RadiusChoice label="Roundness" radius={radius} onChange={onRadius} />
+      </DsField>
+      <label className="inline-flex items-center gap-ds-8 self-start text-p text-ds-fg">
+        <DsCheckbox
+          checked={pillRadius === null}
+          // Unticked, the pills start from the buttons' corner, so nothing jumps until it's changed.
+          onCheckedChange={(on) => onPillRadius(on ? null : radius)}
+        />
+        Same for buttons and pills
+      </label>
+      {pillRadius !== null && (
+        <DsField label="Pill roundness">
+          <RadiusChoice label="Pill roundness" radius={pillRadius} onChange={onPillRadius} />
+        </DsField>
+      )}
+    </div>
+  );
+}
+
+/**
+ * The theme's roundness: None, Small (a crisp 2px), Medium, Large and
+ * Custom in one row, the five sharing its width; Custom opens a field for
+ * the pixels (the cards' and buttons' corner, the smaller ones scaled from
+ * it). It rounds every corner, buttons first.
+ */
+function RadiusChoice({ label, radius, onChange }: { label: string; radius: DsRadius; onChange: (radius: DsRadius) => void }) {
   const custom = typeof radius === "number";
   const [text, setText] = React.useState(custom ? String(radius) : "");
   return (
     <div className="flex flex-col gap-ds-8">
-      <div className="flex items-center gap-ds-4" role="group" aria-label="Radius">
-        {/* Small is left out of the choices (an older theme's still reads); Custom covers what's between. */}
-        {DS_RADII.filter((r) => r.id !== "small").map((r) => (
+      <div className="flex items-center gap-ds-4" role="group" aria-label={label}>
+        {DS_RADII.map((r) => (
           <DsButton key={r.id} size="small" className="min-w-0 flex-1 px-0" pressed={radius === r.id} onClick={() => onChange(r.id)}>
             {r.label}
           </DsButton>
@@ -318,7 +524,7 @@ function RadiusChoice({ radius, onChange }: { radius: DsRadius; onChange: (radiu
       </div>
       {custom && (
         <DsInput
-          aria-label="Radius in pixels"
+          aria-label={`${label} in pixels`}
           inputMode="numeric"
           className="w-full"
           value={text}
@@ -575,10 +781,41 @@ export function ThemeSection() {
         </PanelSection>
 
         <PanelSection
-          title="Radius"
-          actions={<SectionRestore section="Radius" theme={theme} setTheme={setTheme} restore={(t) => ({ ...t, radius: DS_DEFAULT_RADIUS })} />}
+          title="Buttons"
+          actions={
+            <SectionRestore
+              section="Buttons"
+              theme={theme}
+              setTheme={setTheme}
+              restore={(t) => ({ ...t, radius: DS_DEFAULT_RADIUS, pillRadius: null, buttons: DS_DEFAULT_BUTTON_STYLE })}
+            />
+          }
         >
-          <RadiusChoice radius={theme.radius} onChange={(radius) => setTheme({ ...theme, radius })} />
+          <ButtonChoice
+            style={theme.buttons}
+            button={dsColourTokens(theme.colours, mode).button}
+            radius={theme.radius}
+            pillRadius={theme.pillRadius}
+            onStyle={(buttons) => setTheme({ ...theme, buttons })}
+            onRadius={(radius) => setTheme({ ...theme, radius })}
+            onPillRadius={(pillRadius) => setTheme({ ...theme, pillRadius })}
+          />
+        </PanelSection>
+
+        <PanelSection
+          title="Fields"
+          actions={
+            <SectionRestore section="Fields" theme={theme} setTheme={setTheme} restore={(t) => ({ ...t, fields: DS_DEFAULT_FIELD_STYLE })} />
+          }
+        >
+          <OutlineChoice
+            label="Field outline"
+            on={theme.fields.outline}
+            width={theme.fields.outlineWidth}
+            opacity={theme.fields.outlineOpacity}
+            colour={dsColourTokens(theme.colours, mode)["field-border"]}
+            onChange={(next) => setTheme({ ...theme, fields: { ...theme.fields, ...next } })}
+          />
         </PanelSection>
 
         <PanelSection
@@ -587,7 +824,8 @@ export function ThemeSection() {
         >
           <DsField label="Icon library">
             <DsSelect
-              options={DS_ICON_LIBRARIES.map((l) => ({ value: l.id, label: l.ready ? l.label : `${l.label} (soon)`, disabled: !l.ready }))}
+              // Only the libraries that work: Lucide, for now.
+              options={DS_ICON_LIBRARIES.filter((l) => l.ready).map((l) => ({ value: l.id, label: l.label }))}
               value={theme.icons}
               onValueChange={(icons) => setTheme({ ...theme, icons })}
             />

@@ -19,18 +19,31 @@ import { cn } from "../cn";
  * (DS_FIELD_WIDTH_CLASS) on its own; inside a DsField it fills the field,
  * which carries the width instead.
  *
+ * Small (`size="small"`): the mini field, the small button's size: 24px
+ * tall, its corners (`rounded-ds-control`), `text-small`, 8px sides, for
+ * dense rows of numbers and codes (a colour's hue, its hex). A DsField of
+ * that size has a small label to match.
+ *
  * DS_FIELD_BOX_CLASS is exported so every field-shaped control (select and
- * date triggers, multi-select) draws the same box.
+ * date triggers, multi-select) draws the same box, and DS_FIELD_INVALID_CLASS
+ * its error outline, always 2px, so it shows even in a theme whose fields
+ * have no outline.
  */
 export const DS_FIELD_WIDTH_CLASS = "w-(--ds-field-width) max-w-full";
 
+export const DS_FIELD_INVALID_CLASS = "border-2 border-ds-error";
+
+// The outline's thickness is the theme's (`--ds-field-border-width`, 2px by default, 0 with the outline off).
 export const DS_FIELD_BOX_CLASS = [
-  `group flex h-9 ${DS_FIELD_WIDTH_CLASS} items-center gap-2 rounded-ds-lg border-2 border-ds-field-border bg-ds-field px-4`,
+  `group flex h-9 ${DS_FIELD_WIDTH_CLASS} items-center gap-2 rounded-ds-lg border-[length:var(--ds-field-border-width)] border-ds-field-border bg-ds-field px-4`,
   "transition-colors ds-focus-within",
   "text-p text-ds-fg",
   "disabled:cursor-not-allowed disabled:text-ds-fg-subtle has-[:disabled]:cursor-not-allowed has-[:disabled]:text-ds-fg-subtle",
   "[&_svg]:size-4 [&_svg]:shrink-0",
 ].join(" ");
+
+/** The small field's box, laid over DS_FIELD_BOX_CLASS: the small button's height, corners, type and sides. */
+export const DS_FIELD_SMALL_CLASS = "h-6 gap-1 rounded-ds-control px-2 text-small";
 
 /**
  * A form's fields: left-aligned at the standard width, side by side, wrapping
@@ -121,6 +134,8 @@ type DsInputOwnProps = {
   invalid?: boolean;
   /** No box: the text sits directly on the page. See DS_FIELD_BARE_CLASS. */
   bare?: boolean;
+  /** Small: the mini field, the small button's size (DS_FIELD_SMALL_CLASS). */
+  size?: "default" | "small";
 };
 
 export type DsInputProps = DsInputOwnProps &
@@ -136,6 +151,7 @@ export function DsInput({ ref, ...fieldProps }: DsInputProps) {
     showFocus,
     invalid,
     bare,
+    size = "default",
     className,
     onChange,
     ...props
@@ -168,7 +184,10 @@ export function DsInput({ ref, ...fieldProps }: DsInputProps) {
       data-slot="ds-input"
       data-focus={showFocus || undefined}
       data-invalid={invalid || undefined}
-      className={cn(bare ? DS_FIELD_BARE_CLASS : [DS_FIELD_BOX_CLASS, invalid && "border-ds-error"], className)}
+      className={cn(
+        bare ? DS_FIELD_BARE_CLASS : [DS_FIELD_BOX_CLASS, size === "small" && DS_FIELD_SMALL_CLASS, invalid && DS_FIELD_INVALID_CLASS],
+        className
+      )}
     >
       {IconLeft && <IconLeft aria-hidden />}
       <input
@@ -197,6 +216,68 @@ export function DsInput({ ref, ...fieldProps }: DsInputProps) {
       )}
       {IconRight && <IconRight aria-hidden />}
     </div>
+  );
+}
+
+/**
+ * Parabola number field: a DsInput for a whole number, as fields with numbers
+ * behave everywhere: the up and down arrows step it (Shift for steps of 10),
+ * kept between `min` and `max` (or, with `wrap`, round past them, as an angle
+ * does); typing shows what's typed and applies it as soon as it's a whole
+ * number in range; leaving it shows the value again. Controlled: `value`,
+ * and `onValueChange` with the new number.
+ */
+export function DsNumberInput({
+  value,
+  onValueChange,
+  min = 0,
+  max,
+  step = 1,
+  wrap = false,
+  className,
+  ...props
+}: Omit<DsInputProps, "value" | "onChange" | "type" | "inputMode"> & {
+  value: number;
+  onValueChange: (value: number) => void;
+  min?: number;
+  max: number;
+  step?: number;
+  /** Past `max` comes round to `min` and back, as degrees do. */
+  wrap?: boolean;
+}) {
+  const [text, setText] = React.useState<string | null>(null);
+  const fit = (n: number) =>
+    wrap ? ((((n - min) % (max - min + 1)) + (max - min + 1)) % (max - min + 1)) + min : Math.min(max, Math.max(min, n));
+  return (
+    <DsInput
+      {...props}
+      inputMode="numeric"
+      className={cn("tabular-nums", className)}
+      value={text ?? String(value)}
+      onFocus={(e) => {
+        setText(String(value));
+        e.currentTarget.select();
+        props.onFocus?.(e);
+      }}
+      onBlur={(e) => {
+        setText(null);
+        props.onBlur?.(e);
+      }}
+      onKeyDown={(e) => {
+        props.onKeyDown?.(e);
+        const delta = e.key === "ArrowUp" ? 1 : e.key === "ArrowDown" ? -1 : 0;
+        if (!delta || e.defaultPrevented) return;
+        e.preventDefault();
+        const next = fit(value + delta * step * (e.shiftKey ? 10 : 1));
+        setText(String(next));
+        onValueChange(next);
+      }}
+      onChange={(e) => {
+        setText(e.target.value);
+        const n = Number.parseInt(e.target.value, 10);
+        if (Number.isFinite(n) && n >= min && n <= max) onValueChange(n);
+      }}
+    />
   );
 }
 
@@ -249,7 +330,7 @@ export function DsTextarea(
       data-focus={showFocus || undefined}
       data-invalid={invalid || undefined}
       className={cn(
-        bare ? [DS_FIELD_BARE_CLASS, "items-start"] : [DS_FIELD_BOX_CLASS, "h-auto items-start py-2", invalid && "border-ds-error"],
+        bare ? [DS_FIELD_BARE_CLASS, "items-start"] : [DS_FIELD_BOX_CLASS, "h-auto items-start py-2", invalid && DS_FIELD_INVALID_CLASS],
         className
       )}
     >
@@ -279,9 +360,12 @@ export function DsField({
   description,
   error,
   required,
+  size = "default",
   children,
   className,
 }: {
+  /** Small: a small label and gap, for small fields (DsInput `size="small"`). */
+  size?: "default" | "small";
   /** The control's id; generated when left out. */
   id?: string;
   label?: React.ReactNode;
@@ -302,9 +386,9 @@ export function DsField({
   );
 
   return (
-    <div data-slot="ds-field" className={cn("flex flex-col gap-2 text-left", DS_FIELD_WIDTH_CLASS, className)}>
+    <div data-slot="ds-field" className={cn("flex flex-col text-left", size === "small" ? "gap-1" : "gap-2", DS_FIELD_WIDTH_CLASS, className)}>
       {label && (
-        <label htmlFor={id} className="text-p text-ds-fg-muted">
+        <label htmlFor={id} className={cn(size === "small" ? "text-small" : "text-p", "text-ds-fg-muted")}>
           {label}
           {required && <span aria-hidden>*</span>}
         </label>

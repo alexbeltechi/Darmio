@@ -128,10 +128,13 @@ export {
 export {
   DsField,
   DsInput,
+  DsNumberInput,
   DsSearch,
   DsTextarea,
   useDsField,
   DS_FIELD_BOX_CLASS,
+  DS_FIELD_INVALID_CLASS,
+  DS_FIELD_SMALL_CLASS,
   DS_FIELD_BARE_CLASS,
   DS_FIELD_INPUT_CLASS,
   DS_FIELD_CLEAR_CLASS,
@@ -175,4 +178,17 @@ export { DsInfoCard } from "./components/info-card";
 export { DsLinkList, type DsLinkListItem } from "./components/link-list";
 export { DsFontPairing, dsFontOptions } from "./components/font-pairing";
 export { DsColourPicker } from "./components/colour-picker";
+export {
+  DS_DEFAULT_BUTTON_STYLE,
+  DS_DEFAULT_FIELD_STYLE,
+  DS_OUTLINE_MAX,
+  DS_OUTLINE_WIDTHS,
+  dsButtonStyleVars,
+  dsFieldStyleVars,
+  parseDsButtonStyle,
+  parseDsFieldStyle,
+  type DsButtonFill,
+  type DsButtonStyle,
+  type DsFieldStyle,
+} from "./button-style";
 export { DsColourWheel, type DsWheelPoint } from "./components/colour-wheel";

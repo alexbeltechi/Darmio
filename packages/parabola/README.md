@@ -134,7 +134,8 @@ A theme is data (`theme.ts`), much as shadcn's create page sets a style:
   `darkShift`, `dsShift`). `dsColourTokens` turns the six into every
   colour token; `DsColourWheel` shows them all as points on one wheel (hue
   round it, a tick on the ring for the chosen one, dragged round to turn it, saturation out from the centre, saturation and brightness on
-  the arcs; one size, the chosen one filled, the others a thin ring; choose one
+  the arcs, and below it the chosen one's saturation, hue and brightness as
+  small fields; one size, the chosen one filled, the others a thin ring; choose one
   and drag its point, Delete to restore it), and `DsColourPicker` picks a single colour inline, with
   `DsColourBar` its hue and brightness bars.
 - **Font families** (`families`): Font (text, always there) and Heading
@@ -147,7 +148,16 @@ A theme is data (`theme.ts`), much as shadcn's create page sets a style:
   family, weight, size and line height. By default Display to H2 are in
   Heading (Instrument Serif, Regular) and the rest, H3 included, in Font
   (Instrument Sans, Medium).
-- **Radius** (`radius.ts`): None, Small, Medium, Large (the default) or a
+- **Buttons** (`button-style.ts`): the solid buttons' fill, solid or a
+  gradient of the button colour (contrast -1 to 1, 0 flat, above it the
+  top lighter), an inset outline (1 to 8px, with an opacity; off by default), a label text shadow cast from a
+  light's angle (`DsAngleDial`; never on the icons), each `none` until on
+  (`--ds-button-image`, `--ds-button-ring`, `--ds-button-text-shadow`); and
+  their roundness, the radius below, with the pills the same or their own
+  (`pillRadius`, `--ds-radius-chip`, `rounded-ds-chip`). Fields have their
+  own outline (`fields`: on, 2px, solid by default; `--ds-field-border-width`;
+  an invalid field's red outline, `DS_FIELD_INVALID_CLASS`, is always 2px).
+- **Radius** (`radius.ts`): None, Small (2px), Medium, Large (the default) or a
   custom number of pixels (the cards' and pills' corner, the rest scaled),
   for every corner (`rounded-ds-sm` … `rounded-ds-lg`) and the pill
   (`rounded-ds-pill`: buttons, nav items, tooltips), which is fully round

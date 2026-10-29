@@ -3,6 +3,7 @@
 import * as React from "react";
 import { cn } from "../cn";
 import { dsHexToHsv, dsHsvToHex } from "../colours";
+import { DsField, DsNumberInput } from "../primitives/field";
 
 type Hsv = { h: number; s: number; v: number };
 
@@ -31,6 +32,19 @@ const ARC = 124;
 const SPAN = 42;
 
 const HUES = "#FF0000, #FF00FF, #0000FF, #00FFFF, #00FF00, #FFFF00, #FF0000";
+
+/**
+ * The hue a white, black or grey is headed: none of them has one, so they point to paper's warm yellow-orange
+ * (Parabola's own paper and charcoal sit there), and moving one out from the centre warms it, not reddens it
+ * (Alex, 2026-10-29).
+ */
+const NEUTRAL_HUE = 40;
+
+/** A colour's hue, saturation and brightness, a neutral's hue paper's. */
+function toHsv(hex: string): Hsv {
+  const hsv = dsHexToHsv(hex);
+  return hsv.s === 0 ? { ...hsv, h: NEUTRAL_HUE } : hsv;
+}
 
 const clamp = (n: number) => Math.min(1, Math.max(0, n));
 const rad = (deg: number) => (deg * Math.PI) / 180;
@@ -113,7 +127,8 @@ function drag(onMove: (p: { deg: number; dist: number }) => void, slop = 0) {
  * to move it; a click on the disc itself changes nothing. The arc on the left is its saturation, the arc on the
  * right its brightness. The chosen point takes the keyboard: the arrow
  * keys turn its hue (left, right) and saturation (up, down; Shift for
- * bigger steps), and Delete or Backspace hands it to `onRemove`. Controlled:
+ * bigger steps), and Delete or Backspace, or a double click on a point,
+ * hands it to `onRemove`. Controlled:
  * every change goes to `onChange` with the point's id and its new
  * `#RRGGBB`.
  */
@@ -131,13 +146,13 @@ export function DsColourWheel({
   /** A point pressed on the wheel. */
   onSelect: (id: string) => void;
   onChange: (id: string, hex: string) => void;
-  /** Delete or Backspace on a chosen point. */
+  /** Delete or Backspace on a chosen point, or a double click on one. */
   onRemove?: (id: string) => void;
   className?: string;
 }) {
   // Each point keeps its own hue and saturation, so they survive black, white and greys while it's dragged.
   const [kept, setKept] = React.useState<Record<string, { hex: string; hsv: Hsv }>>({});
-  const hsvOf = (p: DsWheelPoint): Hsv => (kept[p.id]?.hex === p.colour ? kept[p.id].hsv : dsHexToHsv(p.colour));
+  const hsvOf = (p: DsWheelPoint): Hsv => (kept[p.id]?.hex === p.colour ? kept[p.id].hsv : toHsv(p.colour));
   const set = (p: DsWheelPoint, hsv: Hsv) => {
     const next = { h: (hsv.h + 360) % 360, s: clamp(hsv.s), v: clamp(hsv.v) };
     const hex = dsHsvToHex(next.h, next.s, next.v);
@@ -326,13 +341,17 @@ export function DsColourWheel({
                 // the others are only a thin black ring with a faint white line outside it, so they show on a dark wheel
                 // too, and the chosen one stands out (Alex, 2026-10-29).
                 backgroundColor: chosen ? p.colour : "transparent",
-                boxShadow: chosen ? "inset 0 0 0 2px white, 0 0 0 2px var(--ds-fg)" : "inset 0 0 0 1px black, 0 0 0 1px rgb(255 255 255 / 0.3)",
+                boxShadow: chosen
+                  ? "inset 0 0 0 2px white, 0 0 0 2px var(--ds-fg)"
+                  : "inset 0 0 0 1px black, 0 0 0 1px rgb(255 255 255 / 0.3)",
               }}
               onPointerDown={(event) => {
                 // Pressing it focuses it (in drag), so Delete and the arrow keys reach it after a click.
                 onSelect(p.id);
                 drag(({ deg, dist }) => set(p, { h: deg, s: toSaturation(dist), v: Math.max(h.v, p.floor ?? 0) }), SLOP)(event);
               }}
+              // A double click restores it, as Delete does.
+              onDoubleClick={() => onRemove?.(p.id)}
               onKeyDown={(event) => {
                 if ((event.key === "Delete" || event.key === "Backspace") && onRemove) {
                   event.preventDefault();
@@ -350,14 +369,50 @@ export function DsColourWheel({
           );
         })}
       </div>
-      <div className="flex items-baseline justify-between text-small tabular-nums">
-        <span className="text-ds-fg-muted">
-          Saturation <span className="text-ds-fg">{Math.round(hsv.s * 100)}</span>
-        </span>
-        <span className="text-ds-fg-muted">
-          Brightness <span className="text-ds-fg">{Math.round(hsv.v * 100)}</span>
-        </span>
+      {/* The chosen colour in numbers, in the wheel's order: saturation (its left arc), hue (the ring), brightness
+          (its right arc); each typed in as well as read, laid out as any field is. */}
+      <div className="grid grid-cols-3 gap-ds-8">
+        <NumberField
+          label="Saturation"
+          value={Math.round(hsv.s * 100)}
+          max={100}
+          onCommit={(n) => set(current, { ...hsv, s: n / 100 })}
+        />
+        <NumberField
+          label="Hue"
+          value={Math.round(hsv.h) % 360}
+          max={359}
+          wrap
+          onCommit={(n) => set(current, { ...hsv, h: n })}
+        />
+        <NumberField
+          label="Brightness"
+          value={Math.round(hsv.v * 100)}
+          max={100}
+          onCommit={(n) => set(current, { ...hsv, v: n / 100 })}
+        />
       </div>
     </div>
+  );
+}
+
+/** One of the chosen colour's numbers: a small labelled number field (arrows step it, Shift by 10). */
+function NumberField({
+  label,
+  value,
+  max,
+  wrap,
+  onCommit,
+}: {
+  label: string;
+  value: number;
+  max: number;
+  wrap?: boolean;
+  onCommit: (n: number) => void;
+}) {
+  return (
+    <DsField size="small" label={label} className="w-full">
+      <DsNumberInput size="small" value={value} max={max} wrap={wrap} onValueChange={onCommit} />
+    </DsField>
   );
 }

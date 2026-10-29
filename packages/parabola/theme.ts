@@ -22,6 +22,16 @@ import {
   type DsFont,
 } from "./fonts";
 import { DS_DEFAULT_RADIUS, DS_RADII, DS_RADIUS_MAX, DS_RADIUS_TOKENS, dsRadiusPx, type DsRadius } from "./radius";
+import {
+  DS_DEFAULT_BUTTON_STYLE,
+  DS_DEFAULT_FIELD_STYLE,
+  dsButtonStyleVars,
+  dsFieldStyleVars,
+  parseDsButtonStyle,
+  parseDsFieldStyle,
+  type DsButtonStyle,
+  type DsFieldStyle,
+} from "./button-style";
 
 /**
  * A Parabola theme: the choices that change how everything looks, stored as
@@ -40,6 +50,8 @@ import { DS_DEFAULT_RADIUS, DS_RADII, DS_RADIUS_MAX, DS_RADIUS_TOKENS, dsRadiusP
  *   Heading, the rest in Font, by default), weight, size and line height;
  * - a radius (None, Small, Medium, Large) for every corner, buttons
  *   included: fully round only at Large (radius.ts);
+ * - the buttons' look: solid or a gradient (with its contrast), an outline,
+ *   a 3D label (button-style.ts);
  * - an icon library (Lucide, for now).
  *
  * Themes are kept in a library (DsThemeLibrary): Parabola (the default) and
@@ -100,6 +112,12 @@ export type DsThemeConfig = {
   hiddenFonts: string[];
   /** How round every corner is: a preset, or custom pixels (radius.ts). */
   radius: DsRadius;
+  /** The pills' corner (labels like New, Published): null for the same as the buttons, or a radius of their own. */
+  pillRadius: DsRadius | null;
+  /** How the solid buttons look: fill, outline, 3D label (button-style.ts). */
+  buttons: DsButtonStyle;
+  /** The fields' outline: on or off, its width and opacity (button-style.ts). */
+  fields: DsFieldStyle;
   /** The icon library, by id (colours.ts). */
   icons: string;
 };
@@ -119,6 +137,9 @@ export const DS_DEFAULT_THEME: DsThemeConfig = {
   customFonts: [],
   hiddenFonts: [],
   radius: DS_DEFAULT_RADIUS,
+  pillRadius: null,
+  buttons: DS_DEFAULT_BUTTON_STYLE,
+  fields: DS_DEFAULT_FIELD_STYLE,
   icons: "lucide",
 };
 
@@ -231,6 +252,7 @@ export function parseDsThemeConfig(value: unknown): DsThemeConfig {
           text: colour(coloursRaw.text ?? coloursRaw.ui, DS_BASE_COLOURS, DS_DEFAULT_BASE_COLOUR),
           muted: colour(coloursRaw.muted),
           accent: accent.light === null && buttons.light ? buttons : accent,
+          buttonSecondary: colour(coloursRaw.buttonSecondary),
           field: colour(coloursRaw.field),
         }
       : {
@@ -239,6 +261,7 @@ export function parseDsThemeConfig(value: unknown): DsThemeConfig {
           text: { light: lightPick(coloursRaw.base, DS_BASE_COLOURS, DS_DEFAULT_BASE_COLOUR), dark: null },
           muted: { light: null, dark: null },
           accent: { light: lightPick(coloursRaw.accent ?? coloursRaw.secondary, DS_ACCENT_COLOURS, DS_DEFAULT_ACCENT_COLOUR), dark: null },
+          buttonSecondary: { light: null, dark: null },
           field: { light: null, dark: null },
         };
 
@@ -307,20 +330,32 @@ export function parseDsThemeConfig(value: unknown): DsThemeConfig {
       )
     : [];
 
-  const radius: DsRadius =
-    typeof raw.radius === "number" && Number.isFinite(raw.radius)
-      ? Math.min(DS_RADIUS_MAX, Math.max(0, Math.round(raw.radius)))
-      : DS_RADII.some((r) => r.id === raw.radius)
-        ? (raw.radius as DsRadius)
-        : DS_DEFAULT_RADIUS;
+  const parseRadius = (value: unknown): DsRadius | null =>
+    typeof value === "number" && Number.isFinite(value)
+      ? Math.min(DS_RADIUS_MAX, Math.max(0, Math.round(value)))
+      : DS_RADII.some((r) => r.id === value)
+        ? (value as DsRadius)
+        : null;
+  const radius: DsRadius = parseRadius(raw.radius) ?? DS_DEFAULT_RADIUS;
+  const pillRadius = parseRadius(raw.pillRadius);
   const icons = DS_ICON_LIBRARIES.some((l) => l.id === raw.icons && l.ready) ? (raw.icons as string) : "lucide";
 
-  return { colours, families, type, customFonts, hiddenFonts, radius, icons };
+  const buttonStyle = parseDsButtonStyle(raw.buttons);
+
+  return { colours, families, type, customFonts, hiddenFonts, radius, pillRadius, buttons: buttonStyle, fields: parseDsFieldStyle(raw.fields), icons };
 }
 
-/** A theme's colour tokens in light or dark, every one of them, so a theme's CSS stands on its own over another's. */
+/**
+ * A theme's colour tokens in light or dark, every one of them, so a theme's CSS stands on its own over another's,
+ * and its buttons' look, which follows their colour.
+ */
 function colourVars(theme: DsThemeConfig, mode: "light" | "dark"): Record<string, string> {
-  return Object.fromEntries(Object.entries(dsColourTokens(theme.colours, mode)).map(([name, value]) => [`--ds-${name}`, value]));
+  const tokens = dsColourTokens(theme.colours, mode);
+  return {
+    ...Object.fromEntries(Object.entries(tokens).map(([name, value]) => [`--ds-${name}`, value])),
+    ...dsButtonStyleVars(theme.buttons, tokens.button),
+    ...dsFieldStyleVars(theme.fields, tokens["field-border"]),
+  };
 }
 
 /** The CSS custom properties a theme sets on :root, in the light theme (tokens.css has the defaults). */
@@ -337,6 +372,8 @@ export function dsThemeVars(theme: DsThemeConfig): Record<string, string> {
   }
   const px = dsRadiusPx(theme.radius);
   for (const token of DS_RADIUS_TOKENS) vars[`--ds-radius-${token}`] = `${px[token]}px`;
+  // Pills: the buttons' corner, or their own.
+  vars["--ds-radius-chip"] = `${dsRadiusPx(theme.pillRadius ?? theme.radius).pill}px`;
   return vars;
 }
 
@@ -378,9 +415,10 @@ const COLOUR_ROLES: [token: string, role: string][] = [
   ["surface-subtle", "surface: cards and panels"],
   ["field", "field: input backgrounds"],
   ["field-border", "field outlines"],
-  ["surface", "secondary buttons and image placeholders"],
+  ["surface", "button: secondary, the quiet buttons and pills, and image placeholders"],
+  ["on-surface", "text on secondary buttons and pills"],
   ["surface-inverse", "toasts and tooltips"],
-  ["button", "button: primary buttons and selected states"],
+  ["button", "button: primary, the solid buttons and selected states"],
   ["on-button", "text on primary buttons"],
   ["highlight", "button colour as an accent (highlight pills, what needs attention)"],
   ["highlight-tint", "accent background"],
@@ -422,6 +460,20 @@ export function dsThemeExport(theme: DsThemeConfig, name = "Parabola theme") {
       "small buttons and pills": round(px.control),
       "smallest (tags, swatches)": round(px.sm),
       buttons: round(px.pill),
+      pills: round(dsRadiusPx(theme.pillRadius ?? theme.radius).pill),
+    },
+    buttons: {
+      fill:
+        theme.buttons.fill === "gradient" && theme.buttons.contrast !== 0
+          ? `a gradient of the button colour, ${theme.buttons.contrast > 0 ? "lighter at the top and darker at the bottom" : "darker at the top and lighter at the bottom"} (contrast ${Math.round(Math.abs(theme.buttons.contrast) * 50)} of 50)`
+          : "solid, the button colour",
+      outline: theme.buttons.outline ? `a ${theme.buttons.outlineWidth}px line inside the edge, the button colour a step darker` : "none",
+      fieldOutline: theme.fields.outline
+        ? `${theme.fields.outlineWidth}px${theme.fields.outlineOpacity < 1 ? `, ${Math.round(theme.fields.outlineOpacity * 100)}% opaque` : ""}`
+        : "none",
+      label: theme.buttons.shadow
+        ? `a 1px text shadow on the label only, falling away from a light at ${theme.buttons.shadowAngle}° (90 is from above)`
+        : "flat",
     },
     settings: theme,
   };

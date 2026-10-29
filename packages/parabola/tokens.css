@@ -29,6 +29,7 @@
   --color-ds-field: var(--ds-field);
   --color-ds-field-border: var(--ds-field-border);
   --color-ds-surface: var(--ds-surface);
+  --color-ds-on-surface: var(--ds-on-surface);
   --color-ds-surface-inverse: var(--ds-surface-inverse);
   --color-ds-button: var(--ds-button);
   --color-ds-on-button: var(--ds-on-button);
@@ -74,6 +75,7 @@
   --radius-ds-md: var(--ds-radius-md);
   --radius-ds-lg: var(--ds-radius-lg);
   --radius-ds-pill: var(--ds-radius-pill);
+  --radius-ds-chip: var(--ds-radius-chip);
 
   /* Parabola type scale (Figma: Folio Dharmify 693:5061), named for the
      element each style is for: text-display, text-h1 … text-h3, text-p, text-prose,
@@ -277,11 +279,21 @@
   --ds-field: #FFFFFF;
   --ds-field-border: #D6D3D1;
   --ds-surface: #E2DFD9;
+  /* The label on it (quiet buttons, light pills): the text, or black or
+     white where the text wouldn't read on a theme's own surface. */
+  --ds-on-surface: #000000;
   --ds-surface-inverse: rgb(48 46 44 / 0.7); /* the dark theme's surface, #302E2C */
   /* Solid buttons and selected states, and what's on them: the text and the
      page by default; a theme's button colour sets its own (colours.ts). */
   --ds-button: var(--ds-fg);
   --ds-on-button: var(--ds-bg);
+  /* The solid buttons' look, all off here: a theme sets a gradient fill, an
+     inset outline and a 3D label's text shadow (button-style.ts). */
+  --ds-button-image: none;
+  --ds-button-ring: none;
+  --ds-button-text-shadow: none;
+  /* Fields' outline thickness: 2px, 0 in a theme that turns it off. */
+  --ds-field-border-width: 2px;
   /* Derived from the palette (not new colours): hover washes, a thin layer
      of the text colour over default buttons and of the page colour over
      inverted (selected) ones, so hover always moves a button away from its
@@ -352,6 +364,8 @@
   --ds-radius-md: 12px;
   --ds-radius-lg: 16px;
   --ds-radius-pill: 9999px;
+  /* Pills (DsPill): the buttons' corner, or a theme's own for them. */
+  --ds-radius-chip: 9999px;
 
   /* Field width: the one width of a field (the DsField, and any input,
      select, date picker, search, textarea or multi-select on its own), so a
@@ -391,6 +405,7 @@
   --ds-field: #121110;
   --ds-field-border: #44403C;
   --ds-surface: #302E2C;
+  --ds-on-surface: #FFFFFF;
   /* Selected buttons invert against the page, as the nav pills always have. */
   --ds-surface-inverse: rgb(255 255 255 / 0.8);
   --ds-error: oklch(0.704 0.191 22.216);

@@ -10,6 +10,18 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-29 — **Taste is Style and Mood.** Alex: "aesthetics and
+  personality". Feel, World and Era are gone ("there's just too much going
+  on"): **Style** is the one rail, one pick (Editorial, Tech, Fashion,
+  Natural, Sci-fi, Luxury, Retro, Sport), choosing a palette, a kind of type
+  and a kind of button. Restrained, Playful and Wacky aren't styles but the
+  **Mood** bar, the personality, Restrained to Wacky; moving it changes the
+  look you can see ("if I go through the slider, I want to see the mood
+  change"): each kind of type has four font pairs along it, buttons get
+  rounder and deeper, the colour more saturated and the button colour
+  livelier, and the voice goes from calm to wild. A style keeps the mood
+  set; the dice draws both. Overrides the tracks, Era rules and blends of
+  the entries below.
 - 2026-10-29 — **Back to Parabola's own is Parabola.** Alex: after
   restoring, the panel still said Custom. Now when the working copy comes
   back to Parabola's own look (a section restored, say), Parabola (default)

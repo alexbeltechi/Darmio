@@ -10,6 +10,20 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-29 — **No Expression; one rail per section; an Era track.**
+  Alex: Expression "doesn't actually make sense", the mood does it better,
+  so the bar and the colour spread it drove (`vivid`) are gone; cards and
+  secondary buttons are Parabola's again. Temperature moved from Taste to
+  Appearance, beside the background it warms. The Feel and World pills no
+  longer repeat inside every section: Typography has one rail, a kind of
+  type (Editorial, Startup, Elegant, Funky, Quirky), Buttons one, a kind of
+  button (Product, Soft, Sharp, Tactile, Chunky); Appearance and Fields
+  have none, their dials say it. Taste opens with its pills, Feel, World
+  and a new **Era** (Retro, Modern, Contemporary, Futuristic), then Mood.
+  Era takes more than one pick, under rules (`DS_TASTE_EXCLUDES`): retro,
+  modern and contemporary rule each other out; futuristic goes with any,
+  and retro with futuristic draws a blend of its own, Retro-futuristic.
+  Overrides "Expression is colour" below.
 - 2026-10-29 — **Expression is colour; platforms keep their own look.**
   Alex: Expression isn't bolder fonts, "it's more around the use of colour
   than shape". So it no longer moves the headlines' weight or the buttons'

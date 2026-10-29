@@ -10,6 +10,26 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-29 — **Three levers define a taste; a slider in the system; the
+  player is variations.** Alex asked for a serious think about the sliders
+  as the foundation of the taste engine, and found Expression doing nothing
+  he could see. The levers are the three things people say about a brand
+  before naming a genre: **Mood** (Serious to Wacky: how formal; roundness
+  and the fonts' character), **Expression** (Quiet to Loud: how much it
+  shouts; contrast, the headlines' weight, Regular to Bold, and the
+  buttons' depth, `dsThemeWithExpression`) and **Temperature** (Cool to
+  Warm: how human or technical; the background's warmth and the greys from
+  it, moved up from Appearance). Each is a lever, not a value of its own;
+  the pills are the vocabulary on top; Appearance keeps only the physical
+  (Brightness, Hue, Contrast). Every bar is one Parabola primitive now,
+  **`DsSlider`** (`primitives/slider.tsx`; `DsColourBar` is it): the title
+  in the text colour with the readout beside it, the end words small and
+  muted under the track, so the two never read alike. **The player** at the
+  top is variations, not retries: back and forward step through variations
+  of the look locked in (the pills picked), the wand between them nudges
+  it a little without a new draw (`dsNudgeTaste`: the levers and the
+  background a step, now and then another font pair), and the dice at the
+  right end, no background, starts over with random pills.
 - 2026-10-29 — **A player at the top, a slimmer Appearance, Instagram's
   type.** Alex: the player should look like Spotify and sit at the very
   top; Appearance should start with brightness; Colour and Depth sliders

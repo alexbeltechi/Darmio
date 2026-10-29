@@ -14,8 +14,9 @@ with the why. To change one, add a new line that overrides it.
   Radius section is Buttons (Alex): a fill, Solid or Gradient, whose
   **contrast** runs -50 to +50 from a flat 0 in the middle (above 0 the
   top lighter, below it darker; the bar drawn in the button colour); an
-  **Outline** (inside the edge, 1 to 4px, a step darker, lighter on a
-  near-black button); a **Text shadow** on the label only, never the
+  **Outline**, off by default (inside the edge, 1px or 2px or a width typed
+  beside them up to 8, and a transparency bar; a step darker than the
+  button, lighter on a near-black one); a **Text shadow** on the label only, never the
   icon, 1px, cast away from a light whose direction a dial sets as in
   Photoshop (90° from above); and **Roundness**, which still rounds every
   corner, with "Same for buttons and pills" ticked by default: the pills
@@ -24,7 +25,10 @@ with the why. To change one, add a new line that overrides it.
   Small is back as a crisp 2px on everything. It's `buttons` and
   `pillRadius` in the theme (`button-style.ts`); only the primary button
   wears the look, each part off until turned on. Destructive buttons stay
-  plain red.
+  plain red. **Fields** have their own section and outline, on by default
+  (2px, the same width, typed and transparency settings; off, a field has
+  no outline but still shows a 2px red one when invalid; `fields`,
+  `--ds-field-border-width`). Icons offer only Lucide, the one that works.
 - 2026-10-29 — **Two button colours.** The colours list has **Button:
   primary** (the solid buttons, selected states, the highlight) and
   **Button: secondary** (the quiet buttons like Learn more, and the pills'

@@ -10,6 +10,22 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-29 — **Tastes choose chips; Mood fine-tunes them; hue and
+  saturation for colour.** Alex: instead of Temperature, hue and
+  saturation, "think of it like editing a photograph": by default a paper
+  hue with no saturation, and raising it goes to a bright orange. They sit
+  in the section now called **Colour**, with colour chips of their own
+  (Classic, Parabola's as it is; Neutral, a startup's; Earthy, Pastel,
+  Vibrant, Sport, Rich, Vintage, Neon), each a background, a button colour
+  and a contrast. The taste pills choose the chips in every section (a
+  palette, a kind of type, a kind of button: the ones most picks name), and
+  the **Mood** bar, Serious to Playful, fine-tunes that combination ("a way
+  of fine-tuning that existing combination of chips"): where in each kind's
+  range it sits. Typography gains Classic, Friendly, Retro and Futurist. A
+  colour's brightness is now as in a photo editor (hue, saturation,
+  brightness: white is no saturation at full brightness), which overrides
+  the "true brightness" of the 2026-10-29 wheel entry for the background
+  dials; themes stored with a temperature keep their tint.
 - 2026-10-29 — **No Expression; one rail per section; an Era track.**
   Alex: Expression "doesn't actually make sense", the mood does it better,
   so the bar and the colour spread it drove (`vivid`) are gone; cards and

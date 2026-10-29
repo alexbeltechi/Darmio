@@ -10,6 +10,20 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-29 — **A player at the top, a slimmer Appearance, Instagram's
+  type.** Alex: the player should look like Spotify and sit at the very
+  top; Appearance should start with brightness; Colour and Depth sliders
+  felt redundant (depth only shows on solid buttons) and roundness is the
+  UI's. So: under the theme picker, **back, retry (the large icon button in
+  the middle) and forward**, then **Shuffle** on or off; no counter.
+  **Appearance** is Brightness, Warmth, Hue, Contrast (a hue dragged onto a
+  white gives it a tint; a pill or Colours sets more colour); **Roundness**
+  moved to Buttons; depth is Expression's, no slider of its own. A story's
+  words are set **as Instagram sets them, line by line**: each line its own
+  tight box following the text (`box-decoration-break: clone`), in the page
+  colour (boxed: Restrained, Editorial, Luxurious, Tech, Sci-fi), with no
+  box and white words (plain: Approachable, Candid, Fashion, Natural), or on
+  the button colour (loud: Bold, Playful, Wacky); `dsTasteStory`.
 - 2026-10-29 — **Taste as the front door, pills in every section.** Alex:
   the default isn't "no pills", it's a mix of them; Mood belongs with the
   pills, as two bars; Restrained isn't a font; the pills should decide each

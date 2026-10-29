@@ -10,6 +10,26 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-29 — **Taste in two groups, a player for takes, the background
+  as dials.** Alex, after trying it: tastes read the way people describe a
+  brand, so they come in two groups with an icon each: **Feel** (how it
+  comes across: Approachable, Restrained, Editorial, Luxurious, Bold,
+  Candid; Restrained is what Minimal was) and **World** (where it belongs:
+  Playful, Wacky, Tech, Sci-fi, Fashion, Natural). Their backgrounds reach
+  mid-tones too (a strong teal, a sage, a burgundy), not only light and
+  dark. Under the pills, like a music player: **Shuffle** is on or off, and
+  back and forward step through takes (forward draws a new one, from one or
+  two random pills with Shuffle on, from the pills picked with it off;
+  back returns; forward again replays before drawing anew), with a counter.
+  **Appearance** has no hex any more (that's Colours' job): the background
+  is dials, **Warmth** first, then **Hue**, **Colour** (none to full) and
+  **Brightness** (dark to light), then Contrast, Roundness, Depth. In the
+  preview, Ilo shows as **her photo** in a friendly look (a taste whose
+  people are photos) and as **ILO initials** on the button colour in a
+  branded one; the story's text is in the theme's main font, in three
+  pieces (a line, a small note, a sticker), set squarely in boxes when
+  branded and loose and tilted when friendly; the X post is laid out as X
+  lays one out (the check, the ⋯, the counts with their icons).
 - 2026-10-29 — **A taste builder, not a theme picker.** Alex wants
   /parabola to build a brand's taste, not only a UI: drag a few dials and
   press a few pills, see the whole look roll out, and let an agent go

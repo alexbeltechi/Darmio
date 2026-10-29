@@ -10,10 +10,12 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
-- 2026-10-29 — **Previous and Next under the mood.** Alex: the variation
-  arrows sit under the Mood slider as Previous (chevron on its left, at the
-  left) and Next (chevron on its right, at the right); the dice stays in
-  Taste's header beside Restore.
+- 2026-10-29 — **Previous, Shuffle, Next under the mood.** Alex: grey
+  buttons in one row under the Mood slider, Previous at the left (chevron on
+  its left), Next at the right (chevron on its right), and between them,
+  filling the space, Shuffle: another version of the style picked (another
+  Elegant). The dice stays in Taste's header beside Restore: fully random,
+  any style and mood.
 - 2026-10-29 — **Styles tuned; variations live in Taste; letters are
   white.** Alex: Minimal's buttons are regular square ones (Text read as
   offset; it stays a chip to pick by hand); square is Minimal's, so Tech is

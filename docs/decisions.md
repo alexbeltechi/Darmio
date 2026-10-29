@@ -10,6 +10,17 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-29 — **Styles tuned; variations live in Taste; letters are
+  white.** Alex: Minimal's buttons are regular square ones (Text read as
+  offset; it stays a chip to pick by hand); square is Minimal's, so Tech is
+  fully round and Classic's other button a product's. Elegant uses no
+  Didone (Bodoni, Playfair, Italiana): EB Garamond, Cormorant, Marcellus,
+  Cinzel Decorative. Each kind of type's playful pair is plainly playful and
+  its wacky one a retro display face (Shrikhand, Alfa Slab One, Righteous,
+  Bagel Fat One). ‹ › and the dice sit in Taste beside its Restore, to cycle
+  through variations of a style. The email's letter is white in Gmail's
+  inks, in the theme's fonts, unless the mood is far up Playful ("only like
+  funky stuff"). The Mood slider has no labels under it.
 - 2026-10-29 — **Mood is a slider again, on a 1px line.** Alex tried the
   + Serious / + Playful buttons and the step dots, then chose the slider:
   the same grab circle as Saturation and Brightness, its track a subtle 1px

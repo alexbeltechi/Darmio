@@ -29,6 +29,13 @@ with the why. To change one, add a new line that overrides it.
   (2px, the same width, typed and transparency settings; off, a field has
   no outline but still shows a 2px red one when invalid; `fields`,
   `--ds-field-border-width`). Icons offer only Lucide, the one that works.
+- 2026-10-29 — **A small field, and the wheel in numbers.** Parabola's
+  field has a small size (`DsInput size="small"`, and a DsField of that
+  size with a small label): the small button's 24px, its corners and
+  `text-small`, for dense rows of numbers and codes (Alex). Under the colour
+  wheel, the chosen colour's Saturation, Hue and Brightness are small
+  labelled fields, left, centre and right as the arcs and ring are, typed
+  in as well as read, and its Hex a small labelled field under them.
 - 2026-10-29 — **Two button colours.** The colours list has **Button:
   primary** (the solid buttons, selected states, the highlight) and
   **Button: secondary** (the quiet buttons like Learn more, and the pills'

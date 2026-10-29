@@ -39,7 +39,9 @@ with the why. To change one, add a new line that overrides it.
   dark, no longer purple; buttons and the accent were separate colours
   for a day, Alex: "buttons ARE tertiary"; a theme's buttons colour becomes
   its button colour when it had no accent), **field** (the fields'
-  background; the base's by default) and **surface** (cards and side
+  background; the base's by default; a field colour of its own brings its
+  own outline, that colour a step toward black, or toward white on a dark
+  field, `--ds-field-border`; Alex, 2026-10-29) and **surface** (cards and side
   panels; a shade of the base by default). Selected states (the current nav
   item, a pressed button, a checked box) are the button colour, solid, as
   Publish is. In the panel the six are points on **one colour wheel**
@@ -51,8 +53,10 @@ with the why. To change one, add a new line that overrides it.
   type included; each sits exactly where its colour is, the base at the
   centre by default, stacked in order (base on top, the chosen one above
   all; Alex, 2026-10-29). Each arc has a faint track under its gradient,
-  so a white end still shows on a white panel. You choose a colour in the list, then click or
-  drag anywhere on the wheel to put it there. There's a point for each of
+  so a white end still shows on a white panel. You choose a colour in the list (or press its
+  point), then drag its point to move it; a click on the wheel itself
+  changes nothing, so a stray click never recolours anything (for a day a
+  click put the chosen colour there; Alex, 2026-10-29). There's a point for each of
   the six and no more. Delete or Backspace deletes the chosen colour (back
   to what it's based on; the base back to Parabola's). Under the wheel the chosen colour's hex and the six as Parabola nav
   items (`DsNavItem`, which now takes a `leading` swatch and `actions`),

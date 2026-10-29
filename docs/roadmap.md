@@ -1,5 +1,5 @@
 ---
-reviewed: 2026-10-28
+reviewed: 2026-10-29
 owner: Alex
 ---
 
@@ -248,6 +248,33 @@ When a task changes an item, update this file in the same change.
   Developed in its own repo, `~/Documents/Code/techistack`, linked into
   `~/.claude/skills/`. Done (v1.0): survived a few real curation batches;
   Alex calls it stable.
+
+## Launch flow
+
+What `positioning.md` asks of the product (decisions, 2026-10-29): launch a
+creator and their offer through five gated stages, Clarity, Interest,
+Conversations, First paid client, Repeat. Phase 1 ships this one flow well:
+interview, offer page, first client. Unscheduled until Alex places them.
+
+- **Onboarding interview** — `shape` (BEL-116)
+  The Dharma method: who you serve, the offer, the price, the proof you
+  have, answered by hand or with AI, saved as brain MD files in the library.
+  Done: a maker finishes it and the library holds who, offer and price.
+- **Offer page** — `shape`
+  One page template with one call to action, built from the interview's
+  answers, with the social posts and emails drawn from the same answers.
+  Done: from a finished interview, a live offer page in 7 days or fewer.
+- **Clients** — `shape`
+  `clients.csv` in the library, one row per person (name, email, source,
+  stage, offer, price, date, notes), edited by hand or by the agent; Stripe
+  as the record of payments, Kit sync optional.
+  Done: a booked call and a payment show up as rows without a spreadsheet
+  open.
+- **Weekly fit summary** — `shape`
+  The agent reads the signals (page analytics, `clients.csv`, Stripe) and
+  writes what works, what to change and whether to move to the next stage.
+  Done: a launch gets one each week, and the agent holds back effort until
+  its gate is passed.
 
 ## Three Darmios
 

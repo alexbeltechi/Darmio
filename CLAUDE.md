@@ -13,6 +13,8 @@ settings live in its database; its keys in its deployment's environment.
 ## Read first
 
 - `docs/vision.md`: what this is, who it's for, principles.
+- `docs/positioning.md`: who it sells to, the launch flow, phases,
+  competitors and prices; it leads where vision disagrees.
 - `docs/roadmap.md`: what to work on, in order, with what done looks like.
 - `docs/decisions.md`: calls already made. Don't reopen them; flag a conflict
   instead.

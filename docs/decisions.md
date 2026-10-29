@@ -53,8 +53,10 @@ with the why. To change one, add a new line that overrides it.
   chosen one stands out (Alex, 2026-10-29); in the list each is a solid dot
   of its colour with a faint see-through edge, so a white one still shows; each sits exactly where its colour is, the base at the
   centre by default, stacked in order (base on top, the chosen one above
-  all; Alex, 2026-10-29). Each arc has a faint track under its gradient,
-  so a white end still shows on a white panel. You choose a colour in the list (or press its
+  all; Alex, 2026-10-29). A tick across the hue ring points to the
+  chosen colour's hue, even for a white or grey one at the centre, and
+  dragging round the ring turns the hue, as on any colour wheel (Alex,
+  2026-10-29). The arcs are their gradient alone, no outline. You choose a colour in the list (or press its
   point), then drag its point to move it; a click on the wheel itself
   changes nothing, so a stray click never recolours anything (for a day a
   click put the chosen colour there; Alex, 2026-10-29). There's a point for each of

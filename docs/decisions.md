@@ -10,6 +10,22 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-29 — **A look never touches the type scale; true brightness;
+  contrast between the buttons; Colours follows the theme.** Alex: the dice
+  barely changed anything yet moved the display size; brightness should run
+  black to white; contrast should be what sets primary and secondary
+  buttons and cards apart; the foundations should show the theme's own
+  colours, without the separate Accent tab. So: **Expression** sets only the
+  headlines' weight and the buttons' depth; sizes stay the type scale's
+  (Taste's restore puts the type scale back). The **dice** reaches past the
+  tastes' own picks half the time (a coloured background, any font pair).
+  **Brightness** on a colour is lightness: 0 black, 50 the colour at its
+  strongest, 100 white (backgrounds read as hue, saturation, lightness).
+  **Contrast** is Appearance's alone and moves the secondary buttons and
+  pills away from the cards (`surface`), the cards and borders from the
+  page, the quiet text toward the strong. **Foundations › Colours** is one
+  page, every token in light and dark worked out live from the open theme;
+  the content accents' page is gone from the showcase (the tokens stay).
 - 2026-10-29 — **Pills first, fine-tuning folded.** Alex: the sliders and
   choices are fine-tuning, not where you start. In Appearance, Typography,
   Buttons and Fields the pills come first and **"Show advanced options"**

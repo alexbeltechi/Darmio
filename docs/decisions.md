@@ -10,6 +10,28 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-29 — **Taste as the front door, pills in every section.** Alex:
+  the default isn't "no pills", it's a mix of them; Mood belongs with the
+  pills, as two bars; Restrained isn't a font; the pills should decide each
+  section's values; Colours is a subset of Appearance. So: **Taste** opens
+  with two bars, **Mood** (Serious to Wacky: warmth, roundness and the
+  fonts) and **Expression** (Toned down to Expressive: contrast and depth,
+  `dsExpressionDials`), tracks in two tastes' colours, then the pills, then
+  the Shuffle player centred. **Parabola's own is Restrained + Editorial**
+  (`DS_DEFAULT_TASTES`), so those show picked to start; Restrained sets no
+  fonts. Every section's **Restore is an icon at its top right**, in place
+  of the ⋮. **Typography, Buttons, Fields and Appearance each have the
+  pills** (`ScopedTastes`, kept as `character.scoped`): in Typography a
+  pill picks a font pair (`dsTasteFonts`), in Buttons a roundness, depth
+  and button colour (`dsTasteButtons`), in Fields an outline
+  (`dsTasteField`, each taste has one), in Appearance a background
+  (`dsTasteBackground`); unpicking the last leaves Parabola's own. **Colours
+  is inside Appearance**, behind "Show colour controls" (Light and Dark,
+  the wheel). The preview's article is "Creating tasteful AI in an
+  AI-infested world", on what to hand to AI and what to keep; a large
+  "Read the essay" button under it, the one big one; the subscribe card
+  says "Keep up with my thoughts. One letter in your inbox a week." with
+  the regular buttons.
 - 2026-10-29 — **Taste in two groups, a player for takes, the background
   as dials.** Alex, after trying it: tastes read the way people describe a
   brand, so they come in two groups with an icon each: **Feel** (how it

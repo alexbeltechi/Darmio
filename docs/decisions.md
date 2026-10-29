@@ -33,7 +33,9 @@ with the why. To change one, add a new line that overrides it.
   primary** (the solid buttons, selected states, the highlight) and
   **Button: secondary** (the quiet buttons like Learn more, and the pills'
   background, `surface`): by default a wash of the primary button colour
-  on the page, or Parabola's stone while the primary is its own. On the
+  on the page, or Parabola's stone while the primary is its own. Its label
+  (`--ds-on-surface`) is light on a dark one and dark on a light one, as
+  the primary button's is. On the
   right of each colour the list says **Auto** (worked out from another)
   or **Custom** (its own), not the hex, and a Custom one has a Restore
   icon beside its ⋮ (Alex).

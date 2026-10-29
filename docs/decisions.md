@@ -1,5 +1,5 @@
 ---
-reviewed: 2026-10-28
+reviewed: 2026-10-29
 owner: Alex
 ---
 
@@ -23,9 +23,10 @@ with the why. To change one, add a new line that overrides it.
 - 2026-10-28 — **Parabola themes, made like shadcn's create page.** A
   theme is data (`packages/parabola/theme.ts`): five colours
   (`colours.ts`), each based on the one before until given its own: the
-  **primary colour** (was "theme colour") (the website's background; Parabola's own is paper, a
-  warm off-white #FAF7EF, its cards a step darker #EFECE4 so they show;
-  it was white, cards a barely-there #FAFAF9, until 2026-10-28; every picker
+  **primary colour** (was "theme colour") (the website's background; Parabola's own is white, its
+  cards a warm off-white #F7F5F2, 4 darker, the same step a picked primary
+  colour's cards take (paper, #FAF7EF, for a day on 2026-10-28; Alex wanted
+  white back, 2026-10-29); every picker
   has a warmth bar, cold to warm, between hue and brightness), the
   **surface** (cards, side panels, fields; based on the primary colour, a
   bar sets how much lighter or darker, so the contrast between page and
@@ -55,7 +56,7 @@ with the why. To change one, add a new line that overrides it.
   it takes a dark colour of its own. A colour based on another (buttons on
   the typography, every one in dark on the light one) shows a brightness
   bar, how much lighter or darker it is than what it's based on, as it is
-  (the paper's cards read −4), and its picker faint underneath; touching
+  (Parabola's cards read −4), and its picker faint underneath; touching
   the picker gives it a colour of its own (Alex, 2026-10-28). Since text and surfaces come from the same two
   colours, text on a card reads as it does on the page; **font families**,
   Font (text) and Heading (headlines) to start and any more you add, each

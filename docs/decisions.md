@@ -48,9 +48,10 @@ with the why. To change one, add a new line that overrides it.
   (`DsColourWheel`; Alex, 2026-10-29, after a grading tool's wheels): a
   point's angle is its hue, its distance from the centre its saturation;
   the arc on the left is the chosen point's saturation, on the right its
-  brightness. Every point is the same size: solid when its
-  colour is its own, an outline while it's based on another, the primary
-  type included; each sits exactly where its colour is, the base at the
+  brightness. Every point is the same size: the chosen one
+  filled with its colour, the others only a black and white ring, so the
+  chosen one stands out (Alex, 2026-10-29); in the list, a colour of its
+  own has a solid dot and one based on another an outline; each sits exactly where its colour is, the base at the
   centre by default, stacked in order (base on top, the chosen one above
   all; Alex, 2026-10-29). Each arc has a faint track under its gradient,
   so a white end still shows on a white panel. You choose a colour in the list (or press its

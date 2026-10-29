@@ -10,6 +10,16 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-29 — **Mood in steps; Classic; no gradients in the styles.**
+  Alex: the Mood bar is two buttons, + Serious and + Playful, at the normal
+  size: each press is a step (an eighth, Balanced in the middle) and every
+  step changes the look inside the style, fonts, buttons, colour and voice.
+  Default and Editorial are one style, **Classic** (Parabola's own first,
+  its balanced fonts Parabola's). A style's own look is the first of each
+  of its lists; › draws from the rest. No style reaches for a gradient
+  ("generally, I disagree"): Chunky is a thick edge now, Tactile the one
+  gradient, picked by hand. Sport is vibrant and athletic, mostly on colour:
+  volt, black, electric blue, blaze orange, a court green, neon on dark.
 - 2026-10-29 — **Styles settled; rails are tabs; Social is one piece.**
   Alex: Fashion's look was "a different type of editorial", so it's
   **Elegant** now and took Luxury in (redundant); Sci-fi looked like Tech

@@ -10,6 +10,32 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-29 — **A character layer above the theme; dials generate,
+  overrides stick, published is frozen.** Alex: picking colours on a wheel
+  makes ugly UIs; the start should be "how bright, how warm", like editing
+  a photograph, and the look should roll out everywhere; an agent should
+  set a look ("hacker-like", a screenshot) by altering characteristics,
+  not hard-coding values, so the result is a set of sliders he can drag.
+  So a theme has three layers. **Character** (`character.ts`): a base
+  colour to start from (Auto: white) and dials, Brightness (dark to
+  bright), Warmth (cold to warm), Contrast (soft to hard), Roundness
+  (sharp to round), Depth (flat to deep), each nudging many values: the
+  base and every colour that follows it, the corners, the buttons' look.
+  **Theme**: the values as before (colours, corners, buttons, fields,
+  fonts), each Auto (worked out from the dials) or Custom (its own); a dial
+  moves the Auto values and leaves the Custom ones, and Restore hands one
+  back to the dials. **Tokens and components**: unchanged, so the rollout is
+  already solved. Two rules make it last: dials generate and overrides stick
+  (a saved theme is dial positions plus overrides, readable whatever the
+  mapping becomes), and published is frozen while the editor is live (a
+  better mapping later moves nothing on a live site until republished). In
+  the panel Character comes first and the colour wheel is folded under
+  Colours, for a colour of its own. The export carries `character` and the
+  list of `overrides`, so an agent reads and sets a look at that level. The
+  mapping from dials to values is the taste, kept in the one file with a
+  line per dial on what it's for, for a later model to improve a rule
+  rather than a number. Not yet: loudness and formality, presets, themed
+  sections, the brand brief (roadmap).
 - 2026-10-29 — **Radius became Buttons.** In /parabola's theme panel the
   Radius section is Buttons (Alex): a fill, Solid or Gradient, whose
   **contrast** runs -50 to +50 from a flat 0 in the middle (above 0 the

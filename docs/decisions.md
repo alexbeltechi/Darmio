@@ -22,46 +22,42 @@ with the why. To change one, add a new line that overrides it.
   Alex, 2026-10-29), and each colour is one
   nested inside Colours; the top bar's Collapse all / Expand all folds or opens them all. The site's own nav is unchanged for now.
 - 2026-10-28 — **Parabola themes, made like shadcn's create page.** A
-  theme is data (`packages/parabola/theme.ts`): five colours
-  (`colours.ts`), each based on the one before until given its own: the
-  **primary colour** (was "theme colour") (the website's background; Parabola's own is white, its
-  cards a warm off-white #F7F5F2, 4 darker, the same step a picked primary
-  colour's cards take (paper, #FAF7EF, for a day on 2026-10-28; Alex wanted
-  white back, 2026-10-29)), the
-  **surface** (cards and side panels; based on the primary colour, a
-  bar sets how much lighter or darker, so the contrast between page and
-  cards is a choice; Alex, 2026-10-28), the **secondary colour** (was
-  "typography")
-  (the text, and the quiet text, borders and shades drawn from it;
-  Parabola's is black or white, whichever reads on the theme colour),
-  the **tertiary colour** (was "accent colour"; the calls to action and
-  what needs attention, the highlight pill; "Based on secondary colour" by
-  default, so Parabola's own is black, white in dark, no longer purple;
-  it's the colour picked after the primary, before the surface; Alex,
-  2026-10-29), which is also the **buttons** (solid buttons and selected
-  states: the current nav item, a pressed button, a checked box, the
-  Published pill, with black or white on them): buttons were a colour of
-  their own for a day; Alex: "buttons ARE tertiary", 2026-10-29, and a
-  theme's buttons colour becomes its tertiary when it had none), and the
-  **quaternary colour** (the fields' background, optional; the page's by
-  default; Alex, 2026-10-29). Selected states (the current nav
-  item, a pressed button, a checked box) are the text colour, solid, as
-  Publish is. In the panel the five are points on **one colour wheel**
+  theme is data (`packages/parabola/theme.ts`): six colours
+  (`colours.ts`), named for what they colour (Alex, 2026-10-29; they were
+  primary, secondary, tertiary, quaternary and surface for a day), each
+  based on another until given its own: **base** (the website's
+  background; Parabola's own is white, its cards a warm off-white
+  #F7F5F2, 4 darker, the same step a picked base's cards take; paper,
+  #FAF7EF, for a day on 2026-10-28, until Alex wanted white back),
+  **type: primary** (the text and the borders drawn from it; black or
+  white, whichever reads on the base, until given its own), **type:
+  secondary** (the quieter text, paragraphs' and meta, and a fainter step
+  drawn from it; the primary type mixed toward the page by default; Alex:
+  "typography needs two colours", 2026-10-29), **button** (solid buttons,
+  selected states and the highlight pill, with black or white on them;
+  the primary type's by default, so Parabola's own is black, white in
+  dark, no longer purple; buttons and the accent were separate colours
+  for a day, Alex: "buttons ARE tertiary"; a theme's buttons colour becomes
+  its button colour when it had no accent), **field** (the fields'
+  background; the base's by default) and **surface** (cards and side
+  panels; a shade of the base by default). Selected states (the current nav
+  item, a pressed button, a checked box) are the button colour, solid, as
+  Publish is. In the panel the six are points on **one colour wheel**
   (`DsColourWheel`; Alex, 2026-10-29, after a grading tool's wheels): a
   point's angle is its hue, its distance from the centre its saturation;
   the arc on the left is the chosen point's saturation, on the right its
   brightness. Every point is the same size: solid when its
-  colour is its own, an outline while it's based on another, the secondary
-  included (black or white, whichever reads on the primary, until given
-  its own); each sits exactly where its colour is, the primary at the
-  centre by default, stacked in order (primary on top, the chosen one above
-  all; Alex, 2026-10-29). You choose a colour in the list, then click or
+  colour is its own, an outline while it's based on another, the primary
+  type included; each sits exactly where its colour is, the base at the
+  centre by default, stacked in order (base on top, the chosen one above
+  all; Alex, 2026-10-29). Each arc has a faint track under its gradient,
+  so a white end still shows on a white panel. You choose a colour in the list, then click or
   drag anywhere on the wheel to put it there. There's a point for each of
-  the five (primary, secondary, tertiary, quaternary, surface) and no more. Delete or Backspace deletes the chosen colour (back
-  to what it's based on; the primary back to Parabola's). Under the wheel the chosen colour's hex and the five as Parabola nav
+  the six and no more. Delete or Backspace deletes the chosen colour (back
+  to what it's based on; the base back to Parabola's). Under the wheel the chosen colour's hex and the six as Parabola nav
   items (`DsNavItem`, which now takes a `leading` swatch and `actions`),
   each with a ⋮: Copy hex, Paste hex (to give two the same colour) and
-  Delete, or Restore for the primary. No swatches or preset lists: for a
+  Delete, or Restore for the base. No swatches or preset lists: for a
   different look you make another theme (Alex, 2026-10-28). Each is picked
   for light; in dark it's based on the light one until given a dark
   colour of its own. **Dark is a dark version, not a flip** (Alex,

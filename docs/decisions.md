@@ -10,6 +10,17 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-29 — **Pills remember; the preview reads as parts.** Alex: going
+  from Approachable to Restrained and back drew a new look when he wanted
+  the one he'd liked. So a pick of pills comes back as it was last seen,
+  tweaks and all; › and the dice are the ways to a new one, and picking
+  another theme forgets them. Light and Dark sit under the theme, not in
+  the wheel. Each preview part has a divider and a title the size of the
+  panel's; the order is Web, Social, Email, App, then Brand. The story
+  stretches to the height of the feed post beside it, which is an outlined
+  card like the X post; the X photo is square, her head in, no edge. Ilo is
+  a Y3K maker (craft, art, sound, writing), so the words tell of Dragonfly,
+  the silver glasses she made at the lake, and App is her project's draft.
 - 2026-10-29 — **A taste has a voice; the preview in parts; back,
   forward, dice.** Alex: tastes are brand rules, so the words have to change
   with them ("the text doesn't change in the tweet; it obviously ought

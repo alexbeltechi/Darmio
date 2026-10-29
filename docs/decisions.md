@@ -10,6 +10,19 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-29 — **Expression is colour; platforms keep their own look.**
+  Alex: Expression isn't bolder fonts, "it's more around the use of colour
+  than shape". So it no longer moves the headlines' weight or the buttons'
+  depth (depth comes with the tastes); it sets how far the button colour
+  spreads (`vivid`): quiet keeps cards, secondary buttons and tints grey,
+  loud washes them, the borders and the quieter text in the brand colour.
+  The X post and the Instagram post sit on the platforms' white with their
+  inks and system font ("you can't do custom branding there, so let's not
+  mislead"); only what Ilo puts in a post carries the theme. A story's
+  words are one small size, low on the photo, and what to tap is words in
+  the other colour, never a button. Email follows Web, right after the
+  subscribe box: the top of her letter, cropped, opening in the taste's
+  voice with what she's been up to.
 - 2026-10-29 — **Pills remember; the preview reads as parts.** Alex: going
   from Approachable to Restrained and back drew a new look when he wanted
   the one he'd liked. So a pick of pills comes back as it was last seen,

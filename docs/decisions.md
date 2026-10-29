@@ -41,23 +41,27 @@ with the why. To change one, add a new line that overrides it.
   so Parabola's own highlight is black, white in dark, no longer purple,
   the admin's included; Alex, 2026-10-28). Selected states (the current nav
   item, a pressed button, a checked box) are the text colour, solid, as
-  Publish is. In the panel each is just
-  a colour picker (a short shade square, a hue bar and a brightness bar,
-  the same bar, each with its name and value above it, hue in degrees and
-  the rest out of 100, so a colour can be noted and made again; then the hex) sitting on the colour it is now, Parabola's
-  own until it's moved, and faint while it's based on another (ticked; Theme colour and Typography, with no tick in light, are always clear): no swatches or preset lists, for a different look
-  you make another theme (Alex, 2026-10-28). Each is picked for light; in
-  dark, "Based on light theme" (on by default) keeps it the light one's
-  counterpart: for the page and cards the same hue at the other end of
-  light; text, buttons and the accent keep their hue and richness and move
-  only as far as they need to read on the dark page (a red stays a red, a
-  navy a blue; Alex, 2026-10-28), so light and dark
-  always contrast (Alex: "every colour should have an anti-colour"); off,
-  it takes a dark colour of its own. A colour based on another (buttons on
-  the typography, every one in dark on the light one) shows a brightness
-  bar, how much lighter or darker it is than what it's based on, as it is
-  (Parabola's cards read −4), and its picker faint underneath; touching
-  the picker gives it a colour of its own (Alex, 2026-10-28). Since text and surfaces come from the same two
+  Publish is. In the panel the five are points on **one colour wheel**
+  (`DsColourWheel`; Alex, 2026-10-29, after a grading tool's wheels): a
+  point's angle is its hue, its distance from the centre its saturation;
+  the arc on the left is the chosen point's saturation, on the right its
+  brightness. A colour of its own is a solid dot, one still based on
+  another a faint one; drag any point to make it yours. Hovering the disc
+  shows a plus: a click there gives the next based colour its own, where
+  you clicked, so the more you add, the more of the theme you set. Under
+  the wheel the chosen colour's hex and the five in a list, each with a
+  way back to what it's based on. No swatches or preset lists: for a
+  different look you make another theme (Alex, 2026-10-28). Each is picked
+  for light; in dark it's based on the light one until given a dark
+  colour of its own. **Dark is a dark version, not a flip** (Alex,
+  2026-10-29): the page and cards keep their hue and colour and are about
+  90% dark (the page at most 8% bright, cards a step above), however light
+  or dark the light theme is, and a light page darker than that stays as
+  it is; paper becomes a warm charcoal. Text, buttons and the accent keep
+  their hue and richness and move only as far as they need to read on the
+  dark page (a red stays a red, a navy a blue; Alex, 2026-10-28). Until
+  2026-10-29 each colour was its own picker with a brightness bar, and a
+  light colour's dark one was its opposite (a dark page went pale). Since text and surfaces come from the same two
   colours, text on a card reads as it does on the page; **font families**,
   Font (text) and Heading (headlines) to start and any more you add, each
   a name and a font; the fonts it can use, Parabola's (Instrument Sans,

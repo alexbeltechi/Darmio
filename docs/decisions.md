@@ -18,46 +18,67 @@ with the why. To change one, add a new line that overrides it.
   read as places to type on a card; info cards take the default button's
   see-through surface, so they show on a card as well (Alex). The panel's
   sections are a Parabola accordion (`DsAccordion`, Layout › Accordion,
-  32px headers, what's under each set in 16px), and each colour is one
+  32px headers, what's under each lined up with its title, no indent;
+  Alex, 2026-10-29), and each colour is one
   nested inside Colours; the top bar's Collapse all / Expand all folds or opens them all. The site's own nav is unchanged for now.
 - 2026-10-28 — **Parabola themes, made like shadcn's create page.** A
-  theme is data (`packages/parabola/theme.ts`): five colours
-  (`colours.ts`), each based on the one before until given its own: the
-  **primary colour** (was "theme colour") (the website's background; Parabola's own is white, its
-  cards a warm off-white #F7F5F2, 4 darker, the same step a picked primary
-  colour's cards take (paper, #FAF7EF, for a day on 2026-10-28; Alex wanted
-  white back, 2026-10-29); every picker
-  has a warmth bar, cold to warm, between hue and brightness), the
-  **surface** (cards, side panels, fields; based on the primary colour, a
-  bar sets how much lighter or darker, so the contrast between page and
-  cards is a choice; Alex, 2026-10-28), the **secondary colour** (was
-  "typography")
-  (the text, and the quiet text, borders and shades drawn from it;
-  Parabola's is black or white, whichever reads on the theme colour),
-  **buttons** (solid buttons and selected states: the current nav item, a
-  pressed button, a checked box, the Published pill, with black or white
-  on them; "Based on secondary colour" by default; Alex, 2026-10-28) and
-  the **accent colour** (the one highlight; "Based on buttons" by default,
-  so Parabola's own highlight is black, white in dark, no longer purple,
-  the admin's included; Alex, 2026-10-28). Selected states (the current nav
-  item, a pressed button, a checked box) are the text colour, solid, as
-  Publish is. In the panel each is just
-  a colour picker (a short shade square, a hue bar and a brightness bar,
-  the same bar, each with its name and value above it, hue in degrees and
-  the rest out of 100, so a colour can be noted and made again; then the hex) sitting on the colour it is now, Parabola's
-  own until it's moved, and faint while it's based on another (ticked; Theme colour and Typography, with no tick in light, are always clear): no swatches or preset lists, for a different look
-  you make another theme (Alex, 2026-10-28). Each is picked for light; in
-  dark, "Based on light theme" (on by default) keeps it the light one's
-  counterpart: for the page and cards the same hue at the other end of
-  light; text, buttons and the accent keep their hue and richness and move
+  theme is data (`packages/parabola/theme.ts`): six colours
+  (`colours.ts`), named for what they colour (Alex, 2026-10-29; they were
+  primary, secondary, tertiary, quaternary and surface for a day), each
+  based on another until given its own: **base** (the website's
+  background; Parabola's own is white, its cards a warm off-white
+  #F7F5F2, 4 darker, the same step a picked base's cards take; paper,
+  #FAF7EF, for a day on 2026-10-28, until Alex wanted white back),
+  **type: primary** (the text and the borders drawn from it; black or
+  white, whichever reads on the base, until given its own), **type:
+  secondary** (the quieter text, paragraphs' and meta, and a fainter step
+  drawn from it; the primary type mixed toward the page by default; Alex:
+  "typography needs two colours", 2026-10-29), **button** (solid buttons,
+  selected states and the highlight pill, with black or white on them;
+  the primary type's by default, so Parabola's own is black, white in
+  dark, no longer purple; buttons and the accent were separate colours
+  for a day, Alex: "buttons ARE tertiary"; a theme's buttons colour becomes
+  its button colour when it had no accent), **field** (the fields'
+  background; the base's by default; a field colour of its own brings its
+  own outline, that colour a step toward black, or toward white on a dark
+  field, `--ds-field-border`; Alex, 2026-10-29) and **surface** (cards and side
+  panels; a shade of the base by default). Selected states (the current nav
+  item, a pressed button, a checked box) are the button colour, solid, as
+  Publish is. In the panel the six are points on **one colour wheel**
+  (`DsColourWheel`; Alex, 2026-10-29, after a grading tool's wheels): a
+  point's angle is its hue, its distance from the centre its saturation;
+  the arc on the left is the chosen point's saturation, on the right its
+  brightness. Every point is the same size: the chosen one
+  filled with its colour, the others only a thin black ring, so the
+  chosen one stands out (Alex, 2026-10-29); in the list each is a solid dot
+  of its colour with a faint see-through edge, so a white one still shows; each sits exactly where its colour is, the base at the
+  centre by default, stacked in order (base on top, the chosen one above
+  all; Alex, 2026-10-29). A tick across the hue ring points to the
+  chosen colour's hue, even for a white or grey one at the centre, and
+  dragging round the ring turns the hue, as on any colour wheel (Alex,
+  2026-10-29). The arcs are their gradient alone, no outline. You choose a colour in the list (or press its
+  point), then drag its point to move it; a click on the wheel itself
+  changes nothing, so a stray click never recolours anything (for a day a
+  click put the chosen colour there; Alex, 2026-10-29). There's a point for each of
+  the six and no more. Delete or Backspace restores the chosen colour (back
+  to what it's based on; the base back to Parabola's). Under the wheel the chosen colour's hex and the six as Parabola nav
+  items (`DsNavItem`, which now takes a `leading` swatch and `actions`),
+  each with a ⋮: Copy hex, Paste hex (to give two the same colour) and
+  Restore (back to what it's based on; the base to Parabola's). No swatches or preset lists: for a
+  different look you make another theme (Alex, 2026-10-28). Each is picked
+  for light; in dark it's based on the light one until given a dark
+  colour of its own. **Dark is a dark version, not a flip** (Alex,
+  2026-10-29): the page and cards keep their hue, with a little more
+  colour than in light so it shows, and are about 87% dark (the page at
+  most 13% bright, cards a step above; 8% was too dark, the colour lost),
+  however light or dark the light theme is, and a light page darker than
+  that stays as it is; paper becomes a warm charcoal, a pale green a dark
+  green. Text, buttons and the accent keep their hue and richness and move
   only as far as they need to read on the dark page (a red stays a red, a
-  navy a blue; Alex, 2026-10-28), so light and dark
-  always contrast (Alex: "every colour should have an anti-colour"); off,
-  it takes a dark colour of its own. A colour based on another (buttons on
-  the typography, every one in dark on the light one) shows a brightness
-  bar, how much lighter or darker it is than what it's based on, as it is
-  (Parabola's cards read −4), and its picker faint underneath; touching
-  the picker gives it a colour of its own (Alex, 2026-10-28). Since text and surfaces come from the same two
+  navy a blue; Alex, 2026-10-28): text to 7:1, so its quieter steps (also
+  a little closer to it in dark) still read, the accent to 4.5:1. Until
+  2026-10-29 each colour was its own picker with a brightness bar, and a
+  light colour's dark one was its opposite (a dark page went pale). Since text and surfaces come from the same two
   colours, text on a card reads as it does on the page; **font families**,
   Font (text) and Heading (headlines) to start and any more you add, each
   a name and a font; the fonts it can use, Parabola's (Instrument Sans,

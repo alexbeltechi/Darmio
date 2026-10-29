@@ -1,11 +1,12 @@
 "use client";
 
 import * as React from "react";
-import { ChevronRight, Copy, Moon, MoreVertical, Pencil, Plus, RotateCcw, Sun, Trash2 } from "lucide-react";
+import { ChevronRight, ClipboardPaste, Copy, Moon, MoreVertical, Pencil, Plus, RotateCcw, Sun, Trash2 } from "lucide-react";
 import { DsAccordion } from "../primitives/accordion";
 import { DsButton } from "../primitives/button";
 import { DsConfirmDialog, DsDialog, DsDialogActions } from "../primitives/dialog";
-import { DsDropdown, DsDropdownContent, DsDropdownItem, DsDropdownTrigger } from "../primitives/dropdown";
+import { DsDropdown, DsDropdownContent, DsDropdownItem, DsDropdownSeparator, DsDropdownTrigger } from "../primitives/dropdown";
+import { DsNavItem } from "../primitives/nav-item";
 import { DsField, DsInput, DsTextarea } from "../primitives/field";
 import { DsPill } from "../primitives/pill";
 import { DsSelect } from "../primitives/select";
@@ -14,10 +15,8 @@ import { DsThemeToggle } from "../primitives/theme-toggle";
 import { DsInfoCard } from "../components/info-card";
 import { DsLinkList } from "../components/link-list";
 import { dsFontOptions } from "../components/font-pairing";
-import { DS_DEFAULT_COLOURS, DS_ICON_LIBRARIES, DS_SHIFT_MAX, dsColourShown, dsHexToHsl, dsShift, type DsColourKind, type DsThemeColour, type DsThemeColours } from "../colours";
-import { DsCheckbox } from "../primitives/checkbox";
-import { DsColourBar, DsColourPicker } from "../components/colour-picker";
-import { cn } from "../cn";
+import { DS_DEFAULT_COLOURS, DS_ICON_LIBRARIES, dsColourShown, dsNormalizeHex, type DsColourKind, type DsThemeColour, type DsThemeColours } from "../colours";
+import { DsColourWheel } from "../components/colour-wheel";
 import { DS_DEFAULT_RADIUS, DS_RADII, DS_RADIUS_MAX, dsRadiusPx, type DsRadius } from "../radius";
 import {
   DS_BODY_FAMILY,
@@ -31,74 +30,143 @@ import {
 } from "../theme";
 import { InPanel, InPanelFooter, PanelSection, RESTORE, useThemeEditor } from "./theme-editor";
 
+/** The theme's colours on the wheel, in the order they're picked, named for what they colour (Alex, 2026-10-29). */
+const WHEEL: { kind: DsColourKind; label: string }[] = [
+  { kind: "theme", label: "Base" },
+  { kind: "text", label: "Type: primary" },
+  { kind: "muted", label: "Type: secondary" },
+  { kind: "accent", label: "Button" },
+  { kind: "field", label: "Field" },
+  { kind: "surface", label: "Surface" },
+];
+
 /**
- * One of the theme's five colours in the panel, for the light or the dark
- * theme (whichever the page is in): its name, then the colour picker sitting
- * on the colour it is now (Parabola's own until you move it). A colour based
- * on another (the surface on the theme colour, buttons on the typography,
- * the accent on the buttons, until given their own; in dark,
- * each on the light one, by default) shows only that tick and a brightness
- * bar, to make it lighter or darker than what it's based on; untick it and
- * the picker comes back, starting from the colour it was.
+ * The theme's six colours on one wheel, for the light or the dark theme
+ * (whichever the preview is in): each a point of one size, the chosen one
+ * filled with its colour, the others a thin ring. Each is based on another
+ * until given its own (the primary type, the field and the surface on the
+ * base; the secondary type and the button on the primary type; in dark,
+ * each on the light one). Pick one in the list under the wheel (or press
+ * its point), then drag its point to move it; clicking the wheel itself
+ * changes nothing. The list: the six as nav items, each a solid dot of its
+ * colour, its hex or what it's based on, and a ⋮ to copy or paste its hex
+ * (to give two the same colour) and restore it (back to what it's based
+ * on; the base to Parabola's). Delete or Backspace on the chosen point
+ * does the same.
  */
-function ColourChoice({
-  kind,
-  label,
+function ColourWheelChoice({
   colours,
   mode,
   onChange,
 }: {
-  kind: DsColourKind;
-  label: string;
   colours: DsThemeColours;
   mode: "light" | "dark";
   onChange: (colours: DsThemeColours) => void;
 }) {
-  const colour = colours[kind];
-  const set = (next: Partial<DsThemeColour>) => onChange({ ...colours, [kind]: { ...colour, ...next } });
-  const shown = dsColourShown(colours, kind, mode);
   const pick = mode === "light" ? "light" : "dark";
   const shiftKey = mode === "light" ? "lightShift" : "darkShift";
-  const basedOn = mode === "dark" ? "light theme" : LIGHT_BASIS[kind];
-  const based = basedOn !== null && colour[pick] === null;
-  // What it's based on, for the bar's middle, and how much lighter or darker it is than that.
-  const unshifted = dsColourShown({ ...colours, [kind]: { ...colour, [shiftKey]: 0 } }, kind, mode);
-  const at = (amount: number) => dsShift(unshifted, amount);
-  const diff = Math.round((dsHexToHsl(shown)[2] - dsHexToHsl(unshifted)[2]) * 100);
+  const [selected, setSelected] = React.useState<DsColourKind>("theme");
+  const set = (kind: DsColourKind, next: Partial<DsThemeColour>) => onChange({ ...colours, [kind]: { ...colours[kind], ...next } });
+  const basis = (kind: DsColourKind) => (mode === "dark" ? "light theme" : LIGHT_BASIS[kind]);
+  const own = (kind: DsColourKind) => colours[kind][pick] !== null;
+  const based = (kind: DsColourKind) => !own(kind) && basis(kind) !== null;
+  const shown = (kind: DsColourKind) => dsColourShown(colours, kind, mode);
+  const label = (kind: DsColourKind) => WHEEL.find((w) => w.kind === kind)?.label ?? kind;
+  const remove = (kind: DsColourKind) => {
+    if (!own(kind)) return;
+    const before = colours;
+    set(kind, { [pick]: null, [shiftKey]: undefined });
+    dsToast(`${label(kind)} restored`, {
+      action: { label: "Undo", onClick: () => onChange(before) },
+    });
+  };
+  const chosen = WHEEL.find((w) => w.kind === selected) ?? WHEEL[0];
+  const [text, setText] = React.useState("");
+  const [editing, setEditing] = React.useState(false);
   return (
-    <DsAccordion title={label} inset contentClassName="gap-ds-8">
-      {basedOn && (
-        <label className="inline-flex items-center gap-ds-8 self-start">
-          <DsCheckbox
-            checked={based}
-            // Off, the picker starts from the colour it was, shift and all.
-            onCheckedChange={(on) => set(on ? { [pick]: null } : { [pick]: shown, [shiftKey]: 0 })}
-          />
-          <span className="text-p text-ds-fg">Based on {basedOn}</span>
-        </label>
-      )}
-      {/* Faint while it's based on another (ticked); the bar shifts it, touching the picker makes it yours.
-          Theme colour and Typography have no tick in light, so they're always clear. */}
-      <div className={cn("flex flex-col gap-ds-8", based && "opacity-30 transition-opacity hover:opacity-60")}>
-        {based && (
-          <DsColourBar
-            label={`${label} brightness`}
-            title="Brightness"
-            // Lighter (+) or darker (−) than what it's based on, out of 100: what it is, not just what was moved.
-            readout={diff === 0 ? "0" : `${diff > 0 ? "+" : "−"}${Math.abs(diff)}`}
-            value={Math.min(1, Math.max(0, (diff / 100 + DS_SHIFT_MAX) / (2 * DS_SHIFT_MAX)))}
-            onChange={(x) => {
-              const amount = Math.round((x * 2 - 1) * DS_SHIFT_MAX * 100) / 100;
-              set({ [shiftKey]: amount });
-            }}
-            valueText={diff === 0 ? "As it is" : `${Math.abs(diff)}% ${diff < 0 ? "darker" : "lighter"}`}
-            track={`linear-gradient(to right, ${[-1, -0.5, 0, 0.5, 1].map((t) => at(t * DS_SHIFT_MAX)).join(", ")})`}
-            thumb={shown}
-          />
-        )}
-          <DsColourPicker aria-label={label} value={shown} onChange={(hex) => set({ [pick]: hex })} />
+    <div className="flex flex-col gap-ds-16">
+      <DsColourWheel
+        points={WHEEL.map((w) => ({
+          id: w.kind,
+          label: w.label,
+          colour: shown(w.kind),
+          based: based(w.kind),
+          // The base, fields and cards keep their brightness; type and the button come out as a colour, not black.
+          floor: w.kind === "text" || w.kind === "muted" ? 0.45 : w.kind === "accent" ? 0.7 : 0,
+        }))}
+        selected={selected}
+        onSelect={(id) => setSelected(id as DsColourKind)}
+        onChange={(id, hex) => set(id as DsColourKind, { [pick]: hex })}
+        onRemove={(id) => remove(id as DsColourKind)}
+      />
+      <DsInput
+        aria-label={`${chosen.label} hex`}
+        className="w-full font-mono"
+        value={editing ? text : shown(chosen.kind)}
+        onFocus={() => {
+          setText(shown(chosen.kind));
+          setEditing(true);
+        }}
+        onBlur={() => setEditing(false)}
+        onChange={(e) => {
+          setText(e.target.value);
+          const hex = dsNormalizeHex(e.target.value);
+          if (hex) set(chosen.kind, { [pick]: hex });
+        }}
+      />
+      <div className="flex flex-col gap-ds-4">
+        {WHEEL.map((w) => (
+          <DsNavItem
+            key={w.kind}
+            selected={selected === w.kind}
+            onClick={() => setSelected(w.kind)}
+            leading={
+              // The colour as it is, solid, with a faint see-through edge so a white or pale one still shows.
+              <span
+                aria-hidden
+                className="size-4 shrink-0 rounded-full shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--ds-fg)_18%,transparent)]"
+                style={{ backgroundColor: shown(w.kind) }}
+              />
+            }
+            meta={own(w.kind) || !basis(w.kind) ? shown(w.kind) : `Based on ${basis(w.kind)}`}
+            actions={
+              <DsDropdown>
+                <DsDropdownTrigger asChild>
+                  <DsButton size="small" variant="text" iconLeft={MoreVertical} aria-label={`More for ${w.label}`} />
+                </DsDropdownTrigger>
+                <DsDropdownContent align="end">
+                  <DsDropdownItem
+                    iconLeft={Copy}
+                    onSelect={() => navigator.clipboard.writeText(shown(w.kind)).then(() => dsToast.success(`${shown(w.kind)} copied`))}
+                  >
+                    Copy hex
+                  </DsDropdownItem>
+                  <DsDropdownItem
+                    iconLeft={ClipboardPaste}
+                    onSelect={() =>
+                      navigator.clipboard.readText().then((value) => {
+                        const hex = dsNormalizeHex(value);
+                        if (hex) set(w.kind, { [pick]: hex });
+                        else dsToast.error("No hex to paste");
+                      })
+                    }
+                  >
+                    Paste hex
+                  </DsDropdownItem>
+                  <DsDropdownSeparator />
+                  {/* Back to what it's based on (the base back to Parabola's); there's nothing to restore while it is. */}
+                  <DsDropdownItem iconLeft={RotateCcw} disabled={!own(w.kind)} onSelect={() => remove(w.kind)}>
+                    Restore
+                  </DsDropdownItem>
+                </DsDropdownContent>
+              </DsDropdown>
+            }
+          >
+            {w.label}
+          </DsNavItem>
+        ))}
       </div>
-    </DsAccordion>
+    </div>
   );
 }
 
@@ -208,10 +276,12 @@ function ThemeCode({ theme, name, setTheme }: { theme: DsThemeConfig; name: stri
 /** What each colour is based on in the light theme until it's given its own (colours.ts); null: Parabola's own. */
 const LIGHT_BASIS: Record<DsColourKind, string | null> = {
   theme: null,
-  surface: "primary colour",
-  text: null,
-  button: "secondary colour",
-  accent: "buttons",
+  // Black or white, whichever reads on the base, until it's given its own.
+  text: "base",
+  muted: "type: primary",
+  accent: "type: primary",
+  field: "base",
+  surface: "base",
 };
 
 /**
@@ -476,41 +546,7 @@ export function ThemeSection() {
               Dark
             </DsButton>
           </div>
-          <ColourChoice
-            kind="theme"
-            label="Primary colour"
-            colours={theme.colours}
-            mode={mode}
-            onChange={(colours) => setTheme({ ...theme, colours })}
-          />
-          <ColourChoice
-            kind="surface"
-            label="Surface"
-            colours={theme.colours}
-            mode={mode}
-            onChange={(colours) => setTheme({ ...theme, colours })}
-          />
-          <ColourChoice
-            kind="text"
-            label="Secondary colour"
-            colours={theme.colours}
-            mode={mode}
-            onChange={(colours) => setTheme({ ...theme, colours })}
-          />
-          <ColourChoice
-            kind="button"
-            label="Buttons"
-            colours={theme.colours}
-            mode={mode}
-            onChange={(colours) => setTheme({ ...theme, colours })}
-          />
-          <ColourChoice
-            kind="accent"
-            label="Accent colour"
-            colours={theme.colours}
-            mode={mode}
-            onChange={(colours) => setTheme({ ...theme, colours })}
-          />
+          <ColourWheelChoice colours={theme.colours} mode={mode} onChange={(colours) => setTheme({ ...theme, colours })} />
         </PanelSection>
 
         <PanelSection

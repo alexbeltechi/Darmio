@@ -1,28 +1,32 @@
 /**
- * The five colours a theme picks (theme.ts; decisions, 2026-10-28), each
- * based on the one before it until it's given its own:
+ * The six colours a theme picks (theme.ts; decisions, 2026-10-28, renamed
+ * 2026-10-29), each based on another until it's given its own:
  *
- * - the **theme colour**: the website's background, Parabola's white (and
+ * - **base** (`theme`): the website's background, Parabola's white (and
  *   charcoal in dark) by default; any colour, a bright yellow included.
- * - the **surface**: cards, side panels and fields. By default a shade of
- *   the theme colour, made lighter or darker for more or less contrast.
- * - **typography**: the text, and the quiet text and borders drawn from it.
- *   Parabola's own is black or white, whichever reads on the theme colour,
- *   with Stone's warm greys on the default page (tokens.css;
+ * - **type: primary** (`text`): the text, and the borders drawn from it.
+ *   Parabola's own is black or white, whichever reads on the base, with
+ *   Stone's warm greys on the default page (tokens.css;
  *   `npm run check:parabola` checks).
- * - **buttons**: the solid buttons (Publish) and selected states (the
- *   current nav item, a pressed button, a checked box, the dark pill), with
- *   black or white on them, whichever reads. By default the typography's.
- * - the **accent colour**: the one highlight, for the few things that need
- *   attention (a highlight pill), and its tint. By default the buttons'.
+ * - **type: secondary** (`muted`): the quieter text (`fg-muted`, and
+ *   `fg-subtle` a step fainter). By default the primary type mixed toward
+ *   the page.
+ * - **button** (`accent`): the calls to action and what needs attention:
+ *   the solid buttons (Publish) and selected states (the current nav item,
+ *   a pressed button, a checked box, the dark pill), with black or white on
+ *   them, whichever reads, and the highlight pill and its tint. By default
+ *   the primary type's.
+ * - **field** (`field`): the fields' background. By default the base.
+ * - **surface** (`surface`): cards and side panels. By default a shade of
+ *   the base.
  *
  * Each is picked for the light theme (or left as Parabola's, or as what
  * it's based on, a little lighter or darker). In the dark theme each is, by
- * default, based on the light one: its counterpart (`dsCounterpart`), the
- * same hue at the other end of light, so the two always contrast; or a
- * colour picked for dark on its own. Older themes' presets (a base colour,
- * an accent) still work. Pure data and functions, so the server and the
- * browser share them.
+ * default, based on the light one: a page, card or field the same hue,
+ * dark (`dsCounterpart`), text and buttons moved just far enough to read on
+ * it (`dsInkCounterpart`); or a colour picked for dark on its own. Older
+ * themes' presets (a base colour, an accent) still work. Pure data and
+ * functions, so the server and the browser share them.
  */
 
 /** The base colour's tokens, by theme. Black and white text and the page stay as they are. */
@@ -200,8 +204,8 @@ export type DsThemeColour = {
   light: string | null;
   dark: string | null;
   /**
-   * While it's based on something (buttons on the typography; in dark, the
-   * light one), how much lighter (above 0) or darker it is, as lightness:
+   * While it's based on something (the surface on the primary colour; in
+   * dark, the light one), how much lighter (above 0) or darker it is, as lightness:
    * -0.1 is 10% darker. Per theme, light and dark.
    */
   lightShift?: number;
@@ -210,15 +214,16 @@ export type DsThemeColour = {
 
 /** How far a shift goes either way. */
 export const DS_SHIFT_MAX = 0.5;
-export type DsColourKind = "theme" | "surface" | "text" | "button" | "accent";
+export type DsColourKind = "theme" | "text" | "muted" | "accent" | "field" | "surface";
 export type DsThemeColours = Record<DsColourKind, DsThemeColour>;
 
 export const DS_DEFAULT_COLOURS: DsThemeColours = {
   theme: { light: null, dark: null },
   surface: { light: null, dark: null },
   text: { light: null, dark: null },
-  button: { light: null, dark: null },
+  muted: { light: null, dark: null },
   accent: { light: null, dark: null },
+  field: { light: null, dark: null },
 };
 
 export const dsBaseColour = (id: string) => DS_BASE_COLOURS.find((c) => c.id === id) ?? DS_BASE_COLOURS[0];
@@ -381,26 +386,30 @@ function fromHsl(h: number, s: number, l: number): string {
   return toHex([(r + m) * 255, (g + m) * 255, (b + m) * 255]);
 }
 
+/** How bright a page's dark version is at most: about 87% dark, dark enough to read as dark, light enough that its colour shows (Alex, 2026-10-29). */
+const DARK_PAGE = 0.13;
+/** A card's dark version is a step brighter than the page's, so cards still show. */
+const DARK_CARD = 0.165;
+
 /**
- * A colour's counterpart for the other theme: the same hue at the other end
- * of light, so whatever contrasted with it still does. A dark colour gets a
- * pale one (88–97%). A light colour gets a deep one, biased dark: its
- * lightness falls from 24% (a mid colour) to 6% (white) along a curve that
- * drops fastest near the middle, and it's then darkened further until it
- * looks dark (luminance under 4%), so a mid yellow or green, which look
- * brighter than their lightness, still sinks. Saturation is softened a
- * little so a bright pick doesn't glow in the dark.
+ * A page's or a card's version for the dark theme: the same hue and as
+ * colourful as it reads, dark. Not a flip: however light or dark the light theme's page
+ * is, the dark one is about 87% dark (brightness `most`, 13% for a page), and
+ * a light page that's already darker than that stays as it is. Paper stays
+ * nearly neutral, a strong colour stays a colour; a yellow or a green, which
+ * look brighter than they are, are taken down until they look as dark. Text,
+ * buttons and the accent go the other way, to read on it (`dsInkCounterpart`).
  */
-export function dsCounterpart(hex: string): string {
-  const [h, s, l] = toHsl(hex);
-  if (l < 0.5) return fromHsl(h, s * 0.75, Math.min(0.97, Math.max(0.88, 1 - l)));
-  // 0 at a mid colour, 1 at white; the square root makes the first steps from the middle count most.
-  const away = Math.sqrt(Math.min(1, (l - 0.5) / 0.5));
-  let lightness = 0.24 - 0.18 * away;
-  let out = fromHsl(h, s * 0.75, lightness);
-  while (dsLuminance(out) > 0.04 && lightness > 0.04) {
-    lightness -= 0.01;
-    out = fromHsl(h, s * 0.75, lightness);
+export function dsCounterpart(hex: string, most = DARK_PAGE): string {
+  const { h, s: own, v } = dsHexToHsv(hex);
+  // Dark, a hue needs more colour to show: paper's faint warmth becomes a warm charcoal, a pale green a green.
+  const s = Math.min(0.92, Math.sqrt(own) * 1.35);
+  const look = dsLuminance(dsHsvToHex(h, 0, most));
+  let value = Math.min(v, most);
+  let out = dsHsvToHex(h, s, value);
+  while (dsLuminance(out) > look * 1.8 && value > 0.02) {
+    value -= 0.005;
+    out = dsHsvToHex(h, s, value);
   }
   return out;
 }
@@ -408,8 +417,8 @@ export function dsCounterpart(hex: string): string {
 /**
  * Text, a button or the accent in the other theme: the same hue, as rich,
  * moved from its own lightness only as far as it needs to read on `page`
- * (`contrast`: 4.5:1 for text and the accent; 2:1 for a button's fill, whose
- * label is black or white on it, so it can stay closer to itself), so a
+ * (`contrast`: 7:1 for text, so its quieter steps still read; 4.5:1 for
+ * the accent, the default), so a
  * red stays a red, a navy a blue, instead of going to near white the way a
  * page's counterpart does (`dsCounterpart`, for pages and cards).
  */
@@ -462,7 +471,8 @@ export function dsColourTokens(colours: DsThemeColours, mode: "light" | "dark"):
     colours.text,
     mode,
     () => (dsLuminance(page ?? tokens.bg) > 0.18 ? BLACK : WHITE),
-    (hex) => dsInkCounterpart(hex, page ?? tokens.bg)
+    // Text in dark reads well clear of the page (7:1), so its quieter steps, mixed toward the page, still read.
+    (hex) => dsInkCounterpart(hex, page ?? tokens.bg, 7)
   );
   if (page || text) {
     const bg = page ?? tokens.bg;
@@ -475,8 +485,9 @@ export function dsColourTokens(colours: DsThemeColours, mode: "light" | "dark"):
     Object.assign(tokens, {
       bg,
       fg,
-      "fg-muted": dsMix(fg, bg, 0.7),
-      "fg-subtle": dsMix(fg, bg, 0.52),
+      // The quieter text: in dark a little closer to the strong text, where it reads fainter (Alex, 2026-10-29).
+      "fg-muted": dsMix(fg, bg, mode === "dark" ? 0.8 : 0.7),
+      "fg-subtle": dsMix(fg, bg, mode === "dark" ? 0.64 : 0.52),
       border: dsMix(fg, bg, 0.12),
       "surface-subtle": card,
       // Fields are the page itself, solid: a place to type that shows on a card.
@@ -486,38 +497,60 @@ export function dsColourTokens(colours: DsThemeColours, mode: "light" | "dark"):
       "surface-inverse": fg,
     });
   }
+  // Type: secondary, the quieter text: its own colour (in dark, moved to read on the page), a fainter step drawn
+  // from it; or the primary type mixed toward the page.
+  const muted = hexIn(colours.muted, mode, () => tokens["fg-muted"], (hex) => dsInkCounterpart(hex, tokens.bg));
+  if (muted) {
+    tokens["fg-muted"] = muted;
+    tokens["fg-subtle"] = dsMix(muted, tokens.bg, 0.75);
+  }
   // Cards and side panels: their own colour; or, based on the primary colour (in dark, on the light one's
   // counterpart), that colour made lighter or darker by the bar, Parabola's own step (a shade toward the text)
   // until it's moved.
   const surface = colours.surface;
   const lightCard = dsIsHex(surface.light) ? surface.light : null;
   const cardShift = mode === "light" ? surface.lightShift : surface.darkShift;
-  const cardBase = mode === "dark" && lightCard ? dsCounterpart(lightCard) : tokens.bg;
+  const cardBase = mode === "dark" && lightCard ? dsCounterpart(lightCard, DARK_CARD) : tokens.bg;
   const card =
     (mode === "light" ? lightCard : surface.dark) ??
     (cardShift !== undefined ? dsShift(cardBase, cardShift) : mode === "dark" && lightCard ? cardBase : null);
   // Only the cards: secondary buttons, pills and hovers (`surface`) stay with the page.
   if (card) tokens["surface-subtle"] = card;
-  // Buttons and selected states: their own colour with black or white on it, or the text on the page.
-  const button = hexIn(colours.button, mode, () => tokens.fg, (hex) => dsInkCounterpart(hex, tokens.bg, 2));
-  tokens.button = button ?? tokens.fg;
-  tokens["on-button"] = button ? (dsLuminance(button) > 0.18 ? BLACK : WHITE) : tokens.bg;
-  // The highlight: an older theme's preset; else its own colour or the buttons', its tint a wash of it on the page.
+  // Fields: their own colour (in dark, the light one's dark version), or the page.
+  const field = hexIn(colours.field, mode, () => tokens.bg);
+  if (field) tokens.field = field;
+  // The fields' outline: the borders' colour while fields are the page's; a field of its own colour gets its own,
+  // that colour a step toward black (or toward white on a dark field), so it frames whatever colour it is.
+  tokens["field-border"] = field ? dsMix(dsLuminance(field) > 0.18 ? BLACK : WHITE, field, 0.16) : tokens.border;
+  // The tertiary colour, the highlight: an older theme's preset; else its own colour or the text's, its tint a
+  // wash of it on the page.
   const preset = colours.accent.light && !dsIsHex(colours.accent.light) && !(mode === "dark" && colours.accent.dark);
+  const accent = preset ? null : hexIn(colours.accent, mode, () => tokens.fg, (hex) => dsInkCounterpart(hex, tokens.bg));
   if (preset) {
-    const accent = dsAccentTokens(colours.accent.light!, mode);
-    tokens.highlight = accent.highlight;
-    tokens["highlight-tint"] = accent.tint;
+    const old = dsAccentTokens(colours.accent.light!, mode);
+    tokens.highlight = old.highlight;
+    tokens["highlight-tint"] = old.tint;
   } else {
-    tokens.highlight = hexIn(colours.accent, mode, () => tokens.button, (hex) => dsInkCounterpart(hex, tokens.bg)) ?? tokens.button;
+    tokens.highlight = accent ?? tokens.fg;
     tokens["highlight-tint"] = dsMix(tokens.highlight, tokens.bg, 0.14);
   }
+  // Buttons and selected states: the tertiary colour with black or white on it; or, while it's the text's, the
+  // text on the page.
+  tokens.button = accent ?? tokens.fg;
+  tokens["on-button"] = accent ? (dsLuminance(accent) > 0.18 ? BLACK : WHITE) : tokens.bg;
   return tokens;
 }
 
-const SHOWN: Record<DsColourKind, string> = { theme: "bg", surface: "surface-subtle", text: "fg", button: "button", accent: "highlight" };
+const SHOWN: Record<DsColourKind, string> = {
+  theme: "bg",
+  text: "fg",
+  muted: "fg-muted",
+  accent: "highlight",
+  field: "field",
+  surface: "surface-subtle",
+};
 
-/** What one of a theme's colours is in light or dark, as a hex: the page, the cards, the text, the buttons or the highlight. */
+/** What one of a theme's colours is in light or dark, as a hex: the page, the text, the quieter text, the buttons, the fields or the cards. */
 export function dsColourShown(colours: DsThemeColours, kind: DsColourKind, mode: "light" | "dark"): string {
   return dsColourTokens(colours, mode)[SHOWN[kind]];
 }

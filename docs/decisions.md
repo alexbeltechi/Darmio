@@ -10,6 +10,18 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-29 — **Temperature and a true brightness; type contrast; chips in
+  the button grey; rails follow.** Alex: the Saturation bar "makes it
+  darker", so Temperature is back in its place (cooler or warmer) and
+  Brightness is a true one again, 100 white, 0 black, the colour at its
+  strongest between; the Contrast bar is gone (a palette sets it). Themes
+  saved in the day's saturation-and-value form are read back as the same
+  colour. Typography gains a Contrast bar for the type: lower, the text is
+  an ink of the page's hue (warm brown on paper, a deep teal on teal), not
+  grey. A picked chip wears the default button's grey, the same as Previous,
+  Shuffle and Next (Parabola's text button, pressed or current). Every rail
+  slides its picked chip into view when it changes, so what a style chose
+  in Colour, Typography and Buttons is seen.
 - 2026-10-29 — **Previous, Shuffle, Next under the mood.** Alex: grey
   buttons in one row under the Mood slider, Previous at the left (chevron on
   its left), Next at the right (chevron on its right), and between them,

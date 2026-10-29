@@ -10,6 +10,17 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-29 — **Styles settled; rails are tabs; Social is one piece.**
+  Alex: Fashion's look was "a different type of editorial", so it's
+  **Elegant** now and took Luxury in (redundant); Sci-fi looked like Tech
+  and went into it. New: **Default** (Parabola's own) and **Minimal**. Every
+  rail is choose-one, as tabs are: picking the one picked does nothing, there's
+  always one. Buttons gain **Outline** and **Text** (no fill, the label in
+  the button colour: a fill of "none"). Email is a short whole letter, no
+  fade. Social is one piece: the story and the feed post over the post on X,
+  4px apart, rounded only at the outer corners. The feed post is one photo
+  with a caption, not a carousel, and the story carries two bits of words,
+  centred ("you're trying very hard").
 - 2026-10-29 — **Taste is Style and Mood.** Alex: "aesthetics and
   personality". Feel, World and Era are gone ("there's just too much going
   on"): **Style** is the one rail, one pick (Editorial, Tech, Fashion,

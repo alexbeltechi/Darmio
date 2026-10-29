@@ -48,17 +48,18 @@ with the why. To change one, add a new line that overrides it.
   (`DsColourWheel`; Alex, 2026-10-29, after a grading tool's wheels): a
   point's angle is its hue, its distance from the centre its saturation;
   the arc on the left is the chosen point's saturation, on the right its
-  brightness. Every point looks and works the same, whether
-  its colour is its own or still based on another (Alex, 2026-10-29):
-  click to choose it, drag to move it and give it its own; points that
-  share a spot (white and black at the centre) sit apart round it so each
-  can be grabbed. There's a point for each of the five and no more, nothing
-  to add. Delete or Backspace on a chosen point deletes its colour (back
-  to what it's based on; the primary and secondary back to Parabola's).
-  Under the wheel the chosen colour's hex and the five as Parabola nav
+  brightness. Every point is the same size: solid when its
+  colour is its own, an outline while it's based on another, the secondary
+  included (black or white, whichever reads on the primary, until given
+  its own); each sits exactly where its colour is, the primary at the
+  centre by default, stacked in order (primary on top, the chosen one above
+  all; Alex, 2026-10-29). You choose a colour in the list, then click or
+  drag anywhere on the wheel to put it there. There's a point for each of
+  the five and no more. Delete or Backspace deletes the chosen colour (back
+  to what it's based on; the primary back to Parabola's). Under the wheel the chosen colour's hex and the five as Parabola nav
   items (`DsNavItem`, which now takes a `leading` swatch and `actions`),
   each with a ⋮: Copy hex, Paste hex (to give two the same colour) and
-  Delete, or Restore for the primary and secondary. No swatches or preset lists: for a
+  Delete, or Restore for the primary. No swatches or preset lists: for a
   different look you make another theme (Alex, 2026-10-28). Each is picked
   for light; in dark it's based on the light one until given a dark
   colour of its own. **Dark is a dark version, not a flip** (Alex,

@@ -10,6 +10,22 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-29 — **A taste has a voice; the preview in parts; back,
+  forward, dice.** Alex: tastes are brand rules, so the words have to change
+  with them ("the text doesn't change in the tweet; it obviously ought
+  to"); Tech was overdone (neon is Sci-fi's); a Natural look shouldn't tilt
+  the story's words; the controls are just back, forward and the dice by the
+  menu. So: each taste carries a **voice**, a tone and a rule
+  (`dsTasteVoice`: the World pick's tone, else the Feel's); the preview
+  opens with **Brand**, a style statement from the pills, the bars and the
+  fonts, and the voice's rules, then **Web**, **Social** (the story beside
+  a square carousel post, "5 …", the X post under), **Email** and **App**,
+  all their words in that tone. Feel gains **Technical** (shadcn-like:
+  Geist or Inter, zinc, flat, 1px), and **Tech** is calmer (no neon). Only
+  Playful and Wacky tilt a story (`dsTasteTilt`). Back and forward step
+  through variations inside the pills picked, forward drawing a new one at
+  the end; the dice picks other pills; the wand is gone. A variation worth
+  keeping is **Save as new theme**, at the panel's foot.
 - 2026-10-29 — **A look never touches the type scale; true brightness;
   contrast between the buttons; Colours follows the theme.** Alex: the dice
   barely changed anything yet moved the display size; brightness should run

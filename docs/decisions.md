@@ -35,7 +35,9 @@ with the why. To change one, add a new line that overrides it.
   `text-small`, for dense rows of numbers and codes (Alex). Under the colour
   wheel, the chosen colour's Saturation, Hue and Brightness are small
   labelled fields in a row, labels and numbers left-aligned as any field's
-  are, typed in as well as read, and its hex a small field under them
+  are, typed in as well as read; they're Parabola's number field
+  (`DsNumberInput`): the up and down arrows step it, Shift by 10, the hue
+  coming round past 359; and its hex a small field under them
   named for the colour ("Colour: Base").
 - 2026-10-29 — **Two button colours.** The colours list has **Button:
   primary** (the solid buttons, selected states, the highlight) and

@@ -34,12 +34,15 @@ with the why. To change one, add a new line that overrides it.
   "typography")
   (the text, and the quiet text, borders and shades drawn from it;
   Parabola's is black or white, whichever reads on the theme colour),
-  **buttons** (solid buttons and selected states: the current nav item, a
-  pressed button, a checked box, the Published pill, with black or white
-  on them; "Based on secondary colour" by default; Alex, 2026-10-28) and
-  the **accent colour** (the one highlight; "Based on buttons" by default,
-  so Parabola's own highlight is black, white in dark, no longer purple,
-  the admin's included; Alex, 2026-10-28). Selected states (the current nav
+  the **tertiary colour** (was "accent colour"; the calls to action and
+  what needs attention, the highlight pill; "Based on secondary colour" by
+  default, so Parabola's own is black, white in dark, no longer purple;
+  it's the colour picked after the primary, before the surface; Alex,
+  2026-10-29) and **buttons** (solid buttons and selected states: the
+  current nav item, a pressed button, a checked box, the Published pill,
+  with black or white on them; "Based on tertiary colour" by default, so
+  one pick colours the calls to action and the pills together; given
+  their own, they part; Alex, 2026-10-29). Selected states (the current nav
   item, a pressed button, a checked box) are the text colour, solid, as
   Publish is. In the panel the five are points on **one colour wheel**
   (`DsColourWheel`; Alex, 2026-10-29, after a grading tool's wheels): a
@@ -48,7 +51,8 @@ with the why. To change one, add a new line that overrides it.
   brightness. A colour of its own is a solid dot, one still based on
   another a faint one; drag any point to make it yours. Hovering the disc
   shows a plus: a click there gives the next based colour its own, where
-  you clicked, so the more you add, the more of the theme you set. Under
+  you clicked, in the order primary, secondary, tertiary, surface,
+  buttons, so the more you add, the more of the theme you set. Under
   the wheel the chosen colour's hex and the five in a list, each with a
   way back to what it's based on. No swatches or preset lists: for a
   different look you make another theme (Alex, 2026-10-28). Each is picked

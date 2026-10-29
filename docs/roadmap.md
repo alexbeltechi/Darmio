@@ -288,8 +288,15 @@ Feature roadmap), unscheduled until Alex places it.
   brightness, warmth, contrast, roundness, depth), every value under them
   Auto until given its own; an agent sets a look by moving dials and
   adding at most a couple of overrides, never by writing hexes. Next:
-  loudness and formality dials (accent spread; serif or sans, weight,
-  spacing); presets as dial positions (Serious, Fun, Hacker, Paper); a
+  done the same day: Style (Mood, Serious to Wacky, moving dials and fonts;
+  Appearance) and the Taste pills with Shuffle (`taste.ts`). Then: a
+  Spacing dial (card padding, section gaps, margins through the
+  `--ds-space-*` tokens); a loudness dial (how much accent); an agent
+  growing the tastes from outside (font trends on Google Fonts, a Figma
+  file, Mobbin, an awards site) and setting a look from a screenshot as
+  dials; a story editor in the CMS (lines placed and dragged over a photo
+  or video, one to three of them, walking a narrative, as Instagram does;
+  an agent drafting one from a folder of images); a
   section wearing a sub-theme (a hero in a derived variant); a brand brief
   the theme exports (palette by role, fonts, a sample button, tone words,
   image mood) for pages, decks, emails and images; tinted neutrals in

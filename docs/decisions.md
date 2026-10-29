@@ -10,6 +10,29 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-29 — **A taste builder, not a theme picker.** Alex wants
+  /parabola to build a brand's taste, not only a UI: drag a few dials and
+  press a few pills, see the whole look roll out, and let an agent go
+  further from outside inspiration without being boxed in. So:
+  **Taste** comes first in the panel: common styles as pills (Minimal,
+  Editorial, Luxury, Tech, Warm, Bold, Playful, Wacky; `taste.ts`), each a
+  recipe of ranges, not a fixed look (where on the Mood bar, where the dials
+  may go, the bases, button colours and font pairs it reaches for). Pick
+  one or several and **Shuffle** draws a whole look inside them, again for
+  another take; with none, from any; **Default** is Parabola's own. A
+  shuffle starts the look over (colours, corners and buttons back to Auto),
+  and never lands a button the colour of the page. **Mood** now runs
+  Serious, Balanced, Playful and on to **Wacky** (everything turned up, a
+  loud display face). The preview shows the **brand, not just the UI**:
+  the site at a glance (a post, Ilo's lake photo with a caption, the
+  subscribe card), then the same look out in the world: a story (her
+  portrait, lines laid over it in the theme), a post on X, an email.
+  **The lists are meant to grow**: an agent adds a taste, a font pair or a
+  colour from what's current (font trends, a Figma file, Mobbin, an awards
+  site) as a line in `taste.ts` or `DS_MOODS`, so every theme can reach
+  it; one maker's look is dials and overrides on their theme. Next
+  (roadmap): spacing in the style, a story editor (lines placed over a
+  photo, as Instagram does, walking through a narrative), the brand brief.
 - 2026-10-29 — **A character layer above the theme; dials generate,
   overrides stick, published is frozen.** Alex: picking colours on a wheel
   makes ugly UIs; the start should be "how bright, how warm", like editing

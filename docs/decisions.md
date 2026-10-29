@@ -18,7 +18,8 @@ with the why. To change one, add a new line that overrides it.
   read as places to type on a card; info cards take the default button's
   see-through surface, so they show on a card as well (Alex). The panel's
   sections are a Parabola accordion (`DsAccordion`, Layout › Accordion,
-  32px headers, what's under each set in 16px), and each colour is one
+  32px headers, what's under each lined up with its title, no indent;
+  Alex, 2026-10-29), and each colour is one
   nested inside Colours; the top bar's Collapse all / Expand all folds or opens them all. The site's own nav is unchanged for now.
 - 2026-10-28 — **Parabola themes, made like shadcn's create page.** A
   theme is data (`packages/parabola/theme.ts`): five colours
@@ -26,9 +27,8 @@ with the why. To change one, add a new line that overrides it.
   **primary colour** (was "theme colour") (the website's background; Parabola's own is white, its
   cards a warm off-white #F7F5F2, 4 darker, the same step a picked primary
   colour's cards take (paper, #FAF7EF, for a day on 2026-10-28; Alex wanted
-  white back, 2026-10-29); every picker
-  has a warmth bar, cold to warm, between hue and brightness), the
-  **surface** (cards, side panels, fields; based on the primary colour, a
+  white back, 2026-10-29)), the
+  **surface** (cards and side panels; based on the primary colour, a
   bar sets how much lighter or darker, so the contrast between page and
   cards is a choice; Alex, 2026-10-28), the **secondary colour** (was
   "typography")
@@ -38,11 +38,13 @@ with the why. To change one, add a new line that overrides it.
   what needs attention, the highlight pill; "Based on secondary colour" by
   default, so Parabola's own is black, white in dark, no longer purple;
   it's the colour picked after the primary, before the surface; Alex,
-  2026-10-29) and **buttons** (solid buttons and selected states: the
-  current nav item, a pressed button, a checked box, the Published pill,
-  with black or white on them; "Based on tertiary colour" by default, so
-  one pick colours the calls to action and the pills together; given
-  their own, they part; Alex, 2026-10-29). Selected states (the current nav
+  2026-10-29), which is also the **buttons** (solid buttons and selected
+  states: the current nav item, a pressed button, a checked box, the
+  Published pill, with black or white on them): buttons were a colour of
+  their own for a day; Alex: "buttons ARE tertiary", 2026-10-29, and a
+  theme's buttons colour becomes its tertiary when it had none), and the
+  **quaternary colour** (the fields' background, optional; the page's by
+  default; Alex, 2026-10-29). Selected states (the current nav
   item, a pressed button, a checked box) are the text colour, solid, as
   Publish is. In the panel the five are points on **one colour wheel**
   (`DsColourWheel`; Alex, 2026-10-29, after a grading tool's wheels): a
@@ -55,7 +57,7 @@ with the why. To change one, add a new line that overrides it.
   centre by default, stacked in order (primary on top, the chosen one above
   all; Alex, 2026-10-29). You choose a colour in the list, then click or
   drag anywhere on the wheel to put it there. There's a point for each of
-  the five and no more. Delete or Backspace deletes the chosen colour (back
+  the five (primary, secondary, tertiary, quaternary, surface) and no more. Delete or Backspace deletes the chosen colour (back
   to what it's based on; the primary back to Parabola's). Under the wheel the chosen colour's hex and the five as Parabola nav
   items (`DsNavItem`, which now takes a `leading` swatch and `actions`),
   each with a ⋮: Copy hex, Paste hex (to give two the same colour) and

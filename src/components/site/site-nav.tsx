@@ -94,23 +94,27 @@ function useLogoOpacity(
 
 const LOGO_CLASS = "text-h3 text-ds-fg";
 
+/** The desktop nav's ghost links: muted, the page colour on hover, no current highlight. */
+const NAV_LINK_CLASS = "bg-transparent text-ds-fg-muted hover:bg-ds-surface/40 hover:text-ds-fg";
+
 /**
  * Site nav, rendered once in the persistent site layout so it never
- * unmounts (and never flickers) between route changes. Each pill is a route,
- * so views are reached by cycling through the nav rather than via back
- * buttons.
+ * unmounts (and never flickers) between route changes.
  *
- * Every control is a Parabola `DsButton`. From `sm` up it's a row of them
- * fixed 20px from the top. Below that it's the site's name top-left (fading
- * out as the page content scrolls up to it) and an "Explore" button top-right
- * that opens the Parabola `DsMenu`, which also holds the theme switch.
+ * From `sm` up it's the conventional bar (decisions, 2026-10-28): the site's
+ * name on the left in H3, a little bigger than the links, the way home; on
+ * the right the sections as ghost `DsButton`s 4px apart (muted text, a light
+ * surface on hover, the current page not highlighted), then the theme
+ * switch, a ghost icon that flips to the other theme. It's as wide as the
+ * reading column and fixed to the top over a fade, so the page scrolls under
+ * it. Below `sm` it's the site's name top-left (fading out as the page
+ * content scrolls up to it) and an "Explore" button top-right that opens the
+ * Parabola `DsMenu`, which also holds the theme switch.
  */
 export function SiteNav({
-  counts = {},
   siteName,
   sections,
 }: {
-  counts?: Record<string, number>;
   siteName: string;
   /** The top-level categories marked for the nav; none means no nav, just the name. */
   sections: NavSection[];
@@ -118,10 +122,8 @@ export function SiteNav({
   const pathname = usePathname();
   const override = useSyncExternalStore(subscribe, () => highlightOverride, () => null);
   const active = override ?? activeSlugForPath(pathname, sections);
-  const NAV_ITEMS = [
-    { slug: "home", label: "Home", href: "/" },
-    ...sections.map((c) => ({ slug: c.slug, label: c.label, href: `/${c.slug}` })),
-  ];
+  // No Home: the site's name is the way home (decisions, 2026-10-28).
+  const NAV_ITEMS = sections.map((c) => ({ slug: c.slug, label: c.label, href: `/${c.slug}` }));
   const [mobileOpen, setMobileOpen] = useState(false);
   const closeMobile = useCallback(() => setMobileOpen(false), []);
   const logoRef = useRef<HTMLAnchorElement>(null);
@@ -138,13 +140,18 @@ export function SiteNav({
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const navButton = (item: (typeof NAV_ITEMS)[number], className = "", style?: React.CSSProperties) => (
+  const navButton = (
+    item: (typeof NAV_ITEMS)[number],
+    className = "",
+    style?: React.CSSProperties,
+    variant: "default" | "text" = "default"
+  ) => (
     <DsButton
       key={item.slug}
       href={item.href}
       onClick={handleClick(item.slug)}
       current={active === item.slug}
-      meta={counts[item.slug]}
+      variant={variant}
       className={className}
       style={style}
     >
@@ -154,13 +161,22 @@ export function SiteNav({
 
   return (
     <>
-      {/* Sits above the page content (z-50). */}
-      <nav className="pointer-events-none fixed inset-x-0 top-5 z-(--ds-z-nav) hidden flex-wrap items-center justify-center gap-1 px-5 sm:flex">
-        {NAV_ITEMS.map((item) => navButton(item, "pointer-events-auto"))}
-      </nav>
-
-      {/* Desktop keeps the theme switch top right; on mobile it lives in the menu. */}
-      <DsThemeToggle className="fixed top-5 right-5 z-(--ds-z-nav) hidden sm:inline-flex" />
+      {/* Sits above the page content; the page fades out beneath it. The bar is
+          as wide as the reading column, so the name and links line up with the text. */}
+      <header className="fixed inset-x-0 top-0 z-(--ds-z-nav) hidden ds-nav-fade px-5 py-5 sm:block">
+        <div className="mx-auto flex w-full max-w-[600px] items-center justify-between gap-4">
+          <Link href="/" onClick={handleClick("home")} className={`min-w-0 truncate ${LOGO_CLASS}`}>
+            {siteName}
+          </Link>
+          <nav className="flex shrink-0 items-center gap-1">
+            {/* The page you're on isn't highlighted (only aria-current marks it): every link is
+                muted, with the ghost's light surface on hover. */}
+            {NAV_ITEMS.map((item) => navButton(item, NAV_LINK_CLASS, undefined, "text"))}
+            {/* On mobile the theme switch lives in the menu. */}
+            <DsThemeToggle variant="text" className={NAV_LINK_CLASS} />
+          </nav>
+        </div>
+      </header>
 
       <Link
         ref={logoRef}

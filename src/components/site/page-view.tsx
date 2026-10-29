@@ -1,24 +1,24 @@
 import { ArticleContent } from "@/components/site/article-content";
+import { HomePage, LinksPage, TextPage } from "@/components/site/pages/formatted-pages";
+import { getEntryMediaIds } from "@/lib/cms/entry-media";
 import { getMediaByIds } from "@/lib/cms/media";
+import { pageSettings } from "@/lib/cms/page-formats";
 import type { Block, Entry } from "@/lib/cms/types";
 
-/** Every media id the page's blocks reference. */
-function blockMediaIds(blocks: Block[]): string[] {
-  return blocks.flatMap((block) => {
-    if (block.type === "gallery") return block.mediaIds;
-    if (block.type === "image" || block.type === "video") return block.mediaId ? [block.mediaId] : [];
-    return [];
-  });
-}
-
 /**
- * A page from the page builder: its content blocks, stacked as in a post but
- * with no post header (the content opens the page). Shared by the public page
- * and the admin preview, which passes the page with its unpublished changes.
+ * A page from the page builder, in its format (lib/cms/page-formats.ts).
+ * Blocks, the default: its content blocks, stacked as in a post but with no
+ * post header (the content opens the page). Shared by the public page and
+ * the admin preview, which passes the page with its unpublished changes.
  */
 export async function PageView({ page, preview = false }: { page: Entry; preview?: boolean }) {
+  const { format } = pageSettings(page.data);
+  if (format === "text") return <TextPage page={page} preview={preview} />;
+  if (format === "links") return <LinksPage page={page} preview={preview} />;
+  if (format === "home") return <HomePage page={page} preview={preview} />;
+
   const blocks = (page.data.content as Block[]) || [];
-  const mediaItems = await getMediaByIds(blockMediaIds(blocks));
+  const mediaItems = await getMediaByIds(getEntryMediaIds(page));
 
   return (
     <main className="min-h-screen bg-ds-bg">

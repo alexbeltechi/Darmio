@@ -7,6 +7,7 @@ import { FeedEntry } from "./feed-entry";
 import { IntroText } from "./intro-text";
 import { PageHero } from "./page-hero";
 import { PostGrid } from "./post-grid";
+import { PostList } from "./pages/post-list";
 import type { Category } from "./post-grid-shared";
 import type { IntroLayout, ViewIntro } from "./site-views";
 
@@ -25,7 +26,8 @@ interface CategoryFeedProps {
 /**
  * A category view: one or more sections, each an intro plus a single
  * chronological column. `wall` skips the intro and shows every post as a
- * masonry grid, like "More to explore". `hero` opens with the homepage's PageHero, which fades
+ * masonry grid, like "More to explore". `list` stacks the posts like a
+ * blog, left-aligned, with or without pictures. `hero` opens with the homepage's PageHero, which fades
  * as the feed scrolls up. `left` keeps the intro sticky beside its own
  * section's posts (Figma 601:2249), stacking intro-over-feed below 1180px
  * where the two columns no longer fit.
@@ -45,6 +47,17 @@ export function CategoryFeed({ layout, sections, mediaItems, categories }: Categ
         {intro && <PageHero title={intro.title} description={intro.description} />}
         <DsEmptyState>Nothing here yet.</DsEmptyState>
       </div>
+    );
+  }
+
+  if (layout === "list") {
+    return (
+      <PostList
+        intro={sections[0].intro}
+        posts={sections.flatMap((section) => section.posts)}
+        mediaMap={mediaMap}
+        categoryMap={categoryMap}
+      />
     );
   }
 

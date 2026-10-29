@@ -92,6 +92,7 @@ const LAYOUT_LABELS: Record<CategoryLayout, string> = {
   hero: "Headline over the posts",
   left: "Text beside the posts",
   wall: "Posts only",
+  list: "Stacked like a blog",
 };
 
 const visibilityOptions: DsSelectOption[] = [

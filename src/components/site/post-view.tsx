@@ -110,7 +110,7 @@ function SourceLine({ post, settings }: { post: Entry; settings: SourceLineSetti
   if (!label) return null;
 
   return (
-    <p className="mx-auto mt-ds-40 w-full max-w-[661px] text-p text-ds-fg-muted">
+    <p className="mx-auto mt-ds-40 w-full max-w-[600px] text-p text-ds-fg-muted">
       {settings.prefix && <>{settings.prefix} </>}
       {url ? (
         <a
@@ -212,7 +212,7 @@ async function moreToExplore({
   const named = primaryCategory ?? parent;
 
   return (
-    // As wide as an inline gallery (INLINE_GALLERY_MAX, 1024px), inside the page's margins.
+    // As wide as an inline gallery (INLINE_GALLERY_MAX, 820px), inside the page's margins.
     <section className="px-ds-20 pt-ds-160 pb-ds-40">
       {/* The title column is as wide as its longest line, so a long category name never runs into the grid. */}
       <div

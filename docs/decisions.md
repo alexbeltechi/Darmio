@@ -10,6 +10,54 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-28 — **The site's nav is a conventional bar** as wide as the
+  reading column: the site's name on the left in H3, which is the way
+  home (no Home button); the sections on the right as ghost buttons 4px
+  apart, muted, with a light surface on hover and no highlight for the
+  page you're on; then the theme switch as a ghost icon that flips to the
+  other theme. No post counts. Phones keep the name and Explore.
+  Overrides the centred pills with counts (Alex, after nicksaraev.com).
+- 2026-10-28 — **The ghost button's hover is one light surface**
+  (`ds-surface` at 40%, no darkening tint), the same as its current
+  state; it was too dark in the light theme. Everywhere the text variant
+  is used, admin included.
+- 2026-10-28 — **Text reads at 600px** (was 661) on posts and pages, and
+  **a square image fills its gallery**: a row may be as tall as the
+  gallery is wide (was 70%). A gallery that shows one image a row (Auto up
+  to three, Stacked) is the reading width, so pictures line up with the
+  text; one with images side by side (Auto from four, grid, masonry,
+  Inline) runs to 820px (was 1024), the tallest a row may be, so three
+  across stay big enough to see. Alex's message lost the exact width;
+  600px is the agent's pick, closer to Nick's column.
+- 2026-10-28 — **Pages have a format, and a fresh install can start as
+  Ilo's site.** Alex: an out-of-the-box site shaped like nicksaraev.com,
+  presets of pages, "not a block editor". A page picks one of four
+  formats (`lib/cms/page-formats.ts`) and fills it with its blocks, by
+  hand or by agent: **Text** (a title, a line, the text in a reading
+  column, the pages under it at the end), **Home** (an intro, then the
+  latest posts of one category, each page with pages under it, each links
+  page and a newsletter, all made from the rest of the site, so nothing is
+  typed twice), **Links** (a title and links with a note each), and
+  **Blocks** (what every page was before; a page without a format is
+  this). A page can sit under one top-level page (My story, Press kit
+  and FAQ under About), and a top-level page can be in the nav, after the
+  categories. A page at `home` is the homepage. Home's sections list in
+  the body copy's size, each ending in a link to its page ("All 6 posts",
+  "Learn more about me"). A category's page gains a **list** layout: its
+  posts stacked like a blog, left-aligned: the picture or video when there
+  is one, the title in the home lists' size, the start of the text, and a
+  row with the post's own categories (links) and its date. New page offers presets (Home, About, My story, Press
+  kit, FAQ, Follow, Work with me), each a starting text that says what
+  goes there. The example site is
+  Ilo's: `npm run seed -- ilo` loads Writing (six essays), Home, About and
+  the three pages under it, Work with me and Follow, with three Y3K images
+  and a loop of her (Alex: "we can use one of the Y3K images"), all marked as
+  examples. Overrides 2026-10-24's seed in part: no Moments category,
+  since Alex's list didn't have one, and Follow instead of Elsewhere. The
+  list of links (label left, note right, a "more" link at the end) is
+  Parabola's `DsLinkList`, which Alex liked; the page title and section
+  heading stay with the site's pages.
+
 - 2026-10-28 — **Three Darmios: self-hosted (free, MIT), the web version
   (paid, later), and themes (sold).** Replaces 2026-10-07's "no paid
   tiers" and the never-merged 2026-10-27 "no hosted plan".

@@ -179,9 +179,10 @@ export interface ImageBlock {
 /**
  * How a top-level category's page sets its intro: `hero` (a big headline over
  * the feed, the default), `left` (a sticky text column beside it), `wall` (no
- * intro, just the grid).
+ * intro, just the grid), `list` (a title, then the posts stacked like a blog,
+ * left-aligned, with or without pictures).
  */
-export const CATEGORY_LAYOUTS = ["hero", "left", "wall"] as const;
+export const CATEGORY_LAYOUTS = ["hero", "left", "wall", "list"] as const;
 export type CategoryLayout = (typeof CATEGORY_LAYOUTS)[number];
 
 export const GALLERY_LAYOUTS = ["auto", "stack", "grid", "masonry"] as const;
@@ -200,7 +201,7 @@ export interface GalleryBlock {
   gap?: number;
   /**
    * `auto` (the default, also when unset): inline for up to three images, the
-   * page's whole width for more. `large` / `normal`: inline, up to 1024px.
+   * page's whole width for more. `large` / `normal`: inline, up to 820px.
    * `full`: the page's whole width. See `galleryIsFull` in justified-rows.ts.
    */
   width?: (typeof GALLERY_WIDTHS)[number];

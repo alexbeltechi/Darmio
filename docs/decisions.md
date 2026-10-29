@@ -35,7 +35,8 @@ with the why. To change one, add a new line that overrides it.
   background, `surface`): by default a wash of the primary button colour
   on the page, or Parabola's stone while the primary is its own. On the
   right of each colour the list says **Auto** (worked out from another)
-  or **Custom** (its own), not the hex (Alex).
+  or **Custom** (its own), not the hex, and a Custom one has a Restore
+  icon beside its ⋮ (Alex).
 - 2026-10-28 — **One top bar, solid by default.** Every admin page and
   /parabola pin the same bar (`DsTopBar`, Parabola, Layout › Top bar):
   compact rows (12px above and below), solid in the page colour with a rule

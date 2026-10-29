@@ -10,6 +10,12 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-29 — **Platform cards are outlined; Email is Gmail.** Alex: the
+  social posts sit on their platform's white in a grey outline, and the
+  email "looks nothing like an email": it's now a message open in Gmail,
+  its toolbar, the subject with its Inbox label and the sender's row in
+  Gmail's own white, inks and font, with only the letter inside in the
+  theme.
 - 2026-10-29 — **Tastes choose chips; Mood fine-tunes them; hue and
   saturation for colour.** Alex: instead of Temperature, hue and
   saturation, "think of it like editing a photograph": by default a paper

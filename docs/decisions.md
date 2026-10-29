@@ -10,6 +10,14 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-29 — **Mood is a slider again, on a 1px line.** Alex tried the
+  + Serious / + Playful buttons and the step dots, then chose the slider:
+  the same grab circle as Saturation and Brightness, its track a subtle 1px
+  line, Serious to Playful. The story tells two moments, small: her next
+  project, Dragonfly Vision, by her cheek and lined up with her avatar,
+  then the line and what to tap. The feed post is her sitting at the lake's
+  edge by day, cropped square with her well in the frame
+  (`public/parabola/preview/ilo-lake-day.jpg`, from the Y3K brand images).
 - 2026-10-29 — **Mood in steps; Classic; no gradients in the styles.**
   Alex: the Mood bar is two buttons, + Serious and + Playful, at the normal
   size: each press is a step (an eighth, Balanced in the middle) and every

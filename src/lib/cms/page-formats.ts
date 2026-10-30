@@ -1,6 +1,6 @@
 /**
  * Page formats: what kind of page a page is, and the few settings that come
- * with it (decisions, 2026-10-28). A format is a fixed layout; what's on the
+ * with it. A format is a fixed layout; what's on the
  * page is its blocks, written by hand or by an agent. There is no layout
  * editor: a page picks a format and fills it.
  *
@@ -57,7 +57,7 @@ export const HOME_POSTS = 7;
 
 /**
  * The link that ends a page's section on a home page, to the page itself:
- * "Learn more about me" for About (Alex, 2026-10-28), "More from <title>"
+ * "Learn more about me" for About, "More from <title>"
  * for any other.
  */
 export function homeMoreLabel(slug: string, title: string): string {

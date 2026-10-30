@@ -54,7 +54,7 @@ const DB_NAME_MAX = 38;
 
 /**
  * A project's database: the hub's name and the project's slug
- * (`darmio-y3k-club`), cut short with a bit of the project's id when that
+ * (`darmio-my-club`), cut short with a bit of the project's id when that
  * runs past Atlas's limit, so it stays unique.
  */
 function projectDbName(hubName: string, slug: string, id: string): string {
@@ -139,7 +139,7 @@ export async function updateProject(slug: string, updates: { name?: unknown; bra
   if (!result) throw new Error(`No project "${slug}"`);
   forgetProjects();
   const row = withoutId<ProjectRow>(result);
-  // A project's name is its site's name too (decisions, 2026-10-26).
+  // A project's name is its site's name too.
   if (set.name) {
     const client = await getMongoClient();
     await client

@@ -30,7 +30,7 @@ function useMe(): Me | null {
 }
 
 /**
- * You, at the foot of a project's rail (decisions, 2026-10-26): a round
+ * You, at the foot of a project's rail: a round
  * avatar with your initial that opens your email, Settings (yours, for the
  * install, not a project's) and Sign out. Home's sidebar lists the same as items.
  */

@@ -15,7 +15,7 @@
  *   "layout": "auto",                      // auto (default) | stack | grid | masonry
  *   "width": "auto",                       // auto (default: 1-3 stacked, 4-19 three a row inline, 20+ full width) | large (inline, 1024px) | full
  *   "intro": "<p>Optional lead text</p>",  // optional text block above the gallery
- *   "sourcePath": "/Users/.../Butter",
+ *   "sourcePath": "~/Pictures/Butter",
  *   "mediaTags": ["Butter", "lettering"],  // the owner's words, confirmed by them: on every image
  *   "keywordsBy": "/post",                 // who wrote the keywords (/curate when from selection.json)
  *   "assets": [{ "path": "...",              // the file to send (an export, or the original)
@@ -294,7 +294,7 @@ async function main() {
   const assets = blocks.flatMap((b) => (b.type === "gallery" ? b.assets : []));
   const total = assets.length;
 
-  // Every image is findable: no bare uploads (decisions, 2026-10-20).
+  // Every image is findable: no bare uploads.
   const bare = assets.filter((a) => mimeFor(a.path).startsWith("image/") && (!a.alt || !a.keywords?.length));
   if (bare.length) {
     throw new Error(`These images have no alt or no keywords; add them to the plan first:\n  ${bare.map((a) => path.basename(a.path)).join("\n  ")}`);

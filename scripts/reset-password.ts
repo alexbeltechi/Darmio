@@ -1,6 +1,6 @@
 /**
  * Set a user's password from the terminal, for when you're locked out of the
- * admin (decisions, 2026-10-24). Works against the database in `.env.local`.
+ * admin. Works against the database in `.env.local`.
  *
  * Usage: npm run reset-password -- <email> <new password>
  */

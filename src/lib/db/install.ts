@@ -1,6 +1,6 @@
 /**
- * What an install runs on and how much of it the projects use (decisions,
- * 2026-10-27): the hosting, the MongoDB cluster and the image storage. All
+ * What an install runs on and how much of it the projects use: the
+ * hosting, the MongoDB cluster and the image storage. All
  * three are set up once, for the whole install; every project shares them.
  * Read-only: nothing here changes a plan or a setting.
  */
@@ -19,9 +19,9 @@ export type ProjectUse = { slug: string; name: string; bytes: number };
 export type InstallUsage = {
   hosting: {
     provider: "vercel" | "local";
-    /** The production address, e.g. darmio-test.vercel.app. */
+    /** The production address, e.g. my-site.vercel.app. */
     address: string | null;
-    /** The GitHub repo it deploys from, e.g. alexbeltechi/darmio-test. */
+    /** The GitHub repo it deploys from, e.g. their-name/my-site. */
     repo: string | null;
     environment: string | null;
     region: string | null;

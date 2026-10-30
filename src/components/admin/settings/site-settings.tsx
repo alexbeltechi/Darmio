@@ -14,7 +14,7 @@ const toForm = (siteName: string): Form => ({ siteName });
 /**
  * The project: its name (the admin's tile, the project menu, the site's logo,
  * the footer, browser titles), and whether its site is published and where.
- * The homepage's own words are a page, not a setting (decisions, 2026-10-27).
+ * The homepage's own words are a page, not a setting.
  */
 export function SiteSettings() {
   const { current } = useCurrentProject();

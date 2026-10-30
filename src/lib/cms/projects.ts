@@ -1,6 +1,6 @@
 /**
- * Projects: one install, many projects (beltechi.com, y3k.club…), each with
- * its own database (decisions, 2026-10-24 and 2026-10-26). Pure: the names
+ * Projects: one install, many projects (a portfolio, a club…),
+ * each with its own database. Pure: the names
  * and rules the middleware, the admin and the server share.
  */
 import { slugify } from "@/lib/slug";

@@ -6,10 +6,9 @@ import { AccountSettings } from "@/components/admin/settings/account-settings";
 import { InstallSettings } from "@/components/admin/settings/install-settings";
 
 /**
- * Home › Settings: what's the install's rather than one project's
- * (decisions, 2026-10-26 and 2026-10-27): you (name, email, password), then
- * what every project runs on (hosting, database, image storage) and how much
- * of it they use. Each project's own settings stay behind its gear.
+ * Home › Settings: what's the install's rather than one project's: you
+ * (name, email, password), then what every project runs on (hosting,
+ * database, image storage) and how much of it they use. Each project's own settings stay behind its gear.
  */
 export default function AccountPage() {
   return (

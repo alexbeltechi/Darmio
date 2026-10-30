@@ -10,7 +10,7 @@ import { InstallProblemNotice } from "@/components/admin/install-problem";
 import { installProblem, type InstallProblem } from "@/lib/cms/install-problems";
 
 /**
- * First-run onboarding (decisions, 2026-10-26). A fresh install has no users,
+ * First-run onboarding. A fresh install has no users,
  * so the admin opens here. No window around it: the fields float on the page,
  * and buttons keep their own width.
  *
@@ -22,7 +22,7 @@ import { installProblem, type InstallProblem } from "@/lib/cms/install-problems"
  *
  * Without a good code (no link, a wrong one, or a lost one) there is no form:
  * the page says the site isn't set up yet and hands over a prompt that asks
- * the installing AI for the link (decisions, 2026-10-26). So nobody else can
+ * the installing AI for the link. So nobody else can
  * claim the install. If the setup is finished elsewhere meanwhile, the page
  * moves on to sign-in by itself.
  */

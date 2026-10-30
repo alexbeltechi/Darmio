@@ -55,8 +55,7 @@ function usageLine(doc: DocWithUsage) {
  * Library › Documents, laid out like Posts and Pages: the list on the left,
  * the open document on the right (the route, as `children`); below `lg` one
  * pane at a time. Every Markdown file that guides the work (briefs, sources,
- * rules) is here, so nothing an agent stores is out of sight (decisions,
- * 2026-10-04 and 2026-10-24).
+ * rules) is here, so nothing an agent stores is out of sight.
  */
 export function DocumentsWorkspace({ children }: { children: React.ReactNode }) {
   const router = useRouter();

@@ -23,7 +23,7 @@ async function patchAccount(body: Record<string, string>): Promise<Record<string
 const reason = (error: unknown) => ({ description: error instanceof Error ? error.message : undefined });
 
 /**
- * You, across the install (decisions, 2026-10-26), as two cards like a
+ * You, across the install, as two cards like a
  * project's settings: Account (your name, and the email you sign in with)
  * and Password. A new email asks for your password, since Darmio can't
  * send a confirmation link yet; it says so under the field.

@@ -3,8 +3,7 @@
 An open-source publishing platform for makers, agent first: a headless CMS
 with an optional site built on the Parabola design system. This repo is the
 **core**. Installs (a maker's own copy) are built on top of it and pull its
-updates; Alex's own install is `alexbeltechi/beltechi`. Private until the
-pre-release on 2026-11-25, then public.
+updates.
 
 **Only what every maker would want goes here.** Nothing about one person's
 site: no names, copy, categories or keys in code. A site's content and
@@ -56,9 +55,7 @@ setup. Test data is fine there. Dev server: `preview_start` with `darmio-dev`
 
 ## Skills
 
-`/contactsheet` and `/curate` live in their own repo,
-`~/Documents/Code/techistack` (public at
-[alexbeltechi/techistack](https://github.com/alexbeltechi/techistack)), and
-are linked into `~/.claude/skills/`, so every project, this one included,
-uses them. Work on them there, not here. This repo keeps only CMS-specific
-skills (`landing-page`, `post`), which ship to every install.
+This repo keeps only CMS-specific skills (`landing-page`, `post`), which
+ship to every install. `/post` works best after `/curate` and
+`/contactsheet`, which are separate and optional
+([techistack](https://github.com/alexbeltechi/techistack)).

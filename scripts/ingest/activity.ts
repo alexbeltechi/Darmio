@@ -12,8 +12,7 @@
  *
  * Replaying the lines gives each post's frames as /post last left them. It
  * travels with the folder, so a copy on another drive keeps its history.
- * It's a history, not the truth: the CMS can change after (decisions,
- * 2026-10-20), so `status.ts` checks each post it names.
+ * It's a history, not the truth: the CMS can change after, so `status.ts` checks each post it names.
  *
  * push.ts writes its own runs. Anything else (publish, delete, a replaced
  * image) is logged with:

@@ -10,7 +10,7 @@ import { ACCOUNT_PATH, HOME_PATH } from "./home-routes";
 export const HOME_SIDEBAR_WIDTH = "lg:pl-[260px]";
 
 /**
- * Home's sidebar (decisions, 2026-10-26): "Home" at the top, then Projects (the cards beside it,
+ * Home's sidebar: "Home" at the top, then Projects (the cards beside it,
  * which list every project and hold New project) and Settings (yours). At
  * the foot, Sign out as a plain button, so it doesn't read as one more place
  * to go, with the theme beside it. Full width rather than the rail's icons: Home

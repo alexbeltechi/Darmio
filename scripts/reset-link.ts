@@ -1,6 +1,6 @@
 /**
  * Make a one-time password reset link for an account, for an owner who's
- * forgotten their password (decisions, 2026-10-26). Works against the
+ * forgotten their password. Works against the
  * database in `.env.local`; for a site on Vercel, pull its settings first
  * with `npx vercel env pull .env.local`. The owner opens the link and
  * chooses the new password on the site; it works once, for an hour.

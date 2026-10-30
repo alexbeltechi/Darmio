@@ -4,7 +4,7 @@ import path from "path";
 import { slugify } from "@/lib/slug";
 
 /**
- * Image renditions, made once at upload (decisions 2026-10-08): AVIF at a few
+ * Image renditions, made once at upload: AVIF at a few
  * fixed widths, the largest at most 2560px on its long edge, plus one JPEG
  * (or PNG, for transparency) for browsers without AVIF. Pages offer the
  * renditions as a srcset and the browser picks; nothing is resized on request.

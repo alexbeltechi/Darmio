@@ -389,7 +389,7 @@ export interface MediaItem {
   /**
    * What's in the picture, written by an agent that looked at it (/curate or
    * /post), never typed by hand. Kept apart from `tags` so either can be
-   * cleared without the other (decisions, 2026-10-08). Search matches both.
+   * cleared without the other. Search matches both.
    */
   keywords?: string[];
   /** Who wrote `keywords` and when, shown beside them in the media panel. */

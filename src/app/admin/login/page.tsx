@@ -19,7 +19,7 @@ import { InstallProblemNotice } from "@/components/admin/install-problem";
 const WRONG = "Wrong email or password";
 
 /**
- * Forgot your password? It opens in place (decisions, 2026-10-26): email
+ * Forgot your password? It opens in place: email
  * isn't set up for a Darmio site yet, so a reset comes from the computer,
  * by hand or from the AI that installed it, as a one-time link
  * (`npm run reset-link`). The prompt asks that AI for one.

@@ -10,7 +10,7 @@ const DAY = new Intl.DateTimeFormat("en", { month: "short", day: "numeric", year
 
 /**
  * A category's posts stacked like a blog, newest first, left-aligned in the
- * reading column (the `list` category layout, decisions 2026-10-28): the
+ * reading column (the `list` category layout): the
  * title, its line and how many posts, then each post as its picture (when it
  * has one; a video plays muted, on a loop), its title in the size of a home
  * page's lists, the start of its text, and a row with its own categories

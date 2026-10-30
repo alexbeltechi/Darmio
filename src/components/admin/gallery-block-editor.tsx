@@ -393,7 +393,7 @@ function formatFileSize(bytes: number): string {
 }
 
 /**
- * One gallery image (Figma: Folio Dharmify 699:6154): the image with move
+ * One gallery image: the image with move
  * left/right buttons top right on hover, then a row with a bulk-select
  * checkbox, the file name and size, and small remove (×) and ⋮ buttons.
  */

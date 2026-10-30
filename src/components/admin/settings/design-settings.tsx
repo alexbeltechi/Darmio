@@ -15,7 +15,7 @@ import { SettingsSection } from "./settings-section";
 /**
  * Which of the project's Parabola themes its site wears (the admin always
  * wears Parabola's own, so a theme can't make it hard to use)
- * (decisions, 2026-10-28): Default or one added on /parabola, where themes
+ *: Default or one added on /parabola, where themes
  * are made and published. A pick is saved right away and shows on the site.
  */
 export function DesignSettings() {

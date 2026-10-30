@@ -1,11 +1,10 @@
 ---
-reviewed: 2026-10-26
-owner: Alex
+reviewed: 2026-10-30
 ---
 
 # Conventions
 
-The standard: every pattern in this codebase should be one Alex would be
+The standard: every pattern in this codebase should be one you'd be
 happy to see an agent copy, because agents copy what they find. Write code
 that way, and when you find a pattern you wouldn't want copied, fix it or
 list it under Known debt below.
@@ -42,7 +41,7 @@ changes in the running app with read-only actions (see `CLAUDE.md`).
 | Reading or writing MongoDB | A function in `src/lib/db/<collection>.ts` | lint: `mongodb` only in `src/lib/db` |
 | A stored document as an app type | `withoutId<T>(doc)` from `@/lib/db/mongodb` | lint: no `_id` destructuring |
 | Media and users | Through `src/lib/cms/media.ts` and `users.ts`: they also handle files, renditions and password hashes. Everything else calls `src/lib/db` directly | |
-| Uploading images from disk | `scripts/ingest/push.ts` (the `/post` skill): every image gets Alex's confirmed tags, a title, alt and keywords from looking at it, and the run is logged in the folder's `_activity.md` (decisions, 2026-10-20) | |
+| Uploading images from disk | `scripts/ingest/push.ts` (the `/post` skill): every image gets the maker's confirmed tags, a title, alt and keywords from looking at it, and the run is logged in the folder's `_activity.md` | |
 | Logging another action on a folder's post (publish, delete, replace) | `scripts/ingest/activity.ts add` | |
 | Searching media | `mediaMatches` from `@/lib/cms/media-search` (library, picker and `GET /media?q=`) | |
 | Spacing (gaps, margins, section padding) | Parabola's spacings, named by size (`/parabola/spacing/scale`): 4, 8, 16, 20, 40, 80, 160 as `gap-ds-20`, `px-ds-20`, `pt-ds-160`, `space-y-ds-40`… Layouts that do arithmetic use `DS_SPACES` / `DS_GUTTER_PX`. New code uses these, not raw `gap-5` | `check:parabola` keeps CSS and TS in step |
@@ -59,7 +58,7 @@ changes in the running app with read-only actions (see `CLAUDE.md`).
 ## Comments
 
 A comment says what the code can't: why it's this way, a constraint, a
-decision (cite it by date), or what a long screen's section is.
+decision and its reason, or what a long screen's section is.
 Never what the next line does (`// Get the entry`), and never history
 ("replaces the old…"); git has the history.
 

@@ -117,6 +117,43 @@ namespace, short and brand-free, so a rename never touches code:
 
 A theme is data (`theme.ts`), much as shadcn's create page sets a style:
 
+- **Character** (`character.ts`, `DsCharacter`): the look as a whole, dials
+  every Auto value is worked out from: a base colour to start from (null:
+  white), hue, saturation, brightness, contrast, roundness and depth. A value given
+  its own (a colour, `radius`, `buttons`) stays when a dial moves; `null`
+  means Auto. `dsThemeRadius`, `dsThemeButtons` and `dsThemeColourTokens`
+  resolve a theme; `dsCharacterColourOptions` is what the colour
+  derivations take from it. An agent sets a look by moving dials. The
+  panel opens with **Taste** (`taste.ts`), aesthetics and personality:
+  the **Style** rail, one pick at a time as tabs are (`DS_TASTES`:
+  Classic, Minimal, Elegant, Tech, Natural, Retro, Sport;
+  `dsPickTaste`, `dsShuffleTaste`, `dsRandomTastes`), which chooses one chip on each section's rail
+  (`character.scoped`): a palette in Colour (`DS_PALETTES`,
+  `dsPaletteDraw`), a kind of type in Typography (`DS_TYPE_STYLES`,
+  `dsTypeStyleFonts`) and a kind of button in Buttons (`DS_BUTTON_LOOKS`,
+  `dsButtonLookAt`; Outline and Text have no fill, `dsButtonLookStyle`, the
+  primary button's fill "none"; Chunky a thick edge; only Tactile has a
+  gradient); each can be picked by hand after, one at a time. A style's own
+  look is the first of each of its lists; › draws from the rest. Then the **Mood**, the personality, a slider from Serious to Playful
+  (on to Wacky at its end; its track a 1px line, no labels under it; `dsThemeWithMood`); under it Shuffle draws another version of the style and Previous and Next step through those seen, the dice beside Taste's Restore starts over, which changes the look inside the style:
+  the kind of type's four font pairs, the buttons' roundness, the colour's
+  saturation (`dsMoodSaturation`) and the button colour (`dsPaletteButton`),
+  and the voice (`dsTasteVoice`; words placed loose from Playful,
+  `dsTasteTilt`).
+  Parabola's own is Classic and Balanced, with Classic, Classic and Soft.
+  **Colour** is the palettes, then the background as three bars: hue,
+  temperature (ice or paper on a white, the hue leaned blue or orange on a
+  colour) and a true brightness (black, the colour, white), with the
+  colours themselves behind "Show advanced options"; a palette sets how much
+  colour and the contrast, which have no bar. **Typography** has a Contrast
+  bar for the type (`character.ink`, `DsColourOptions.ink`): turned down,
+  the text becomes an ink of the page's hue, not a grey. Roundness is with
+  the buttons. Fields is its outline, no rail. A `DsScrollRow` slides its
+  picked item into view when it changes, so a rail a style changed shows
+  its new chip; a picked text button (a chip) wears the default button's
+  grey. The list is meant to grow. `DsColourField` (a swatch and a hex, the picker in a tray) is
+  there for any colour a form asks for.
+
 - **Colours** (`colours.ts`, `DsThemeColours`), six, named for what they
   colour: base (`theme`, the website's background; Parabola's is white,
   its cards a warm off-white #F7F5F2), type: primary (`text`, the text and

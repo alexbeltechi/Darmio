@@ -16,12 +16,27 @@ import {
   DS_DEFAULT_HEADING_FONT,
   DS_FONTS,
   dsCustomFont,
+  dsCustomFontFromInput,
   dsGoogleFontsUrl,
   dsNearestWeight,
   type DsCustomFont,
   type DsFont,
 } from "./fonts";
-import { DS_DEFAULT_RADIUS, DS_RADII, DS_RADIUS_MAX, DS_RADIUS_TOKENS, dsRadiusPx, type DsRadius } from "./radius";
+import { dsButtonLookAt, dsButtonLookStyle, dsMoodSaturation, dsPaletteButton, dsTypeStyleFonts } from "./taste";
+import { DS_RADII, DS_RADIUS_MAX, DS_RADIUS_TOKENS, dsRadiusPx, type DsRadius } from "./radius";
+import {
+  DS_DEFAULT_CHARACTER,
+  dsCharacterBase,
+  dsCharacterButtons,
+  dsCharacterColourOptions,
+  dsCharacterIsDefault,
+  dsCharacterRadius,
+  dsMoodDials,
+  dsMoodFonts,
+  type DsFontPair,
+  parseDsCharacter,
+  type DsCharacter,
+} from "./character";
 import {
   DS_DEFAULT_BUTTON_STYLE,
   DS_DEFAULT_FIELD_STYLE,
@@ -101,7 +116,9 @@ export type DsTextStyleConfig = {
 };
 
 export type DsThemeConfig = {
-  /** Base, type (primary and secondary), button, field and surface, each for light and dark (colours.ts). */
+  /** The dials every Auto value is worked out from: hue, temperature, colour, brightness, contrast, roundness, depth (character.ts). */
+  character: DsCharacter;
+  /** Background, primary and secondary (the text), buttons, field and surface, each for light and dark (colours.ts). */
   colours: DsThemeColours;
   /** Font (text, always there) first; then Heading and any the theme added. */
   families: DsFontFamily[];
@@ -110,12 +127,12 @@ export type DsThemeConfig = {
   customFonts: DsCustomFont[];
   /** Parabola's fonts this theme took out of its list (never System). */
   hiddenFonts: string[];
-  /** How round every corner is: a preset, or custom pixels (radius.ts). */
-  radius: DsRadius;
+  /** How round every corner is: a preset, or custom pixels (radius.ts); null for the character's roundness. */
+  radius: DsRadius | null;
   /** The pills' corner (labels like New, Published): null for the same as the buttons, or a radius of their own. */
   pillRadius: DsRadius | null;
-  /** How the solid buttons look: fill, outline, 3D label (button-style.ts). */
-  buttons: DsButtonStyle;
+  /** How the solid buttons look: fill, outline, text shadow (button-style.ts); null for the character's depth. */
+  buttons: DsButtonStyle | null;
   /** The fields' outline: on or off, its width and opacity (button-style.ts). */
   fields: DsFieldStyle;
   /** The icon library, by id (colours.ts). */
@@ -123,6 +140,7 @@ export type DsThemeConfig = {
 };
 
 export const DS_DEFAULT_THEME: DsThemeConfig = {
+  character: DS_DEFAULT_CHARACTER,
   colours: DS_DEFAULT_COLOURS,
   families: [
     { id: DS_BODY_FAMILY, label: "Font", font: DS_DEFAULT_FONT },
@@ -136,9 +154,9 @@ export const DS_DEFAULT_THEME: DsThemeConfig = {
   ) as Record<DsTextStyle, DsTextStyleConfig>,
   customFonts: [],
   hiddenFonts: [],
-  radius: DS_DEFAULT_RADIUS,
+  radius: null,
   pillRadius: null,
-  buttons: DS_DEFAULT_BUTTON_STYLE,
+  buttons: null,
   fields: DS_DEFAULT_FIELD_STYLE,
   icons: "lucide",
 };
@@ -336,13 +354,99 @@ export function parseDsThemeConfig(value: unknown): DsThemeConfig {
       : DS_RADII.some((r) => r.id === value)
         ? (value as DsRadius)
         : null;
-  const radius: DsRadius = parseRadius(raw.radius) ?? DS_DEFAULT_RADIUS;
+  // Null means Auto, from the character. A theme from before the character (none stored) kept Parabola's
+  // defaults as values: those become Auto, anything else its own (Custom).
+  const older = !(raw.character && typeof raw.character === "object");
+  const storedRadius = parseRadius(raw.radius);
+  const radius = older && storedRadius === "large" ? null : storedRadius;
   const pillRadius = parseRadius(raw.pillRadius);
+  const storedButtons = raw.buttons && typeof raw.buttons === "object" ? parseDsButtonStyle(raw.buttons) : null;
+  const parsed = parseDsCharacter(raw.character);
+  // A theme stored before the chips shows the ones it still matches: Parabola's colours, fonts and buttons.
+  const stored = raw.character && typeof raw.character === "object" ? (raw.character as Record<string, unknown>).scoped : undefined;
+  const chips = { ...parsed.scoped };
+  if (!stored || typeof stored !== "object" || Array.isArray(stored) || Object.values(stored).every(Array.isArray)) {
+    const c = parsed;
+    if (!chips.colour && c.colour === 0 && c.brightness === 1 && c.contrast === 0 && Object.values(colours).every((v) => !v.light && !v.dark)) chips.colour = "classic";
+    if (!chips.type && families.find((f) => f.id === DS_BODY_FAMILY)?.font === DS_DEFAULT_FONT && families.find((f) => f.id === DS_HEADING_FAMILY)?.font === DS_DEFAULT_HEADING_FONT) chips.type = "classic";
+    if (!chips.buttons && c.roundness === 1 && c.depth === 0 && radius === null && !storedButtons) chips.buttons = "soft";
+  }
+  const character = { ...parsed, scoped: chips };
   const icons = DS_ICON_LIBRARIES.some((l) => l.id === raw.icons && l.ready) ? (raw.icons as string) : "lucide";
 
-  const buttonStyle = parseDsButtonStyle(raw.buttons);
+  const buttonStyle =
+    older && storedButtons && JSON.stringify(storedButtons) === JSON.stringify(DS_DEFAULT_BUTTON_STYLE) ? null : storedButtons;
 
-  return { colours, families, type, customFonts, hiddenFonts, radius, pillRadius, buttons: buttonStyle, fields: parseDsFieldStyle(raw.fields), icons };
+  return {
+    character,
+    colours,
+    families,
+    type,
+    customFonts,
+    hiddenFonts,
+    radius,
+    pillRadius,
+    buttons: buttonStyle,
+    fields: parseDsFieldStyle(raw.fields),
+    icons,
+  };
+}
+
+/**
+ * The theme at a mood, its personality, restrained to wacky (character.ts;
+ * Alex, 2026-10-29: "if I go through the slider, I want to see the mood
+ * change"): inside the chips the style chose (taste.ts), the kind of type's
+ * font pair for that mood, the kind of button's roundness and depth, the
+ * background's saturation (quieter restrained, stronger wacky) and the
+ * palette's button colour for it. Without chips (a theme from before them),
+ * roundness and the fonts slide along `DS_MOODS`. Anything given its own
+ * apart from the button colour stays as it is.
+ */
+export function dsThemeWithMood(theme: DsThemeConfig, mood: number): DsThemeConfig {
+  const c = theme.character;
+  const { colour, type, buttons } = c.scoped;
+  const look = buttons ? dsButtonLookAt(buttons, mood) : null;
+  const saturation = Math.round(Math.min(1, (c.colour * dsMoodSaturation(mood)) / dsMoodSaturation(c.mood)) * 100) / 100;
+  const character = { ...c, mood, ...(look ?? dsMoodDials(mood)), ...(colour ? { colour: saturation } : {}) };
+  const colours = colour ? { ...theme.colours, accent: { light: dsPaletteButton(colour, character, mood), dark: null } } : theme.colours;
+  // An outline or text button keeps its own look; any other's comes from the depth.
+  return dsThemeWithFonts(
+    { ...theme, character, colours, buttons: dsButtonLookStyle(buttons) ?? theme.buttons },
+    type ? dsTypeStyleFonts(type, mood) : dsMoodFonts(mood)
+  );
+}
+
+/**
+ * The theme with its Heading and Font in a pair of Google fonts (added to its
+ * fonts if they're not there), or Parabola's own for null.
+ */
+export function dsThemeWithFonts(theme: DsThemeConfig, fonts: DsFontPair | null): DsThemeConfig {
+  const customFonts = [...theme.customFonts];
+  const fontId = (face: { label: string; google: string } | undefined, fallback: string) => {
+    if (!face) return fallback;
+    const font = dsCustomFontFromInput(face.label);
+    if (!font) return fallback;
+    const own = { ...font, google: face.google };
+    if (!customFonts.some((f) => f.id === own.id)) customFonts.push(own);
+    return own.id;
+  };
+  const heading = fontId(fonts?.heading, DS_DEFAULT_HEADING_FONT);
+  const body = fontId(fonts?.body, DS_DEFAULT_FONT);
+  const families = theme.families.map((f) =>
+    f.id === DS_HEADING_FAMILY ? { ...f, font: heading } : f.id === DS_BODY_FAMILY ? { ...f, font: body } : f
+  );
+  return parseDsThemeConfig({ ...theme, families, customFonts });
+}
+
+/** A theme's corners: its own, or the character's roundness. */
+export const dsThemeRadius = (theme: DsThemeConfig): DsRadius => theme.radius ?? dsCharacterRadius(theme.character);
+
+/** A theme's buttons' look: its own, or the character's depth. */
+export const dsThemeButtons = (theme: DsThemeConfig): DsButtonStyle => theme.buttons ?? dsCharacterButtons(theme.character);
+
+/** A theme's colour tokens in a mode, its character's base and contrast under the Auto ones. */
+export function dsThemeColourTokens(theme: DsThemeConfig, mode: "light" | "dark"): Record<string, string> {
+  return dsColourTokens(theme.colours, mode, dsCharacterColourOptions(theme.character));
 }
 
 /**
@@ -350,10 +454,10 @@ export function parseDsThemeConfig(value: unknown): DsThemeConfig {
  * and its buttons' look, which follows their colour.
  */
 function colourVars(theme: DsThemeConfig, mode: "light" | "dark"): Record<string, string> {
-  const tokens = dsColourTokens(theme.colours, mode);
+  const tokens = dsThemeColourTokens(theme, mode);
   return {
     ...Object.fromEntries(Object.entries(tokens).map(([name, value]) => [`--ds-${name}`, value])),
-    ...dsButtonStyleVars(theme.buttons, tokens.button),
+    ...dsButtonStyleVars(dsThemeButtons(theme), tokens.button),
     ...dsFieldStyleVars(theme.fields, tokens["field-border"]),
   };
 }
@@ -370,10 +474,11 @@ export function dsThemeVars(theme: DsThemeConfig): Record<string, string> {
     vars[`--ds-text-${s}-leading`] = `${t.lineHeight}px`;
     vars[`--ds-weight-${s}`] = String(dsNearestWeight(dsThemeFont(theme, family.font), t.weight));
   }
-  const px = dsRadiusPx(theme.radius);
+  const radius = dsThemeRadius(theme);
+  const px = dsRadiusPx(radius);
   for (const token of DS_RADIUS_TOKENS) vars[`--ds-radius-${token}`] = `${px[token]}px`;
   // Pills: the buttons' corner, or their own.
-  vars["--ds-radius-chip"] = `${dsRadiusPx(theme.pillRadius ?? theme.radius).pill}px`;
+  vars["--ds-radius-chip"] = `${dsRadiusPx(theme.pillRadius ?? radius).pill}px`;
   return vars;
 }
 
@@ -407,9 +512,9 @@ const SCOPE_DERIVED: Record<string, string> = {
 
 /** Each colour token's role, in plain words, for an export a person or an AI reads. */
 const COLOUR_ROLES: [token: string, role: string][] = [
-  ["bg", "base: the page background"],
-  ["fg", "type: primary, the text"],
-  ["fg-muted", "type: secondary, quieter text"],
+  ["bg", "background: the page"],
+  ["fg", "primary: the text"],
+  ["fg-muted", "secondary: quieter text"],
   ["fg-subtle", "faintest text (captions, placeholders)"],
   ["border", "borders and field outlines"],
   ["surface-subtle", "surface: cards and panels"],
@@ -434,15 +539,41 @@ const COLOUR_ROLES: [token: string, role: string][] = [
  */
 export function dsThemeExport(theme: DsThemeConfig, name = "Parabola theme") {
   const colours = (mode: "light" | "dark") => {
-    const tokens = dsColourTokens(theme.colours, mode);
+    const tokens = dsThemeColourTokens(theme, mode);
     return Object.fromEntries(COLOUR_ROLES.map(([token, role]) => [role, tokens[token]]));
   };
   const familyFont = (id: string) => dsThemeFont(theme, dsFamily(theme, id).font);
-  const px = dsRadiusPx(theme.radius);
+  const radius = dsThemeRadius(theme);
+  const buttons = dsThemeButtons(theme);
+  const px = dsRadiusPx(radius);
+  const c = theme.character;
+  const pct = (n: number) => Math.round(n * 100);
+  // What's been given its own value, apart from the dials.
+  const overrides = [
+    ...(Object.keys(theme.colours) as (keyof typeof theme.colours)[]).filter((k) => theme.colours[k].light !== null || theme.colours[k].dark !== null).map((k) => `colour: ${k}`),
+    ...(theme.radius !== null ? ["corners"] : []),
+    ...(theme.pillRadius !== null ? ["pill corners"] : []),
+    ...(theme.buttons !== null ? ["buttons"] : []),
+  ];
   const round = (n: number) => (n >= 9999 ? "fully round" : `${n}px`);
   return {
-    about: `"${name}", a website theme made with Parabola. Colours are given for a light and a dark mode, each by what it's for; fonts by name, with a Google Fonts link; type styles by name, largest first; corners in pixels. Use it to build or restyle a website in this look. "settings" is the theme itself, for Parabola to read back.`,
+    about: `"${name}", a website theme made with Parabola. "character" is the look as a whole, dials an agent moves rather than picking colours: hue (0 to 360), temperature ("warmth", cool -50 to warm +50), how much colour ("colour"), the type's contrast ("typeContrast", 100 full, lower an ink of the hue), brightness (0 black, 50 the colour at its strongest, 100 white), contrast, roundness and depth, each 0 to 100 (contrast -50 to +50), plus the base colour they make and the chips picked in each section ("scoped"); every value under them is worked out from the dials unless listed in "overrides". Colours are given for a light and a dark mode, each by what it's for; fonts by name, with a Google Fonts link; type styles by name, largest first; corners in pixels. Use it to build or restyle a website in this look. "settings" is the theme itself, for Parabola to read back.`,
     name,
+    character: {
+      tastes: c.tastes,
+      scoped: c.scoped,
+      background: dsCharacterBase(c) ?? "white",
+      hue: Math.round(c.hue),
+      warmth: Math.round(c.warmth * 50),
+      typeContrast: pct(c.ink),
+      colour: pct(c.colour),
+      brightness: pct(c.brightness),
+      contrast: Math.round(c.contrast * 50),
+      roundness: pct(c.roundness),
+      depth: pct(c.depth),
+      ...(dsCharacterIsDefault(c) ? { note: "Parabola's own: every dial at rest" } : {}),
+    },
+    overrides,
     colours: { light: colours("light"), dark: colours("dark") },
     typography: {
       fonts: Object.fromEntries(theme.families.map((f) => [f.label, familyFont(f.id).label])),
@@ -460,19 +591,19 @@ export function dsThemeExport(theme: DsThemeConfig, name = "Parabola theme") {
       "small buttons and pills": round(px.control),
       "smallest (tags, swatches)": round(px.sm),
       buttons: round(px.pill),
-      pills: round(dsRadiusPx(theme.pillRadius ?? theme.radius).pill),
+      pills: round(dsRadiusPx(theme.pillRadius ?? radius).pill),
     },
     buttons: {
       fill:
-        theme.buttons.fill === "gradient" && theme.buttons.contrast !== 0
-          ? `a gradient of the button colour, ${theme.buttons.contrast > 0 ? "lighter at the top and darker at the bottom" : "darker at the top and lighter at the bottom"} (contrast ${Math.round(Math.abs(theme.buttons.contrast) * 50)} of 50)`
+        buttons.fill === "gradient" && buttons.contrast !== 0
+          ? `a gradient of the button colour, ${buttons.contrast > 0 ? "lighter at the top and darker at the bottom" : "darker at the top and lighter at the bottom"} (contrast ${Math.round(Math.abs(buttons.contrast) * 50)} of 50)`
           : "solid, the button colour",
-      outline: theme.buttons.outline ? `a ${theme.buttons.outlineWidth}px line inside the edge, the button colour a step darker` : "none",
+      outline: buttons.outline ? `a ${buttons.outlineWidth}px line inside the edge, the button colour a step darker` : "none",
       fieldOutline: theme.fields.outline
         ? `${theme.fields.outlineWidth}px${theme.fields.outlineOpacity < 1 ? `, ${Math.round(theme.fields.outlineOpacity * 100)}% opaque` : ""}`
         : "none",
-      label: theme.buttons.shadow
-        ? `a 1px text shadow on the label only, falling away from a light at ${theme.buttons.shadowAngle}° (90 is from above)`
+      label: buttons.shadow
+        ? `a 1px text shadow on the label only, falling away from a light at ${buttons.shadowAngle}° (90 is from above)`
         : "flat",
     },
     settings: theme,
@@ -575,6 +706,18 @@ export function dsClearAppliedTheme(): void {
 }
 
 // ---------------------------------------------------------------------------
+/**
+ * Whether two themes look the same: the style they're named for and fonts
+ * added but unused don't count (a style is a label for how a look was made).
+ */
+export function dsSameLook(a: DsThemeConfig, b: DsThemeConfig): boolean {
+  const look = (t: DsThemeConfig) => {
+    const p = parseDsThemeConfig(t);
+    return JSON.stringify({ ...p, character: { ...p.character, tastes: [] }, customFonts: [], hiddenFonts: [] });
+  };
+  return look(a) === look(b);
+}
+
 // The library: every theme a site has, one of them in use.
 
 /** A named theme in a library. */
@@ -633,7 +776,7 @@ export function parseDsThemeLibrary(value: unknown, legacy?: unknown): DsThemeLi
   let active = typeof raw.active === "string" && others.some((t) => t.id === raw.active) ? raw.active : DS_DEFAULT_THEME_ID;
   // Parabola is Parabola's own and never changes. One changed before that (its colours, its fonts) becomes a
   // theme of its own, Custom, and stays the site's if it was, so the site looks as it did.
-  if (JSON.stringify(first.theme) !== JSON.stringify(parseDsThemeConfig(DS_DEFAULT_THEME))) {
+  if (!dsSameLook(first.theme, DS_DEFAULT_THEME)) {
     const names = new Set(others.map((t) => t.name));
     let name = "Custom";
     for (let n = 2; names.has(name); n++) name = `Custom ${n}`;

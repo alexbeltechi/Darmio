@@ -41,7 +41,9 @@ import { DsLink, type DsLinkProps } from "../provider";
  * red button is the `danger` variant. There's no warning (yellow) style.
  *
  * State (props, not variants); on the default variant both are drawn in
- * `ds-button`, as primary is, on the text variant as its hover surface:
+ * `ds-button`, as primary is; on the text variant in the default button's
+ * own grey, so a picked chip and a plain button share one surface (Alex,
+ * 2026-10-29):
  * - `pressed`: a toggle that's on; sets `aria-pressed`.
  * - `current`: the link to the page you're on; sets `aria-current="page"`.
  *
@@ -66,9 +68,10 @@ export const dsButtonVariants = cva(
       variant: {
         default: "backdrop-blur-[24px] bg-ds-surface/70 text-ds-on-surface ds-hover disabled:text-ds-fg-subtle",
         // The theme's button look (button-style.ts): a gradient under the hover wash, an inset outline, and a
-        // label shadow, which falls on text only, never the icons.
+        // label shadow, which falls on text only, never the icons; or no fill at all, the label in the button
+        // colour (an outline or a text button).
         primary: [
-          "backdrop-blur-[24px] bg-ds-button text-ds-on-button disabled:opacity-40",
+          "backdrop-blur-[24px] [background-color:var(--ds-button-fill,var(--ds-button))] [color:var(--ds-button-label,var(--ds-on-button))] disabled:opacity-40",
           "[background-image:var(--ds-button-image)] [box-shadow:var(--ds-button-ring)] [text-shadow:var(--ds-button-text-shadow)]",
           "hover:[background-image:linear-gradient(var(--ds-hover-inverse),var(--ds-hover-inverse)),var(--ds-button-image)]",
         ],
@@ -126,7 +129,7 @@ export const dsButtonVariants = cva(
       {
         variant: "text",
         inverse: true,
-        className: "bg-ds-surface/40 text-ds-fg",
+        className: "bg-ds-surface/70 text-ds-on-surface ds-hover",
       },
     ],
     defaultVariants: { variant: "default", size: "default" },

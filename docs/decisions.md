@@ -23,6 +23,339 @@ with the why. To change one, add a new line that overrides it.
   Bootstrapped, no investors; Polsia and Ghost are the main competitors.
   The whole of it, with prices still hypotheses, is `positioning.md`, which
   leads where `vision.md` disagrees. Fits the three Darmios (2026-10-28).
+- 2026-10-29 — **Each style has its own type contrast.** Alex: rerolling
+  should change the type's contrast too, "different styles have different
+  contrast levels". A style holds a range (Classic and Sport full, Minimal
+  and Tech nearly, Elegant 55–85, Natural 45–75, Retro 40–70); picking it
+  takes the middle, Shuffle, Next and the dice draw inside it.
+- 2026-10-29 — **Temperature and a true brightness; type contrast; chips in
+  the button grey; rails follow.** Alex: the Saturation bar "makes it
+  darker", so Temperature is back in its place (cooler or warmer) and
+  Brightness is a true one again, 100 white, 0 black, the colour at its
+  strongest between; the Contrast bar is gone (a palette sets it). Themes
+  saved in the day's saturation-and-value form are read back as the same
+  colour. Typography gains a Contrast bar for the type: lower, the text is
+  an ink of the page's hue (warm brown on paper, a deep teal on teal), not
+  grey. A picked chip wears the default button's grey, the same as Previous,
+  Shuffle and Next (Parabola's text button, pressed or current). Every rail
+  slides its picked chip into view when it changes, so what a style chose
+  in Colour, Typography and Buttons is seen.
+- 2026-10-29 — **Previous, Shuffle, Next under the mood.** Alex: grey
+  buttons in one row under the Mood slider, Previous at the left (chevron on
+  its left), Next at the right (chevron on its right), and between them,
+  filling the space, Shuffle: another version of the style picked (another
+  Elegant). The dice stays in Taste's header beside Restore: fully random,
+  any style and mood.
+- 2026-10-29 — **Styles tuned; variations live in Taste; letters are
+  white.** Alex: Minimal's buttons are regular square ones (Text read as
+  offset; it stays a chip to pick by hand); square is Minimal's, so Tech is
+  fully round and Classic's other button a product's. Elegant uses no
+  Didone (Bodoni, Playfair, Italiana): EB Garamond, Cormorant, Marcellus,
+  Cinzel Decorative. Each kind of type's playful pair is plainly playful and
+  its wacky one a retro display face (Shrikhand, Alfa Slab One, Righteous,
+  Bagel Fat One). ‹ › and the dice sit in Taste beside its Restore, to cycle
+  through variations of a style. The email's letter is white in Gmail's
+  inks, in the theme's fonts, unless the mood is far up Playful ("only like
+  funky stuff"). The Mood slider has no labels under it.
+- 2026-10-29 — **Mood is a slider again, on a 1px line.** Alex tried the
+  + Serious / + Playful buttons and the step dots, then chose the slider:
+  the same grab circle as Saturation and Brightness, its track a subtle 1px
+  line, Serious to Playful. The story tells two moments, small: her next
+  project, Dragonfly Vision, by her cheek and lined up with her avatar,
+  then the line and what to tap. The feed post is her sitting at the lake's
+  edge by day, cropped square with her well in the frame
+  (`public/parabola/preview/ilo-lake-day.jpg`, from the Y3K brand images).
+- 2026-10-29 — **Mood in steps; Classic; no gradients in the styles.**
+  Alex: the Mood bar is two buttons, + Serious and + Playful, at the normal
+  size: each press is a step (an eighth, Balanced in the middle) and every
+  step changes the look inside the style, fonts, buttons, colour and voice.
+  Default and Editorial are one style, **Classic** (Parabola's own first,
+  its balanced fonts Parabola's). A style's own look is the first of each
+  of its lists; › draws from the rest. No style reaches for a gradient
+  ("generally, I disagree"): Chunky is a thick edge now, Tactile the one
+  gradient, picked by hand. Sport is vibrant and athletic, mostly on colour:
+  volt, black, electric blue, blaze orange, a court green, neon on dark.
+- 2026-10-29 — **Styles settled; rails are tabs; Social is one piece.**
+  Alex: Fashion's look was "a different type of editorial", so it's
+  **Elegant** now and took Luxury in (redundant); Sci-fi looked like Tech
+  and went into it. New: **Default** (Parabola's own) and **Minimal**. Every
+  rail is choose-one, as tabs are: picking the one picked does nothing, there's
+  always one. Buttons gain **Outline** and **Text** (no fill, the label in
+  the button colour: a fill of "none"). Email is a short whole letter, no
+  fade. Social is one piece: the story and the feed post over the post on X,
+  4px apart, rounded only at the outer corners. The feed post is one photo
+  with a caption, not a carousel, and the story carries two bits of words,
+  centred ("you're trying very hard").
+- 2026-10-29 — **Taste is Style and Mood.** Alex: "aesthetics and
+  personality". Feel, World and Era are gone ("there's just too much going
+  on"): **Style** is the one rail, one pick (Editorial, Tech, Fashion,
+  Natural, Sci-fi, Luxury, Retro, Sport), choosing a palette, a kind of type
+  and a kind of button. Restrained, Playful and Wacky aren't styles but the
+  **Mood** bar, the personality, Restrained to Wacky; moving it changes the
+  look you can see ("if I go through the slider, I want to see the mood
+  change"): each kind of type has four font pairs along it, buttons get
+  rounder and deeper, the colour more saturated and the button colour
+  livelier, and the voice goes from calm to wild. A style keeps the mood
+  set; the dice draws both. Overrides the tracks, Era rules and blends of
+  the entries below.
+- 2026-10-29 — **Back to Parabola's own is Parabola.** Alex: after
+  restoring, the panel still said Custom. Now when the working copy comes
+  back to Parabola's own look (a section restored, say), Parabola (default)
+  opens again and Custom goes, unless Custom is the theme the site wears.
+- 2026-10-29 — **Platform cards are outlined; Email is Gmail.** Alex: the
+  social posts sit on their platform's white in a grey outline, and the
+  email "looks nothing like an email": it's now a message open in Gmail,
+  its toolbar, the subject with its Inbox label and the sender's row in
+  Gmail's own white, inks and font, with only the letter inside in the
+  theme.
+- 2026-10-29 — **Tastes choose chips; Mood fine-tunes them; hue and
+  saturation for colour.** Alex: instead of Temperature, hue and
+  saturation, "think of it like editing a photograph": by default a paper
+  hue with no saturation, and raising it goes to a bright orange. They sit
+  in the section now called **Colour**, with colour chips of their own
+  (Classic, Parabola's as it is; Neutral, a startup's; Earthy, Pastel,
+  Vibrant, Sport, Rich, Vintage, Neon), each a background, a button colour
+  and a contrast. The taste pills choose the chips in every section (a
+  palette, a kind of type, a kind of button: the ones most picks name), and
+  the **Mood** bar, Serious to Playful, fine-tunes that combination ("a way
+  of fine-tuning that existing combination of chips"): where in each kind's
+  range it sits. Typography gains Classic, Friendly, Retro and Futurist. A
+  colour's brightness is now as in a photo editor (hue, saturation,
+  brightness: white is no saturation at full brightness), which overrides
+  the "true brightness" of the 2026-10-29 wheel entry for the background
+  dials; themes stored with a temperature keep their tint.
+- 2026-10-29 — **No Expression; one rail per section; an Era track.**
+  Alex: Expression "doesn't actually make sense", the mood does it better,
+  so the bar and the colour spread it drove (`vivid`) are gone; cards and
+  secondary buttons are Parabola's again. Temperature moved from Taste to
+  Appearance, beside the background it warms. The Feel and World pills no
+  longer repeat inside every section: Typography has one rail, a kind of
+  type (Editorial, Startup, Elegant, Funky, Quirky), Buttons one, a kind of
+  button (Product, Soft, Sharp, Tactile, Chunky); Appearance and Fields
+  have none, their dials say it. Taste opens with its pills, Feel, World
+  and a new **Era** (Retro, Modern, Contemporary, Futuristic), then Mood.
+  Era takes more than one pick, under rules (`DS_TASTE_EXCLUDES`): retro,
+  modern and contemporary rule each other out; futuristic goes with any,
+  and retro with futuristic draws a blend of its own, Retro-futuristic.
+  Overrides "Expression is colour" below.
+- 2026-10-29 — **Expression is colour; platforms keep their own look.**
+  Alex: Expression isn't bolder fonts, "it's more around the use of colour
+  than shape". So it no longer moves the headlines' weight or the buttons'
+  depth (depth comes with the tastes); it sets how far the button colour
+  spreads (`vivid`): quiet keeps cards, secondary buttons and tints grey,
+  loud washes them, the borders and the quieter text in the brand colour.
+  The X post and the Instagram post sit on the platforms' white with their
+  inks and system font ("you can't do custom branding there, so let's not
+  mislead"); only what Ilo puts in a post carries the theme. A story's
+  words are one small size, low on the photo, and what to tap is words in
+  the other colour, never a button. Email follows Web, right after the
+  subscribe box: the top of her letter, cropped, opening in the taste's
+  voice with what she's been up to.
+- 2026-10-29 — **Pills remember; the preview reads as parts.** Alex: going
+  from Approachable to Restrained and back drew a new look when he wanted
+  the one he'd liked. So a pick of pills comes back as it was last seen,
+  tweaks and all; › and the dice are the ways to a new one, and picking
+  another theme forgets them. Light and Dark sit under the theme, not in
+  the wheel. Each preview part has a divider and a title the size of the
+  panel's; the order is Web, Social, Email, App, then Brand. The story
+  stretches to the height of the feed post beside it, which is an outlined
+  card like the X post; the X photo is square, her head in, no edge. Ilo is
+  a Y3K maker (craft, art, sound, writing), so the words tell of Dragonfly,
+  the silver glasses she made at the lake, and App is her project's draft.
+- 2026-10-29 — **A taste has a voice; the preview in parts; back,
+  forward, dice.** Alex: tastes are brand rules, so the words have to change
+  with them ("the text doesn't change in the tweet; it obviously ought
+  to"); Tech was overdone (neon is Sci-fi's); a Natural look shouldn't tilt
+  the story's words; the controls are just back, forward and the dice by the
+  menu. So: each taste carries a **voice**, a tone and a rule
+  (`dsTasteVoice`: the World pick's tone, else the Feel's); the preview
+  opens with **Brand**, a style statement from the pills, the bars and the
+  fonts, and the voice's rules, then **Web**, **Social** (the story beside
+  a square carousel post, "5 …", the X post under), **Email** and **App**,
+  all their words in that tone. Feel gains **Technical** (shadcn-like:
+  Geist or Inter, zinc, flat, 1px), and **Tech** is calmer (no neon). Only
+  Playful and Wacky tilt a story (`dsTasteTilt`). Back and forward step
+  through variations inside the pills picked, forward drawing a new one at
+  the end; the dice picks other pills; the wand is gone. A variation worth
+  keeping is **Save as new theme**, at the panel's foot.
+- 2026-10-29 — **A look never touches the type scale; true brightness;
+  contrast between the buttons; Colours follows the theme.** Alex: the dice
+  barely changed anything yet moved the display size; brightness should run
+  black to white; contrast should be what sets primary and secondary
+  buttons and cards apart; the foundations should show the theme's own
+  colours, without the separate Accent tab. So: **Expression** sets only the
+  headlines' weight and the buttons' depth; sizes stay the type scale's
+  (Taste's restore puts the type scale back). The **dice** reaches past the
+  tastes' own picks half the time (a coloured background, any font pair).
+  **Brightness** on a colour is lightness: 0 black, 50 the colour at its
+  strongest, 100 white (backgrounds read as hue, saturation, lightness).
+  **Contrast** is Appearance's alone and moves the secondary buttons and
+  pills away from the cards (`surface`), the cards and borders from the
+  page, the quiet text toward the strong. **Foundations › Colours** is one
+  page, every token in light and dark worked out live from the open theme;
+  the content accents' page is gone from the showcase (the tokens stay).
+- 2026-10-29 — **Pills first, fine-tuning folded.** Alex: the sliders and
+  choices are fine-tuning, not where you start. In Appearance, Typography,
+  Buttons and Fields the pills come first and **"Show advanced options"**
+  opens the rest: Appearance's Brightness, Hue, Contrast and the colours
+  themselves (Light and Dark, the wheel; no separate colour toggle any
+  more); Typography's Heading and Font (plain Parabola selects of font
+  names: the "Aa" previews were drawing twice in the closed field) and the
+  link to font families and the type scale; Buttons' Roundness and button
+  choices; Fields' outline.
+- 2026-10-29 — **Tracks: one pick each, in light pills that slide.** Alex:
+  some pills exclude each other (Restrained and Bold can't both be true),
+  so a group of pills is a **track** and takes one pick, as tabs do
+  (`dsPickTaste`): picking replaces the track's pick, picking it again takes
+  it off. Two tracks, **Feel** (Approachable, Restrained, Luxurious, Bold,
+  Candid) and **World** (Editorial, Playful, Wacky, Tech, Sci-fi, Fashion,
+  Natural; Editorial moved here), so Parabola's own, Restrained +
+  Editorial, is one of each; the dice picks at most one per track. The same
+  in every section's pills. Each track is one row that **slides sideways**
+  with its edge fading where there's more (`DsScrollRow`, a Parabola
+  primitive). The pills are the **light kind**: text buttons, no fill at
+  rest, a soft fill when picked (the filled kind turns black when picked).
+  **Expression** now also sizes the headlines, 90% of Parabola's when quiet
+  to 130% when loud, so the bar shows on any page.
+- 2026-10-29 — **Three levers define a taste; a slider in the system; the
+  player is variations.** Alex asked for a serious think about the sliders
+  as the foundation of the taste engine, and found Expression doing nothing
+  he could see. The levers are the three things people say about a brand
+  before naming a genre: **Mood** (Serious to Wacky: how formal; roundness
+  and the fonts' character), **Expression** (Quiet to Loud: how much it
+  shouts; contrast, the headlines' weight, Regular to Bold, and the
+  buttons' depth, `dsThemeWithExpression`) and **Temperature** (Cool to
+  Warm: how human or technical; the background's warmth and the greys from
+  it, moved up from Appearance). Each is a lever, not a value of its own;
+  the pills are the vocabulary on top; Appearance keeps only the physical
+  (Brightness, Hue, Contrast). Every bar is one Parabola primitive now,
+  **`DsSlider`** (`primitives/slider.tsx`; `DsColourBar` is it): the title
+  in the text colour with the readout beside it, the end words small and
+  muted under the track, so the two never read alike. **The player** at the
+  top is variations, not retries: back and forward step through variations
+  of the look locked in (the pills picked), the wand between them nudges
+  it a little without a new draw (`dsNudgeTaste`: the levers and the
+  background a step, now and then another font pair), and the dice at the
+  right end, no background, starts over with random pills.
+- 2026-10-29 — **A player at the top, a slimmer Appearance, Instagram's
+  type.** Alex: the player should look like Spotify and sit at the very
+  top; Appearance should start with brightness; Colour and Depth sliders
+  felt redundant (depth only shows on solid buttons) and roundness is the
+  UI's. So: under the theme picker, **back, retry (the large icon button in
+  the middle) and forward**, then **Shuffle** on or off; no counter.
+  **Appearance** is Brightness, Warmth, Hue, Contrast (a hue dragged onto a
+  white gives it a tint; a pill or Colours sets more colour); **Roundness**
+  moved to Buttons; depth is Expression's, no slider of its own. A story's
+  words are set **as Instagram sets them, line by line**: each line its own
+  tight box following the text (`box-decoration-break: clone`), in the page
+  colour (boxed: Restrained, Editorial, Luxurious, Tech, Sci-fi), with no
+  box and white words (plain: Approachable, Candid, Fashion, Natural), or on
+  the button colour (loud: Bold, Playful, Wacky); `dsTasteStory`.
+- 2026-10-29 — **Taste as the front door, pills in every section.** Alex:
+  the default isn't "no pills", it's a mix of them; Mood belongs with the
+  pills, as two bars; Restrained isn't a font; the pills should decide each
+  section's values; Colours is a subset of Appearance. So: **Taste** opens
+  with two bars, **Mood** (Serious to Wacky: warmth, roundness and the
+  fonts) and **Expression** (Toned down to Expressive: contrast and depth,
+  `dsExpressionDials`), tracks in two tastes' colours, then the pills, then
+  the Shuffle player centred. **Parabola's own is Restrained + Editorial**
+  (`DS_DEFAULT_TASTES`), so those show picked to start; Restrained sets no
+  fonts. Every section's **Restore is an icon at its top right**, in place
+  of the ⋮. **Typography, Buttons, Fields and Appearance each have the
+  pills** (`ScopedTastes`, kept as `character.scoped`): in Typography a
+  pill picks a font pair (`dsTasteFonts`), in Buttons a roundness, depth
+  and button colour (`dsTasteButtons`), in Fields an outline
+  (`dsTasteField`, each taste has one), in Appearance a background
+  (`dsTasteBackground`); unpicking the last leaves Parabola's own. **Colours
+  is inside Appearance**, behind "Show colour controls" (Light and Dark,
+  the wheel). The preview's article is "Creating tasteful AI in an
+  AI-infested world", on what to hand to AI and what to keep; a large
+  "Read the essay" button under it, the one big one; the subscribe card
+  says "Keep up with my thoughts. One letter in your inbox a week." with
+  the regular buttons.
+- 2026-10-29 — **Taste in two groups, a player for takes, the background
+  as dials.** Alex, after trying it: tastes read the way people describe a
+  brand, so they come in two groups with an icon each: **Feel** (how it
+  comes across: Approachable, Restrained, Editorial, Luxurious, Bold,
+  Candid; Restrained is what Minimal was) and **World** (where it belongs:
+  Playful, Wacky, Tech, Sci-fi, Fashion, Natural). Their backgrounds reach
+  mid-tones too (a strong teal, a sage, a burgundy), not only light and
+  dark. Under the pills, like a music player: **Shuffle** is on or off, and
+  back and forward step through takes (forward draws a new one, from one or
+  two random pills with Shuffle on, from the pills picked with it off;
+  back returns; forward again replays before drawing anew), with a counter.
+  **Appearance** has no hex any more (that's Colours' job): the background
+  is dials, **Warmth** first, then **Hue**, **Colour** (none to full) and
+  **Brightness** (dark to light), then Contrast, Roundness, Depth. In the
+  preview, Ilo shows as **her photo** in a friendly look (a taste whose
+  people are photos) and as **ILO initials** on the button colour in a
+  branded one; the story's text is in the theme's main font, in three
+  pieces (a line, a small note, a sticker), set squarely in boxes when
+  branded and loose and tilted when friendly; the X post is laid out as X
+  lays one out (the check, the ⋯, the counts with their icons).
+- 2026-10-29 — **A taste builder, not a theme picker.** Alex wants
+  /parabola to build a brand's taste, not only a UI: drag a few dials and
+  press a few pills, see the whole look roll out, and let an agent go
+  further from outside inspiration without being boxed in. So:
+  **Taste** comes first in the panel: common styles as pills (Minimal,
+  Editorial, Luxury, Tech, Warm, Bold, Playful, Wacky; `taste.ts`), each a
+  recipe of ranges, not a fixed look (where on the Mood bar, where the dials
+  may go, the bases, button colours and font pairs it reaches for). Pick
+  one and the look changes at once, drawn inside it; pick more and it's
+  drawn inside all of them; **Shuffle**, a plain action (not a pill, so it
+  doesn't read as one that's on), picks one or two pills at random, shows
+  them picked and draws from them, again for another mix; unpicking the last brings
+  back the look from before the first; **Default** is Parabola's own. The
+  pills picked are kept on the theme (`character.tastes`, in the export). A
+  shuffle starts the look over (colours, corners and buttons back to Auto),
+  and never lands a button the colour of the page. **Mood** now runs
+  Serious, Balanced, Playful and on to **Wacky** (everything turned up, a
+  loud display face). The preview shows the **brand, not just the UI**:
+  the site at a glance (a post, Ilo's lake photo with a caption, the
+  subscribe card), then the same look out in the world: a story (her
+  portrait, lines laid over it in the theme), a post on X, an email.
+  **The lists are meant to grow**: an agent adds a taste, a font pair or a
+  colour from what's current (font trends, a Figma file, Mobbin, an awards
+  site) as a line in `taste.ts` or `DS_MOODS`, so every theme can reach
+  it; one maker's look is dials and overrides on their theme. Next
+  (roadmap): spacing in the style, a story editor (lines placed over a
+  photo, as Instagram does, walking through a narrative), the brand brief.
+- 2026-10-29 — **A character layer above the theme; dials generate,
+  overrides stick, published is frozen.** Alex: picking colours on a wheel
+  makes ugly UIs; the start should be "how bright, how warm", like editing
+  a photograph, and the look should roll out everywhere; an agent should
+  set a look ("hacker-like", a screenshot) by altering characteristics,
+  not hard-coding values, so the result is a set of sliders he can drag.
+  So a theme has three layers. **Character** (`character.ts`): a base
+  colour to start from (Auto: white) and dials, Brightness (dark to
+  bright), Warmth (cold to warm), Contrast (soft to hard), Roundness
+  (sharp to round), Depth (flat to deep), each nudging many values: the
+  base and every colour that follows it, the corners, the buttons' look.
+  **Theme**: the values as before (colours, corners, buttons, fields,
+  fonts), each Auto (worked out from the dials) or Custom (its own); a dial
+  moves the Auto values and leaves the Custom ones, and Restore hands one
+  back to the dials. **Tokens and components**: unchanged, so the rollout is
+  already solved. Two rules make it last: dials generate and overrides stick
+  (a saved theme is dial positions plus overrides, readable whatever the
+  mapping becomes), and published is frozen while the editor is live (a
+  better mapping later moves nothing on a live site until republished). In
+  the panel Character comes first and the colour wheel is folded under
+  Colours, for a colour of its own. The export carries `character` and the
+  list of `overrides`, so an agent reads and sets a look at that level. The
+  mapping from dials to values is the taste, kept in the one file with a
+  line per dial on what it's for, for a later model to improve a rule
+  rather than a number. Not yet: loudness, presets, themed sections, the
+  brand brief (roadmap). Same day, Alex: it's **Style**, not character, in
+  two parts. **Mood** first, one bar from Serious to Playful in plain words
+  ("Serious", "Composed", "Balanced", "Lively", "Playful"), which moves the
+  Appearance dials and the fonts together (`DS_MOODS`): Serious is crisp
+  corners, a little cooler, firmer contrast, flat, Newsreader over IBM Plex
+  Sans; Balanced is Parabola's own; Playful is round, warmer, a touch
+  softer, some depth, Fredoka over Nunito. Then **Appearance**: the base
+  colour, white to start, shown as Figma and Paper show a colour
+  (`DsColourField`: its swatch and hex; the swatch opens the picker), and
+  the dials. Warmth on white tints toward paper (and coolness toward ice),
+  not lemon or blue.
 - 2026-10-29 — **Radius became Buttons.** In /parabola's theme panel the
   Radius section is Buttons (Alex): a fill, Solid or Gradient, whose
   **contrast** runs -50 to +50 from a flat 0 in the middle (above 0 the
@@ -75,9 +408,12 @@ with the why. To change one, add a new line that overrides it.
   nested inside Colours; the top bar's Collapse all / Expand all folds or opens them all. The site's own nav is unchanged for now.
 - 2026-10-28 — **Parabola themes, made like shadcn's create page.** A
   theme is data (`packages/parabola/theme.ts`): six colours
-  (`colours.ts`), named for what they colour (Alex, 2026-10-29; they were
-  primary, secondary, tertiary, quaternary and surface for a day), each
-  based on another until given its own: **base** (the website's
+  (`colours.ts`), named for what they colour, in the order they're thought
+  through (Alex, 2026-10-29): **Background**, **Primary** and
+  **Secondary** (the text and the quieter text; "base", "type: primary"
+  and "type: secondary" for a day), **Button: primary**, **Button:
+  secondary**, **Field**, **Surface**. Each is based on another until
+  given its own: **background** (the website's
   background; Parabola's own is white, its cards a warm off-white
   #F7F5F2, 4 darker, the same step a picked base's cards take; paper,
   #FAF7EF, for a day on 2026-10-28, until Alex wanted white back),

@@ -4,112 +4,23 @@ import * as React from "react";
 import { cn } from "../cn";
 import { dsHexToHsl, dsHexToHsv, dsHslToHex, dsHsvToHex, dsNormalizeHex, dsWarmth, dsWithWarmth } from "../colours";
 import { DsInput } from "../primitives/field";
+import { DS_SLIDER_THUMB, DS_SLIDER_THUMB_RING, DsSlider, useDrag } from "../primitives/slider";
 
 type Hsv = { h: number; s: number; v: number };
 
 const clamp = (n: number) => Math.min(1, Math.max(0, n));
 
-/** Pointer drag over an element, reporting where it is as fractions (0–1) of its width and height. */
-function useDrag(onMove: (x: number, y: number) => void) {
-  return {
-    onPointerDown(event: React.PointerEvent<HTMLElement>) {
-      const el = event.currentTarget;
-      // Keep getting moves when the pointer leaves the element; a pointer that can't be captured still works.
-      try {
-        el.setPointerCapture(event.pointerId);
-      } catch {}
-      const report = (e: { clientX: number; clientY: number }) => {
-        const r = el.getBoundingClientRect();
-        onMove(clamp((e.clientX - r.left) / r.width), clamp((e.clientY - r.top) / r.height));
-      };
-      report(event);
-      const move = (e: PointerEvent) => report(e);
-      const up = () => {
-        el.removeEventListener("pointermove", move);
-        el.removeEventListener("pointerup", up);
-      };
-      el.addEventListener("pointermove", move);
-      el.addEventListener("pointerup", up);
-    },
-  };
+/** A colour's hue, saturation and brightness; a white, black or grey has no hue, so it starts at paper's warm 40°. */
+function toHsv(hex: string): Hsv {
+  const hsv = dsHexToHsv(hex);
+  return hsv.s === 0 ? { ...hsv, h: 40 } : hsv;
 }
 
-const THUMB = "pointer-events-none absolute size-4 -translate-x-1/2 -translate-y-1/2 rounded-full";
+const THUMB = DS_SLIDER_THUMB;
+const THUMB_RING = DS_SLIDER_THUMB_RING;
 
-/** A white ring and a thin black line outside it, so the thumb shows on any colour, white and black included. */
-const THUMB_RING = "inset 0 0 0 2px white, 0 0 0 1px black";
-
-/**
- * Parabola colour bar: a slider whose track shows the colours it gives, left
- * to right, and a thumb in the colour it's on. The colour picker's hue and
- * brightness are both one, and so is a theme colour's shift from what it's
- * based on. Drag it, or use the arrow keys (Shift for bigger steps). With
- * `readout`, its name sits on the left above it and its value on the right,
- * so a colour can be noted down and made again. Controlled: `value` from 0
- * to 1.
- */
-export function DsColourBar({
-  value,
-  onChange,
-  track,
-  thumb,
-  label,
-  title = label,
-  readout,
-  valueText,
-  className,
-}: {
-  value: number;
-  onChange: (value: number) => void;
-  /** The track: a CSS gradient, left to right. */
-  track: string;
-  /** The thumb's colour. */
-  thumb: string;
-  label: string;
-  /** The name shown above it, when it differs from `label` ("Brightness" for "Buttons brightness"). */
-  title?: string;
-  /** The value shown above it on the right: "212°", "64", "−6". */
-  readout?: string;
-  /** What the value means, for assistive tech ("10% darker"). */
-  valueText?: string;
-  className?: string;
-}) {
-  const drag = useDrag((x) => onChange(x));
-  const bar = (
-    <div
-      role="slider"
-      tabIndex={0}
-      aria-label={label}
-      aria-valuemin={0}
-      aria-valuemax={100}
-      aria-valuenow={Math.round(value * 100)}
-      aria-valuetext={valueText}
-      className={cn("relative h-3 w-full cursor-pointer touch-none rounded-full ds-focus", className)}
-      style={{ backgroundImage: track }}
-      onKeyDown={(event) => {
-        const size = event.shiftKey ? 0.1 : 0.02;
-        const delta =
-          event.key === "ArrowRight" || event.key === "ArrowUp" ? size : event.key === "ArrowLeft" || event.key === "ArrowDown" ? -size : 0;
-        if (!delta) return;
-        event.preventDefault();
-        onChange(clamp(value + delta));
-      }}
-      {...drag}
-    >
-      <span className={THUMB} style={{ boxShadow: THUMB_RING, left: `${value * 100}%`, top: "50%", backgroundColor: thumb }} />
-    </div>
-  );
-  if (readout === undefined) return bar;
-  return (
-    <div className="flex flex-col gap-ds-8">
-      <div className="flex items-baseline justify-between gap-ds-8 text-small">
-        <span className="text-ds-fg-muted">{title}</span>
-        <span className="text-ds-fg tabular-nums">{readout}</span>
-      </div>
-      {bar}
-    </div>
-  );
-}
+/** The picker's hue, warmth and brightness bars, and a theme's dials: Parabola's slider (primitives/slider.tsx). */
+export const DsColourBar = DsSlider;
 
 /**
  * Parabola colour picker, inline (no pop-up): a square for saturation (left
@@ -137,7 +48,7 @@ export function DsColourPicker({
   "aria-label"?: string;
 }) {
   // The picker keeps its own hue and saturation, so they survive black, white and greys.
-  const [hsv, setHsv] = React.useState<Hsv>(() => dsHexToHsv(value));
+  const [hsv, setHsv] = React.useState<Hsv>(() => toHsv(value));
   const [text, setText] = React.useState(value);
   const [editing, setEditing] = React.useState(false);
   const shown = dsHsvToHex(hsv.h, hsv.s, hsv.v);
@@ -145,7 +56,7 @@ export function DsColourPicker({
   const [last, setLast] = React.useState(value);
   if (value !== last) {
     setLast(value);
-    if (value !== shown) setHsv(dsHexToHsv(value));
+    if (value !== shown) setHsv(toHsv(value));
   }
 
   const set = (next: Hsv) => {

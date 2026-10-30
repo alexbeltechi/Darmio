@@ -310,7 +310,26 @@ Feature roadmap), unscheduled until Alex places it.
   made on `/parabola` like shadcn's create page: theme colour, typography, buttons
   and accent colour, light and dark, font families (Font, Heading, more), added
   Google fonts, the type scale with weights, the radius (None to Large)
-  and the icon library (Lucide only). Next: icons through one Parabola
+  and the icon library (Lucide only). 2026-10-29: a **character** layer
+  above it (decisions): dials that set the look as a whole (base colour,
+  brightness, warmth, contrast, roundness, depth), every value under them
+  Auto until given its own; an agent sets a look by moving dials and
+  adding at most a couple of overrides, never by writing hexes. Next:
+  done the same day: Style (Mood, Serious to Wacky, moving dials and fonts;
+  Appearance) and the Taste pills with Shuffle (`taste.ts`). Then: a
+  Spacing dial (card padding, section gaps, margins through the
+  `--ds-space-*` tokens); a loudness dial (how much accent); an agent
+  growing the tastes from outside (font trends on Google Fonts, a Figma
+  file, Mobbin, an awards site) and setting a look from a screenshot as
+  dials; a story editor in the CMS (lines placed and dragged over a photo
+  or video, one to three of them, walking a narrative, as Instagram does;
+  an agent drafting one from a folder of images); a
+  section wearing a sub-theme (a hero in a derived variant); a brand brief
+  the theme exports (palette by role, fonts, a sample button, tone words,
+  image mood) for pages, decks, emails and images; tinted neutrals in
+  light (text a near-black of the base's hue); a periodic audit, like
+  /garden for the brain, that builds a sample page from the system and
+  proposes changes; icons through one Parabola
   component so other libraries work, uploading a font file, spacing in the theme, import of
   a theme file, and an agent setting it through the API.
   A theme contract (which tokens and block variants a theme may set) and

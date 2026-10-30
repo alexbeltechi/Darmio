@@ -2,13 +2,20 @@
 
 import * as React from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Bookmark, ChevronLeft } from "lucide-react";
+import { ArrowLeft, Bookmark, ChevronsDownUp, ChevronsUpDown, House, Menu } from "lucide-react";
+import { DsAccordionGroup } from "../primitives/accordion";
 import { DsButton } from "../primitives/button";
+import { DsDropdown, DsDropdownContent, DsDropdownItem, DsDropdownTrigger } from "../primitives/dropdown";
 import { DsSearch } from "../primitives/field";
 import { DsMenu, DsNavBar } from "../primitives/nav";
 import { DsNavGroup, DsNavItem } from "../primitives/nav-item";
 import { DsThemeToggle } from "../primitives/theme-toggle";
+import { DsToaster } from "../primitives/toast";
+import { DsTopBar } from "../primitives/top-bar";
+import { DS_THEME_SCOPE } from "../theme";
+import { DsModeScope } from "../provider";
 import { DS_GROUPS, DS_TIERS, dsHref, type DsGroup } from "./registry";
+import { PanelFooterSlotContext, PanelSlotContext, ThemeEditorProvider, ThemeHeaderActions, useThemeEditor } from "./theme-editor";
 
 /** Sidebar contents: search, then each tier's label and its collapsible groups. */
 function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
@@ -39,7 +46,7 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <div className="flex w-full flex-col gap-4">
       <DsSearch aria-label="Search components" value={query} onValueChange={setQuery} className="w-full" />
-      <nav aria-label="Parabola" className="flex flex-col">
+      <nav aria-label="Parabola" className="flex flex-col gap-ds-4">
         {tiers.map((tier, i) => (
           <React.Fragment key={tier.label ?? i}>
             {tier.label && <p className="px-3 pt-5 pb-1 text-small text-ds-fg-subtle">{tier.label}</p>}
@@ -113,6 +120,26 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
  * canvas holding the current page. Below `md` the sidebar moves into the
  * hamburger menu.
  */
+/** Top left of the sidebar: a menu to Parabola's home or back to the website. */
+function ShellMenu() {
+  const router = useRouter();
+  return (
+    <DsDropdown>
+      <DsDropdownTrigger asChild>
+        <DsButton size="small" iconLeft={Menu} aria-label="Menu" />
+      </DsDropdownTrigger>
+      <DsDropdownContent align="start">
+        <DsDropdownItem iconLeft={House} onSelect={() => router.push("/parabola")}>
+          Home
+        </DsDropdownItem>
+        <DsDropdownItem iconLeft={ArrowLeft} onSelect={() => router.push("/")}>
+          Back to website
+        </DsDropdownItem>
+      </DsDropdownContent>
+    </DsDropdown>
+  );
+}
+
 export function DsShell({ children }: { children: React.ReactNode }) {
   const [menuOpen, setMenuOpen] = React.useState(false);
   const closeMenu = React.useCallback(() => setMenuOpen(false), []);
@@ -127,11 +154,11 @@ export function DsShell({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <>
-      <aside className="fixed inset-y-0 left-0 hidden w-[240px] flex-col gap-4 overflow-y-auto p-5 md:flex">
+    <ThemeEditorProvider>
+      <aside className="fixed inset-y-0 left-0 hidden w-[240px] flex-col gap-4 overflow-y-auto border-r border-ds-border bg-ds-surface-subtle p-5 md:flex">
         <div className="flex items-center justify-between">
-          <DsButton href="/" iconLeft={ChevronLeft} aria-label="Back to site" />
-          <DsThemeToggle />
+          <ShellMenu />
+          <DsThemeToggle size="small" />
         </div>
         <SidebarNav />
       </aside>
@@ -149,39 +176,108 @@ export function DsShell({ children }: { children: React.ReactNode }) {
         </DsMenu>
       </div>
 
-      <main className="flex min-h-screen flex-col bg-ds-surface-subtle pt-[76px] md:ml-[240px] md:pt-0">
+      <main className="flex min-h-screen flex-col bg-ds-bg pt-[76px] md:ml-[240px] md:pt-0">
         {children}
       </main>
-    </>
+      {/* One toaster for every page: the theme's, and the Toast specimen's. */}
+      <DsToaster />
+    </ThemeEditorProvider>
   );
 }
 
 /**
- * Where a specimen's "Options" button lands: the right end of the page
- * header, centred on the group and title (under the nav bar on mobile, as the header is).
+ * One /parabola page on the canvas: its name top left, the theme's actions
+ * top right, the content centred, and, when the page has any, its options in
+ * a panel on the right, set apart by a rule (Linear's
+ * properties panel: collapsible sections of controls; under the content below
+ * `lg`). Pages put things there with `InPanel` (theme-editor.tsx).
  */
-const OptionsSlotContext = React.createContext<HTMLElement | null>(null);
-export const useDsOptionsSlot = () => React.useContext(OptionsSlotContext);
+/** The open theme's name, as the Theme page's title. */
+function ThemeTitle() {
+  return <>{useThemeEditor().entry.name}</>;
+}
 
-/** One /parabola page on the canvas: its name top left, options top right, the content centred. */
-export function DsCanvas({ group, title, children }: { group: string; title: string; children: React.ReactNode }) {
+export function DsCanvas({
+  group,
+  title,
+  themeTitle = false,
+  children,
+}: {
+  group: string;
+  title: string;
+  /** Show the open theme's name as the title (the Theme page: "Theme" over "Parabola"). */
+  themeTitle?: boolean;
+  children: React.ReactNode;
+}) {
   const [slot, setSlot] = React.useState<HTMLElement | null>(null);
+  const [footer, setFooter] = React.useState<HTMLElement | null>(null);
+  const { previewMode, setPreviewMode } = useThemeEditor();
+  // Collapse all, then Expand all: every accordion on the page (the panel's sections) at once.
+  const [allOpen, setAllOpen] = React.useState(true);
+  const [version, setVersion] = React.useState(0);
   return (
-    <OptionsSlotContext.Provider value={slot}>
-      <div className="flex flex-1 flex-col">
-        {/* Pinned over the page, which fades out beneath it (`ds-nav-fade`), as in the
-            admin. The canvas isn't the page colour, so the fade takes the canvas's own
-            (`--ds-bg` is reset here; nothing in the bar draws with it otherwise). Below
-            md it sits under the fixed nav bar (76px). Clicks pass through the gradient. */}
-        <header className="pointer-events-none sticky top-[76px] z-20 flex items-center justify-between gap-4 ds-nav-fade px-6 pt-6 pb-5 [--ds-bg:var(--ds-surface-subtle)] md:top-0 [&>*]:pointer-events-auto">
-          <div className="flex min-w-0 flex-col gap-1">
-            <p className="text-small text-ds-fg-subtle">{group}</p>
-            <h1 className="text-h3 text-ds-fg">{title}</h1>
+    <PanelSlotContext.Provider value={slot}>
+      <PanelFooterSlotContext.Provider value={footer}>
+      <DsAccordionGroup open={allOpen} version={version}>
+      {/* One grid for the header, the page and its panel, so the header stays pinned
+          over all of it: on phones the panel comes under the page, and a header
+          sticky only within the page's own column would scroll away there. From
+          lg the header runs across the page and the panel, a rule under it, and
+          the two scroll on their own beneath it, the panel a column on the right
+          only while the page puts something in it (otherwise the page takes the width). */}
+      <div className="grid flex-1 grid-cols-1 grid-rows-[auto_1fr_auto] lg:h-screen lg:flex-none lg:grid-cols-[minmax(0,1fr)] lg:grid-rows-[auto_minmax(0,1fr)] lg:[&:has(>aside>div:first-child:not(:empty))]:grid-cols-[minmax(0,1fr)_400px]">
+        {/* Pinned on the page colour (as the panel is; the sidebar sits on the surface), so the page never shows through behind
+            the title and the theme's actions. Below md it sits right under the fixed
+            nav bar (76px, its colour reaching up behind the bar), with no padding of
+            its own above. */}
+        <DsTopBar className="top-[76px] self-start before:absolute before:inset-x-0 before:bottom-full before:h-[76px] before:bg-ds-bg md:top-0 md:before:hidden lg:col-span-full lg:row-start-1">
+          <div className="flex flex-wrap items-center justify-between gap-ds-16 px-5 py-3">
+            <div className="flex min-w-0 flex-col">
+              <p className="text-small text-ds-fg-subtle">{group}</p>
+              <h1 className="text-p text-ds-fg">{themeTitle ? <ThemeTitle /> : title}</h1>
+            </div>
+            {/* Collapse all / Expand all first, then the theme's Undo, Redo, Save, Publish and ⋮ menu, wherever you are. */}
+            <ThemeHeaderActions
+              leading={
+                <DsButton
+                  size="small"
+                  variant="text"
+                  iconLeft={allOpen ? ChevronsDownUp : ChevronsUpDown}
+                  aria-label={allOpen ? "Collapse all" : "Expand all"}
+                  title={allOpen ? "Collapse all" : "Expand all"}
+                  onClick={() => {
+                    setAllOpen((o) => !o);
+                    setVersion((v) => v + 1);
+                  }}
+                />
+              }
+            />
           </div>
-          <div ref={setSlot} className="shrink-0" />
-        </header>
-        <div className="flex flex-1 items-center justify-center px-6 py-12">{children}</div>
+        </DsTopBar>
+        {/* The page wears the open theme (theme-editor), light or dark as the panel says; everything
+            around it stays Parabola's own, in the UI's mode. */}
+        <div
+          data-ds-mode={previewMode}
+          className={`${DS_THEME_SCOPE} flex min-w-0 items-center-safe justify-center bg-ds-bg px-6 py-12 lg:col-start-1 lg:row-start-2 lg:min-h-0 lg:overflow-y-auto`}>
+          <DsModeScope onThemeChange={setPreviewMode}>{children}</DsModeScope>
+        </div>
+        {/* The page's properties; hidden while it has none. A rule between sections,
+            so folded ones still read as separate. */}
+        {/* Its sections scroll; its foot (a page's main action) stays pinned under them, on the panel's own colour.
+            Hidden while the page puts nothing there. */}
+        <aside
+          aria-label="Properties"
+          className="flex flex-col border-t border-ds-border [&:has(>div:first-child:empty)]:hidden lg:col-start-2 lg:row-start-2 lg:min-h-0 lg:border-t-0 lg:border-l"
+        >
+          <div
+            ref={setSlot}
+            className="flex flex-col gap-ds-16 p-ds-16 lg:min-h-0 lg:flex-1 lg:overflow-y-auto [&>*+*]:border-t [&>*+*]:border-ds-border [&>*+*]:pt-ds-16"
+          />
+          <div ref={setFooter} className="sticky bottom-0 border-t border-ds-border bg-ds-bg p-ds-16 empty:hidden" />
+        </aside>
       </div>
-    </OptionsSlotContext.Provider>
+      </DsAccordionGroup>
+      </PanelFooterSlotContext.Provider>
+    </PanelSlotContext.Provider>
   );
 }

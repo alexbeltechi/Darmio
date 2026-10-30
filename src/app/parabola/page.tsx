@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 import { DS_GROUPS, dsHref } from "@beltechi/parabola/showcase/registry";
 
-/** /parabola opens on the first page in the sidebar. */
+/** /parabola opens on Theme, where a theme is made (decisions, 2026-10-28). */
 export default function DesignSystemIndex() {
-  const group = DS_GROUPS[0];
+  const group = DS_GROUPS.find((g) => g.slug === "theme") ?? DS_GROUPS[0];
   redirect(dsHref(group, group.pages[0]));
 }

@@ -12,7 +12,7 @@ and its wireframe.
 ## Setup
 
 `GET /api/admin/agent` explains the API. Needs the dev server
-(`preview_start` with `beltechi-cms-dev`) and the token:
+(`preview_start` with `darmio-dev`) and the token:
 
 ```bash
 export $(grep CMS_AGENT_TOKEN .env.local | xargs)

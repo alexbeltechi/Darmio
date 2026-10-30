@@ -6,10 +6,13 @@ import {
   House,
   Image as ImageIcon,
   Info,
+  Link as LinkIcon,
+  Pipette,
   ListTree,
   Mail,
   Ruler,
   MousePointerClick,
+  Paintbrush,
   Palette,
   SquareCheck,
   Tag,
@@ -17,10 +20,12 @@ import {
   Type,
   type LucideIcon,
 } from "lucide-react";
-import { AccentColoursSection, MainColoursSection } from "./colours-section";
+import { MainColoursSection } from "./colours-section";
 import { FontsSection } from "./fonts-section";
+import { FontFamiliesSection } from "./font-families-section";
 import { SpacingSection } from "./spacing-section";
 import { IntroSection } from "./intro-section";
+import { ThemeSection } from "./theme-section";
 import { BlocksOverview, ComponentsOverview } from "./tier-overview";
 import * as S from "./specimens";
 
@@ -52,6 +57,13 @@ export const DS_TIERS: DsTier[] = [
         single: true,
         pages: [{ slug: "welcome", label: "Welcome", component: IntroSection }],
       },
+      {
+        slug: "theme",
+        label: "Theme",
+        icon: Paintbrush,
+        single: true,
+        pages: [{ slug: "fonts", label: "Theme", component: ThemeSection }],
+      },
     ],
   },
   {
@@ -61,17 +73,18 @@ export const DS_TIERS: DsTier[] = [
         slug: "colours",
         label: "Colours",
         icon: Palette,
-        pages: [
-          { slug: "main", label: "Main", component: MainColoursSection },
-          { slug: "accent", label: "Accent", component: AccentColoursSection },
-        ],
+        // One page, the open theme's colours; the content accents (category colours) aren't a theme's (Alex, 2026-10-29).
+        single: true,
+        pages: [{ slug: "main", label: "Colours", component: MainColoursSection }],
       },
       {
-        slug: "fonts",
-        label: "Fonts",
+        slug: "typography",
+        label: "Typography",
         icon: Type,
-        single: true,
-        pages: [{ slug: "type-scale", label: "Type scale", component: FontsSection }],
+        pages: [
+          { slug: "font-families", label: "Font families", component: FontFamiliesSection },
+          { slug: "type-scale", label: "Type scale", component: FontsSection },
+        ],
       },
       {
         slug: "spacing",
@@ -167,9 +180,11 @@ export const DS_TIERS: DsTier[] = [
         label: "Layout",
         icon: LayoutPanelTop,
         pages: [
+          { slug: "accordion", label: "Accordion", component: S.Accordion },
           { slug: "divider", label: "Divider", component: S.Divider },
           { slug: "list-row", label: "List row", component: S.ListRow },
           { slug: "nav-fade", label: "Nav fade", component: S.NavFade },
+          { slug: "top-bar", label: "Top bar", component: S.TopBar },
         ],
       },
     ],
@@ -192,6 +207,18 @@ export const DS_TIERS: DsTier[] = [
           { slug: "media-tile", label: "Media tile", component: S.MediaTile },
           { slug: "placeholder", label: "Placeholder", component: S.Placeholder },
         ],
+      },
+      {
+        slug: "colour",
+        label: "Colour",
+        icon: Pipette,
+        pages: [{ slug: "colour-picker", label: "Colour picker", component: S.ColourPicker }],
+      },
+      {
+        slug: "links",
+        label: "Links",
+        icon: LinkIcon,
+        pages: [{ slug: "link-list", label: "Link list", component: S.LinkList }],
       },
       {
         slug: "states",

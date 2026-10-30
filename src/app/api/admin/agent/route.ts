@@ -43,7 +43,12 @@ Base: /api/admin. Auth: \`Authorization: Bearer $CMS_AGENT_TOKEN\`.
 - GET  /activity?limit=50                               Recent changes
 
 ## Pages
-Pages live at /<slug> and use the same blocks and Markdown as posts. Front matter: title, slug, description, docs (comma-separated doc ids).
+Pages live at /<slug> and use the same blocks and Markdown as posts. Front matter: title, slug, description, docs (comma-separated doc ids), and the page's format and place:
+- format: text (a title, its line, then the text in a reading column: About, My story, Press kit, FAQ, Work with me), home (the intro; the site adds the latest posts, the pages under each page, the links pages and the newsletter), links (a title and links), or blocks (the default: the page is its blocks, full width)
+- parent: <slug> puts the page under another, one level deep (Press kit under About); nav: yes puts a top-level page in the site's nav
+- posts: <category slug> (home: whose posts it lists); newsletter: Heading | one line (home: the sign-up at its foot)
+- links: then one indented line each, "  - Label | https://… | note" (links pages)
+The home page is the page with slug home. Write the page's words; the format does the layout.
 - GET  /collections/pages/entries                       List
 - GET  /collections/pages/entries/{slug}/markdown       Read a page as Markdown
 - PUT  /collections/pages/entries/{slug}/markdown       Replace content and given front matter (?dryRun=1)

@@ -30,6 +30,8 @@ import {
   DsField,
   DsInput,
   DsPill,
+  DsSelect,
+  DsSwitch,
   DsTextarea,
   DsTooltip,
   DS_FIELDS_CLASS,
@@ -45,6 +47,16 @@ import { MediaDetailModal } from "@/components/admin/media-detail-modal";
 import { MediaPicker } from "@/components/admin/media-picker";
 import { announceSaved, publishPosts } from "@/components/admin/publish/events";
 import { UnsavedChangesModal } from "@/components/admin/unsaved-changes-modal";
+import { fetchAll } from "@/lib/api/fetch-all";
+import { parseBlocks } from "@/lib/agent/markdown";
+import {
+  PAGE_FORMATS,
+  PAGE_FORMAT_LABELS,
+  pagePreset,
+  pageSettings,
+  type PageFormat,
+  type PageLink,
+} from "@/lib/cms/page-formats";
 import type { Block, Entry, MediaItem } from "@/lib/cms/types";
 import { slugify } from "@/lib/slug";
 
@@ -69,8 +81,63 @@ function newBlock(type: Block["type"]): Block | null {
   }
 }
 
+/** A page's format and place, as the editor holds them (lib/cms/page-formats.ts). */
+type FormatFields = {
+  format: PageFormat;
+  parent: string;
+  nav: boolean;
+  links: PageLink[];
+  postsCategory: string;
+  newsletterHeading: string;
+  newsletterText: string;
+};
+
+const NO_FORMAT: FormatFields = {
+  format: "text",
+  parent: "",
+  nav: false,
+  links: [],
+  postsCategory: "",
+  newsletterHeading: "",
+  newsletterText: "",
+};
+
+function formatFields(data: Record<string, unknown>): FormatFields {
+  const s = pageSettings(data);
+  return {
+    format: s.format,
+    parent: s.parent ?? "",
+    nav: s.nav,
+    links: s.links,
+    postsCategory: s.postsCategory ?? "",
+    newsletterHeading: s.newsletter?.heading ?? "",
+    newsletterText: s.newsletter?.text ?? "",
+  };
+}
+
+/** The format fields as page data, with only what the format uses. */
+function formatData(f: FormatFields): Record<string, unknown> {
+  const newsletter =
+    f.format === "home" && (f.newsletterHeading.trim() || f.newsletterText.trim())
+      ? { heading: f.newsletterHeading.trim(), text: f.newsletterText.trim() }
+      : null;
+  return {
+    format: f.format,
+    parent: f.parent || null,
+    nav: !f.parent && f.nav,
+    links: f.format === "links" ? f.links.filter((l) => l.label.trim() && l.url.trim()) : [],
+    postsCategory: f.format === "home" && f.postsCategory ? f.postsCategory : null,
+    newsletter,
+  };
+}
+
+// The "Under" picker's value for top level: a select item can't have an empty value.
+const TOP_LEVEL = "top-level";
+// The "Posts from" picker's value for the first category in the nav.
+const FIRST_IN_NAV = "first-in-nav";
+
 /** The fields the editor saves, as one comparable snapshot. */
-type PageFields = { title: string; slug: string; description: string; docs: string[]; blocks: Block[] };
+type PageFields = { title: string; slug: string; description: string; docs: string[]; blocks: Block[]; settings: FormatFields };
 const snapshot = (f: PageFields) => JSON.stringify(f);
 
 /**
@@ -80,7 +147,10 @@ const snapshot = (f: PageFields) => JSON.stringify(f);
  * unpublished changes; the site keeps the live version until Update.
  * Pages live at /<slug>.
  */
-export function PageEditorForm({ slug, onClose }: { slug?: string; onClose: () => void }) {
+export function PageEditorForm({ slug, preset: presetId, onClose }: { slug?: string; preset?: string; onClose: () => void }) {
+  // A new page started from a preset (admin › Pages › New page): its title,
+  // URL, format, place and starting text, to fill in by hand or by agent.
+  const preset = slug ? undefined : pagePreset(presetId);
   const router = useRouter();
   const [currentSlug, setCurrentSlug] = useState<string | undefined>(slug);
   const isEditMode = Boolean(currentSlug);
@@ -93,13 +163,51 @@ export function PageEditorForm({ slug, onClose }: { slug?: string; onClose: () =
   const [deleting, setDeleting] = useState(false);
   const [reloadKey, setReloadKey] = useState(0);
 
-  const [title, setTitle] = useState("");
-  const [urlSlug, setUrlSlug] = useState("");
+  const [title, setTitle] = useState(preset?.title ?? "");
+  const [urlSlug, setUrlSlug] = useState(preset?.slug ?? "");
   // A new page's URL follows its title until it's edited by hand.
-  const [slugTouched, setSlugTouched] = useState(Boolean(slug));
-  const [description, setDescription] = useState("");
+  const [slugTouched, setSlugTouched] = useState(Boolean(slug || preset));
+  const [description, setDescription] = useState(preset?.description ?? "");
   const [docs, setDocs] = useState<string[]>([]);
-  const [blocks, setBlocks] = useState<Block[]>(() => (slug ? [] : [newBlock("text")!]));
+  const [blocks, setBlocks] = useState<Block[]>(() => {
+    if (slug) return [];
+    if (preset?.starter) return parseBlocks(preset.starter).map((b) => b.block);
+    return [newBlock("text")!];
+  });
+  const [settings, setSettings] = useState<FormatFields>(() =>
+    preset
+      ? formatFields({ ...preset, links: preset.links ?? [], newsletter: preset.newsletter })
+      : NO_FORMAT
+  );
+  const patchSettings = (patch: Partial<FormatFields>) => setSettings((prev) => ({ ...prev, ...patch }));
+
+  // The pages it can sit under (top-level ones, not itself) and the categories a home page can list.
+  const [parentOptions, setParentOptions] = useState<{ value: string; label: string }[]>([]);
+  const [categoryOptions, setCategoryOptions] = useState<{ value: string; label: string }[]>([]);
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const [pages, categoriesRes] = await Promise.all([
+        fetchAll<Entry>("/api/admin/collections/pages/entries").catch(() => [] as Entry[]),
+        fetch("/api/admin/categories").catch(() => null),
+      ]);
+      const categories = (categoriesRes?.ok ? (await categoriesRes.json()).data : []) as {
+        slug: string;
+        label: string;
+        parentId?: string | null;
+      }[];
+      if (cancelled) return;
+      setParentOptions(
+        pages
+          .filter((p) => p.slug !== slug && p.slug !== "home" && !pageSettings(p.data).parent)
+          .map((p) => ({ value: p.slug, label: (p.data.title as string) || p.slug }))
+      );
+      setCategoryOptions(categories.filter((c) => !c.parentId).map((c) => ({ value: c.slug, label: c.label })));
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [slug]);
   // What was last saved, to tell edits apart (existing pages only).
   const [saved, setSaved] = useState("");
 
@@ -131,10 +239,11 @@ export function PageEditorForm({ slug, onClose }: { slug?: string; onClose: () =
   const [deleteDescription, setDeleteDescription] = useState("");
   const [showUnsavedModal, setShowUnsavedModal] = useState(false);
 
-  const fields: PageFields = { title, slug: urlSlug, description, docs, blocks };
+  const fields: PageFields = { title, slug: urlSlug, description, docs, blocks, settings };
   const isDirty = isEditMode
     ? snapshot(fields) !== saved
     : title.trim() !== "" || description.trim() !== "" || docs.length > 0 || blocks.some((b) => !isBlockEmpty(b));
+  const isHome = (currentSlug ?? urlSlug) === "home";
 
   // Load the page as last saved: its unpublished changes over the live version.
   useEffect(() => {
@@ -156,6 +265,7 @@ export function PageEditorForm({ slug, onClose }: { slug?: string; onClose: () =
           description: (working.description as string) || "",
           docs: (working.docs as string[]) || [],
           blocks: (working.content as Block[]) || [],
+          settings: formatFields(working),
         };
         setEntry(loaded);
         setCurrentSlug(loaded.slug);
@@ -164,6 +274,7 @@ export function PageEditorForm({ slug, onClose }: { slug?: string; onClose: () =
         setDescription(next.description);
         setDocs(next.docs);
         setBlocks(next.blocks);
+        setSettings(next.settings);
         setSaved(snapshot(next));
 
         // Every gallery's images, for the editor's thumbnails.
@@ -209,7 +320,13 @@ export function PageEditorForm({ slug, onClose }: { slug?: string; onClose: () =
     setSaving(true);
     try {
       const nextSlug = slugify(urlSlug || title);
-      const data = { title, description, docs, content: blocks.filter((b) => !isBlockEmpty(b)) };
+      const data = {
+        title,
+        description,
+        docs,
+        content: blocks.filter((b) => !isBlockEmpty(b)),
+        ...formatData(settings),
+      };
       const res = await fetch(
         currentSlug ? `/api/admin/collections/pages/entries/${currentSlug}` : "/api/admin/collections/pages/entries",
         {
@@ -252,7 +369,7 @@ export function PageEditorForm({ slug, onClose }: { slug?: string; onClose: () =
     return () => clearTimeout(timer);
     // handleSave reads the latest edits; the timer restarts on each of them.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [entry, isDirty, saving, publishing, statusChanging, title, urlSlug, description, docs, blocks]);
+  }, [entry, isDirty, saving, publishing, statusChanging, title, urlSlug, description, docs, blocks, settings]);
 
   const handlePublish = async () => {
     const wasPublished = entry?.status === "published";
@@ -437,7 +554,7 @@ export function PageEditorForm({ slug, onClose }: { slug?: string; onClose: () =
   if (loading) {
     return (
       <div className="flex h-full flex-col gap-4 p-5">
-        <Skeleton className="size-9 rounded-full" />
+        <Skeleton className="size-9 rounded-ds-pill" />
         <Skeleton className="h-10 w-full" />
         <Skeleton className="h-24 w-full" />
         <Skeleton className="h-64 w-full" />
@@ -448,7 +565,7 @@ export function PageEditorForm({ slug, onClose }: { slug?: string; onClose: () =
   const status = entry?.status || "draft";
   const published = status === "published";
   const hasChanges = published && (Boolean(entry?.pendingData) || isDirty);
-  const liveUrl = `/${urlSlug || slugify(title) || "…"}`;
+  const liveUrl = isHome ? "/" : `/${urlSlug || slugify(title) || "…"}`;
 
   return (
     <div className="flex h-full flex-col">
@@ -570,6 +687,68 @@ export function PageEditorForm({ slug, onClose }: { slug?: string; onClose: () =
               placeholder="One or two sentences about the page"
             />
           </DsField>
+
+          <DsField label="Format" description={PAGE_FORMAT_LABELS[settings.format].description}>
+            <DsSelect
+              options={PAGE_FORMATS.map((value) => ({ value, label: PAGE_FORMAT_LABELS[value].label }))}
+              value={settings.format}
+              onValueChange={(format) => patchSettings({ format: format as PageFormat })}
+            />
+          </DsField>
+
+          {!isHome && (
+            <DsField label="Under" description="A page under another is listed at the end of it, and on a home page under its title.">
+              <DsSelect
+                // Radix shows a value only if its option was there on mount: remount once the pages arrive.
+                key={parentOptions.length}
+                options={[{ value: TOP_LEVEL, label: "Top level" }, ...parentOptions]}
+                value={settings.parent || TOP_LEVEL}
+                onValueChange={(value) => patchSettings({ parent: value === TOP_LEVEL ? "" : value })}
+              />
+            </DsField>
+          )}
+
+          {!isHome && !settings.parent && (
+            <div className="flex w-(--ds-field-width) items-center gap-ds-8 self-end py-2">
+              <label htmlFor="page-nav" className="text-p text-ds-fg">
+                In the site&apos;s nav
+              </label>
+              <DsSwitch id="page-nav" checked={settings.nav} onCheckedChange={(nav) => patchSettings({ nav })} />
+            </div>
+          )}
+
+          {settings.format === "home" && (
+            <>
+              <DsField label="Posts from" description="The category whose latest posts it lists.">
+                <DsSelect
+                  key={categoryOptions.length}
+                  options={[{ value: FIRST_IN_NAV, label: "The first in the nav" }, ...categoryOptions]}
+                  value={settings.postsCategory || FIRST_IN_NAV}
+                  onValueChange={(value) => patchSettings({ postsCategory: value === FIRST_IN_NAV ? "" : value })}
+                />
+              </DsField>
+              <DsField label="Newsletter" description="At the foot of the page. Empty leaves it out.">
+                <DsInput
+                  value={settings.newsletterHeading}
+                  onChange={(e) => patchSettings({ newsletterHeading: e.target.value })}
+                  placeholder="Heading"
+                />
+              </DsField>
+              <DsField label="Newsletter line" description="What people get, and how often.">
+                <DsInput
+                  value={settings.newsletterText}
+                  onChange={(e) => patchSettings({ newsletterText: e.target.value })}
+                  placeholder="A few letters a year"
+                />
+              </DsField>
+            </>
+          )}
+
+          {settings.format === "links" && (
+            <DsField label="Links" description="Each with a short note on the right: a handle, how often." className="w-full">
+              <LinksEditor links={settings.links} onChange={(links) => patchSettings({ links })} />
+            </DsField>
+          )}
 
           <DsField label="Documents" description="Anything that gives Claude context for this page: notes, copy, a brief, HTML. All of them live in Agent." className="w-full">
             <DocsField value={docs} onChange={setDocs} />
@@ -775,6 +954,29 @@ export function PageEditorForm({ slug, onClose }: { slug?: string; onClose: () =
         loading={deleting}
         onConfirm={handleDelete}
       />
+    </div>
+  );
+}
+
+/** A links page's links: a row of label, URL and note each, added and removed in place. */
+function LinksEditor({ links, onChange }: { links: PageLink[]; onChange: (links: PageLink[]) => void }) {
+  const update = (index: number, patch: Partial<PageLink>) =>
+    onChange(links.map((link, i) => (i === index ? { ...link, ...patch } : link)));
+  return (
+    <div className="flex flex-col gap-2">
+      {links.map((link, index) => (
+        <div key={index} className={cn(DS_FIELDS_CLASS, "items-center")}>
+          <DsInput aria-label="Label" value={link.label} onChange={(e) => update(index, { label: e.target.value })} placeholder="YouTube" />
+          <DsInput aria-label="URL" value={link.url} onChange={(e) => update(index, { url: e.target.value })} placeholder="https://…" />
+          <DsInput aria-label="Note" value={link.note ?? ""} onChange={(e) => update(index, { note: e.target.value })} placeholder="@you" />
+          <DsButton iconLeft={X} aria-label="Remove link" variant="text" onClick={() => onChange(links.filter((_, i) => i !== index))} />
+        </div>
+      ))}
+      <div>
+        <DsButton iconLeft={Plus} onClick={() => onChange([...links, { label: "", url: "" }])}>
+          Link
+        </DsButton>
+      </div>
     </div>
   );
 }

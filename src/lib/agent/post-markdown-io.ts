@@ -1,5 +1,6 @@
 import { getMediaByIds } from "@/lib/cms/media";
 import type { Block, Entry } from "@/lib/cms/types";
+import { parsePageFormat } from "@/lib/cms/page-formats";
 import type { PostMeta } from "./markdown";
 
 /** Names media ids for Markdown output, from the files' alt text, title or file name. */
@@ -23,6 +24,12 @@ export function metaToData(meta: PostMeta, current?: Record<string, unknown>): R
   if (meta.tags !== undefined) data.tags = meta.tags;
   if (meta.description !== undefined) data.description = meta.description;
   if (meta.docs !== undefined) data.docs = meta.docs;
+  if (meta.format !== undefined) data.format = parsePageFormat(meta.format) ?? "blocks";
+  if (meta.parent !== undefined) data.parent = meta.parent;
+  if (meta.nav !== undefined) data.nav = meta.nav;
+  if (meta.links !== undefined) data.links = meta.links;
+  if (meta.postsCategory !== undefined) data.postsCategory = meta.postsCategory;
+  if (meta.newsletter !== undefined) data.newsletter = meta.newsletter;
   if (meta.date) {
     const existing = typeof current?.date === "string" ? current.date : "";
     data.date = existing.startsWith(meta.date) ? existing : new Date(`${meta.date}T12:00:00.000Z`).toISOString();

@@ -51,6 +51,7 @@ import { DsEmptyState,
   DsTooltip,
   dsToast,
   useDsConfirm,
+  DsTopBar,
 } from "@beltechi/parabola";
 import { AdminMenuButton } from "@/components/admin/layout";
 import {
@@ -918,9 +919,9 @@ export default function MediaLibraryPage() {
           the Parabola nav fade (`ds-nav-fade`); clicks pass through the gradient's
           empty space to the tiles under it. The bar ends 20px under the
           filters and the grid starts right below it, so nothing sits under the fade at rest. */}
-      <div className="pointer-events-none sticky top-0 z-20 flex flex-col ds-nav-fade pb-5 [&>*]:pointer-events-auto">
+      <DsTopBar className="mb-5 pb-3">
       {/* Header */}
-      <div className="flex items-center gap-2 px-5 py-5">
+      <div className="flex items-center gap-2 px-5 py-3">
         <h1 className="min-w-0 flex-1 truncate text-p text-ds-fg">
           Library {!loading && `(${media.length})`}
         </h1>
@@ -1036,7 +1037,7 @@ export default function MediaLibraryPage() {
         </DsDropdown>
       </div>
 
-      </div>
+      </DsTopBar>
 
       {/* Content */}
       <div className="flex flex-1 flex-col px-5 pb-5">

@@ -2,7 +2,7 @@
 
 import { DS_PROSE_CLASS, DsPlaceholder } from "@beltechi/parabola";
 import { DsNewsletterBlock } from "@beltechi/parabola/blocks";
-import { galleryIsFull, INLINE_GALLERY_MAX } from "@/lib/cms/justified-rows";
+import { galleryIsFull, READING_WIDTH } from "@/lib/cms/justified-rows";
 import { Gallery } from "@/components/shared/gallery";
 import { FadeInOnScroll } from "@/components/shared/fade-in-on-scroll";
 import type { Block, GalleryBlock, MediaItem } from "@/lib/cms/types";
@@ -14,11 +14,12 @@ interface ArticleContentProps {
   preview?: boolean;
 }
 
-const READING_COLUMN = "mx-auto w-full max-w-[661px]";
+// READING_WIDTH (lib/cms/justified-rows.ts), written out for Tailwind.
+const READING_COLUMN = "mx-auto w-full max-w-[600px]";
 
 /**
  * Renders a post's blocks, each fading in as it scrolls into view. Text-like
- * blocks sit in a 661px reading column; galleries span the full container.
+ * blocks sit in the 600px reading column (READING_WIDTH); galleries span the full container.
  *
  * Spacing comes from Parabola: 40px (`space-y-ds-40`) between blocks (a text block,
  * a gallery, a quote), so a gallery and the text around it read as separate
@@ -56,7 +57,7 @@ export function ArticleContent({ blocks, mediaItems, preview = false }: ArticleC
                 <figure
                   key={block.id}
                   className="mx-auto flex w-full flex-col gap-ds-8 px-0"
-                  style={galleryIsFull(galleryBlock.width, 0) ? undefined : { maxWidth: INLINE_GALLERY_MAX }}
+                  style={galleryIsFull(galleryBlock.width, 0) ? undefined : { maxWidth: READING_WIDTH }}
                 >
                   <DsPlaceholder ratio="3/2" />
                   {galleryBlock.placeholder && (

@@ -14,6 +14,7 @@ import {
   DsSearch,
   DsSelect,
   dsToast,
+  DsTopBar,
 } from "@beltechi/parabola";
 import { AdminMenuButton } from "@/components/admin/layout";
 import { DOC_ACCEPT, mdBytes, mdName, shortDate, sizeLabel, type DocWithUsage } from "@/lib/cms/docs";
@@ -119,8 +120,8 @@ export function DocumentsWorkspace({ children }: { children: React.ReactNode }) 
           isOpen && "hidden lg:flex"
         )}
       >
-        <div className="pointer-events-none sticky top-0 z-20 -mx-5 flex flex-col ds-nav-fade px-5 pb-5 [&>*]:pointer-events-auto">
-          <div className="flex items-center gap-2 py-5">
+        <DsTopBar className="mb-5 -mx-5 px-5 pb-3">
+          <div className="flex items-center gap-2 py-3">
             <h1 className="min-w-0 flex-1 truncate text-p text-ds-fg">Library</h1>
             <DsDropdown>
               <DsDropdownTrigger asChild>
@@ -168,7 +169,7 @@ export function DocumentsWorkspace({ children }: { children: React.ReactNode }) 
               if (file) upload(file);
             }}
           />
-        </div>
+        </DsTopBar>
 
         {loading ? (
           <div className="flex justify-center py-20">

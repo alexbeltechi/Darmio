@@ -16,6 +16,12 @@ import { DsLink, type DsLinkProps } from "../provider";
  * - default: 36px, fully rounded, `text-p`, 12px padding, 8px gaps; for top-level rows.
  * - small: 24px, 8px corners (like the small button), `text-small`, 8px padding,
  *   4px gaps; for rows inside a group.
+ *
+ * `leading` puts something of its own where the icon goes (a colour
+ * swatch); `actions` puts controls at the row's right end (usually a ⋮
+ * DsDropdown on a small `text` button): the row and its actions sit side by
+ * side in one wrapper, each keeping its own clicks, the actions over the
+ * row's end so its hover and selected surface run under them.
  */
 export const dsNavItemVariants = cva(
   [
@@ -25,11 +31,11 @@ export const dsNavItemVariants = cva(
   {
     variants: {
       size: {
-        default: "h-9 gap-2 rounded-full px-3 text-p",
+        default: "h-9 gap-2 rounded-ds-pill px-3 text-p",
         small: "h-6 gap-1 rounded-ds-control px-2 text-small",
       },
       selected: {
-        true: "bg-ds-surface-inverse text-ds-bg ds-hover-inverse",
+        true: "bg-ds-button text-ds-on-button ds-hover-inverse",
         false: "text-ds-fg hover:bg-ds-surface/70 data-[state=open]:bg-ds-surface/70",
       },
     },
@@ -42,6 +48,10 @@ type DsNavItemOwnProps = {
   /** The current page: takes the selected-button colour. */
   selected?: boolean;
   iconLeft?: LucideIcon;
+  /** Leading content of its own in place of an icon, e.g. a colour swatch. */
+  leading?: React.ReactNode;
+  /** At the row's right end, after `meta`: e.g. a ⋮ menu. */
+  actions?: React.ReactNode;
   /** Trailing detail such as a count: `text-small`, muted (the label colour when selected). */
   meta?: React.ReactNode;
   /** Leading chevron that turns when the row's group is open. */
@@ -59,19 +69,23 @@ export function DsNavItem({
   size = "default",
   selected = false,
   iconLeft: IconLeft,
+  leading,
+  actions,
   meta,
   expandable,
   className,
   children,
   ...props
 }: DsNavItemProps) {
-  const classes = cn(dsNavItemVariants({ size, selected }), className);
+  // Room at the end for the actions, which sit over it.
+  const classes = cn(dsNavItemVariants({ size, selected }), actions != null && (size === "small" ? "pr-8" : "pr-11"), className);
   const content = (
     <>
       {expandable && (
         <ChevronRight aria-hidden className="transition-transform group-data-[state=open]/nav:rotate-90" />
       )}
       {IconLeft && <IconLeft aria-hidden />}
+      {leading}
       <span className="min-w-0 flex-1 truncate">{children}</span>
       {meta != null && (
         <span className={cn("text-small", !selected && "text-ds-fg-muted")}>{meta}</span>
@@ -79,23 +93,38 @@ export function DsNavItem({
     </>
   );
 
-  if (props.href !== undefined) {
-    return (
+  const item =
+    props.href !== undefined ? (
       <DsLink data-slot="ds-nav-item" aria-current={selected ? "page" : undefined} className={classes} {...props}>
         {content}
       </DsLink>
+    ) : (
+      <button type="button" data-slot="ds-nav-item" className={classes} {...props}>
+        {content}
+      </button>
     );
-  }
+  if (actions == null) return item;
   return (
-    <button type="button" data-slot="ds-nav-item" className={classes} {...props}>
-      {content}
-    </button>
+    <div data-slot="ds-nav-item-row" className="relative flex w-full items-center">
+      {item}
+      <div
+        className={cn(
+          "absolute inset-y-0 flex items-center",
+          size === "small" ? "right-0.5" : "right-1.5",
+          // On the selected colour, a text button's icon takes the colour on it.
+          selected && "[&_[data-slot=ds-button][data-variant=text]]:text-ds-on-button"
+        )}
+      >
+        {actions}
+      </div>
+    </div>
   );
 }
 
 /**
  * A collapsible group of nav items: a default-size row with a chevron that
- * opens and closes its small child rows, indented 12px. Radix Collapsible
+ * opens and closes its small child rows, indented 12px and 4px apart
+ * (`ds-4`, the smallest spacing) as nav rows are. Radix Collapsible
  * handles the open state and its announcement.
  */
 export function DsNavGroup({
@@ -122,7 +151,7 @@ export function DsNavGroup({
           {label}
         </DsNavItem>
       </Collapsible.Trigger>
-      <Collapsible.Content className="flex flex-col pl-3">{children}</Collapsible.Content>
+      <Collapsible.Content className="flex flex-col gap-ds-4 pt-ds-4 pl-3">{children}</Collapsible.Content>
     </Collapsible.Root>
   );
 }

@@ -11,20 +11,29 @@ import { DsLink, type DsLinkProps } from "../provider";
  * Variants (style):
  * - default: fully rounded, on `ds-surface` at 70% with a blur behind, so it
  *   reads over images.
- * - primary: the same shape, solid `ds-fg`; the one main action on a screen
- *   (Publish, Save).
+ * - primary: the same shape, solid `ds-button` (the theme's button colour,
+ *   the text's by default); the one main action on a screen
+ *   (Publish, Save). It wears the theme's button look (button-style.ts):
+ *   a gradient, an outline, a 3D label, each off by default.
  * - danger: solid `ds-error`, for a confirmed destructive action (Delete).
- * - text: no surface at rest, for quiet actions like "Read more" or a row's
- *   ⋮. Hovering looks like a default button hovered (its surface plus the
- *   hover tint), so it reads as a button on any background; it has the same
- *   padding as the others to give that room.
+ * - text: the ghost button. No surface at rest, for quiet actions like
+ *   "Read more", a row's ⋮ or a site's nav. Hovering lays a light surface
+ *   (`ds-surface` at 40%) under it, lighter than a default button so a row
+ *   of them stays calm (decisions, 2026-10-28); it has the same padding as
+ *   the others to give that room.
  *
  * Sizes, for every variant, labelled or icon-only:
- * - default: 36px tall, fully rounded, 12px side padding (36px square icon-only).
+ * - large: 56px tall, `text-prose` (18px) label, 20px icons, 20px side
+ *   padding (56px square icon-only). For the one big call to action on a
+ *   page (a landing page's "Book a call").
+ * - default: 36px tall, 12px side padding (36px square icon-only).
  * - small (Figma 699:6154, the image row actions): 24px tall, 8px corners
  *   (`rounded-ds-control`, squarer than the pill), 8px side padding,
  *   `text-small` label, 4px gaps (24px square icon-only). Icons stay 16px.
  *   For dense rows of secondary actions.
+ *
+ * Corners: large and default are pills (`rounded-ds-pill`), fully round at
+ * the theme's Large radius and rounded rectangles below it (radius.ts).
  *
  * Destructive (`destructive` prop): the same button in shadcn's red
  * (`ds-error`), for actions that delete or discard. On the default variant
@@ -32,7 +41,9 @@ import { DsLink, type DsLinkProps } from "../provider";
  * red button is the `danger` variant. There's no warning (yellow) style.
  *
  * State (props, not variants); on the default variant both are drawn in
- * `ds-surface-inverse`:
+ * `ds-button`, as primary is; on the text variant in the default button's
+ * own grey, so a picked chip and a plain button share one surface (Alex,
+ * 2026-10-29):
  * - `pressed`: a toggle that's on; sets `aria-pressed`.
  * - `current`: the link to the page you're on; sets `aria-current="page"`.
  *
@@ -55,15 +66,22 @@ export const dsButtonVariants = cva(
   {
     variants: {
       variant: {
-        default: "backdrop-blur-[24px] bg-ds-surface/70 text-ds-fg ds-hover disabled:text-ds-fg-subtle",
-        primary: "backdrop-blur-[24px] bg-ds-fg text-ds-bg ds-hover-inverse disabled:opacity-40",
+        default: "backdrop-blur-[24px] bg-ds-surface/70 text-ds-on-surface ds-hover disabled:text-ds-fg-subtle",
+        // The theme's button look (button-style.ts): a gradient under the hover wash, an inset outline, and a
+        // label shadow, which falls on text only, never the icons; or no fill at all, the label in the button
+        // colour (an outline or a text button).
+        primary: [
+          "backdrop-blur-[24px] [background-color:var(--ds-button-fill,var(--ds-button))] [color:var(--ds-button-label,var(--ds-on-button))] disabled:opacity-40",
+          "[background-image:var(--ds-button-image)] [box-shadow:var(--ds-button-ring)] [text-shadow:var(--ds-button-text-shadow)]",
+          "hover:[background-image:linear-gradient(var(--ds-hover-inverse),var(--ds-hover-inverse)),var(--ds-button-image)]",
+        ],
         danger: "backdrop-blur-[24px] bg-ds-error text-ds-bg ds-hover-inverse disabled:opacity-40",
-        // Hover looks like a default button's hover (surface plus the hover tint), so it
-        // still shows on a surface of its own, like a hovered card.
-        text: "text-ds-fg hover:bg-ds-surface/70 ds-hover disabled:bg-transparent disabled:bg-none disabled:text-ds-fg-subtle",
+        // The ghost: one light surface on hover, no tint, the same as when it's current.
+        text: "text-ds-fg hover:bg-ds-surface/40 disabled:bg-transparent disabled:text-ds-fg-subtle",
       },
       size: {
-        default: "gap-2 rounded-full text-p",
+        large: "gap-2 rounded-ds-pill text-prose [&_svg]:size-5",
+        default: "gap-2 rounded-ds-pill text-p",
         small: "gap-1 rounded-ds-control text-small",
       },
       /** Pressed or current: set from those props rather than passed directly. */
@@ -79,9 +97,11 @@ export const dsButtonVariants = cva(
       },
     },
     compoundVariants: [
+      { variant: PADDED, size: "large", className: "h-14 px-5" },
       { variant: PADDED, size: "default", className: "h-9 px-3" },
       { variant: PADDED, size: "small", className: "h-6 px-2" },
-      // Icon-only is square at either size, text variant included (its hit area).
+      // Icon-only is square at every size, text variant included (its hit area).
+      { iconOnly: true, size: "large", className: "size-14 px-0" },
       { iconOnly: true, size: "default", className: "size-9 px-0" },
       { iconOnly: true, size: "small", className: "size-6 px-0" },
       {
@@ -97,12 +117,19 @@ export const dsButtonVariants = cva(
       {
         variant: "primary",
         destructive: true,
-        className: "bg-ds-error",
+        // Red, plain: the theme's button look is for its own colour.
+        className:
+          "bg-ds-error [background-image:none] [box-shadow:none] [text-shadow:none] hover:[background-image:linear-gradient(var(--ds-hover-inverse),var(--ds-hover-inverse))]",
       },
       {
         variant: "default",
         inverse: true,
-        className: "bg-ds-surface-inverse text-ds-bg ds-hover-inverse disabled:text-ds-bg disabled:opacity-40",
+        className: "bg-ds-button text-ds-on-button ds-hover-inverse disabled:text-ds-on-button disabled:opacity-40",
+      },
+      {
+        variant: "text",
+        inverse: true,
+        className: "bg-ds-surface/70 text-ds-on-surface ds-hover",
       },
     ],
     defaultVariants: { variant: "default", size: "default" },

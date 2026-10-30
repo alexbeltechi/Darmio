@@ -1,5 +1,5 @@
 ---
-reviewed: 2026-10-26
+reviewed: 2026-10-29
 owner: Alex
 ---
 
@@ -40,6 +40,9 @@ When a task changes an item, update this file in the same change.
       and runs `npm publish` from `packages/parabola` when a project
       outside the CMS needs it.
       Done: another project installs Parabola from npm and renders a block.
+      The CMS always carries the Parabola in its own repo, so a release has
+      the latest by construction; publishing it (and, if it earns it, its
+      own repo) is for other projects, such as y3k.club (Alex, 2026-10-28).
    2. **Blank slate.** Done 2026-10-26 in `darmio` (decisions,
       2026-10-26), with the first-run setup screen. Was: category groups and the nav come from categories (a
       group and a nav flag), not code; hero and intro copy, site name,
@@ -57,34 +60,37 @@ When a task changes an item, update this file in the same change.
       Layouts move to the page they belong to, never here.
       Done: everything a project can vary is on this page, no code edit.
    4. **First run: the launch package.** The seed is **Ilo Odena**, one
-      of the Humans of Y3K (`seed/ilo/`, decisions 2026-10-24), shaped on
-      nicksaraev.com: categories **Writing** and **Moments**, an **About**
-      page, and a home page from blocks that overrides the feed (intro with
-      her portrait loop, latest writing as a list with year and read time,
-      latest moments as a strip, links, a newsletter form at the foot). Nav:
-      Writing, Moments, About, Newsletter. Everything is marked as an
-      example and removed in one action, which leaves the plain feed.
+      of the Humans of Y3K (`seed/ilo/`, decisions 2026-10-24 and
+      2026-10-28), shaped on nicksaraev.com: a **Writing** category (a list
+      like a blog), a **Home** page (her portrait, three short paragraphs,
+      the latest writing with year and read time, About's pages, Follow's
+      links, the newsletter), **About** with **My story**, **Press kit**
+      and **FAQ** under it, **Work with me**, and **Follow**. Nav:
+      Writing, About, Work with me. Everything is marked as an example and
+      removed in one action, which leaves the plain feed.
       In order:
       - **a. V0 folder.** Done differently 2026-10-26: `darmio`'s own
         checkout, on its own empty `darmio-dev` database, is the blank
-        install; the Ilo seed goes there. Was: a second clone of this repo (not a fork) beside
-        it, with its own `.env.local`: the same Atlas cluster but its own
-        database in the URI (`/ilo-v0`), no Blob token (uploads stay in the
-        folder), its own `NEXTAUTH_SECRET` and agent token. It is what a
-        tester gets, and it is the separate dev database of item 3: agents
-        test there, never on the live data.
-      - **b. Blank slate first** (step 2): without it the V0 still shows
-        Alex's Design, Photography and Journal.
-      - **c. Blocks:** intro (portrait, video allowed), latest posts (by
-        category, as a list or a strip), link list, newsletter (the Kit
-        session). Posts gain a read time.
-      - **d. Seed script:** `npm run seed -- ilo` creates the owner from
-        the terminal, the settings, categories, pages and posts (through
-        the agent Markdown API), uploads the media, marks every item as an
-        example; "Remove examples" in Settings undoes it.
-      - **e. Media:** six moments (three stills, three 3–5s loops, first
-        person, never her face; briefs in each post's placeholder line) and
-        Alex's OK to ship the Y3K Ilo images in an open-source repo.
+        install; the Ilo seed goes there.
+      - **b. Blank slate first** (step 2). Done 2026-10-26.
+      - **c. Page formats instead of new blocks.** Done 2026-10-28
+        (decisions): Text, Home, Links and Blocks; pages under pages; pages
+        in the nav; the category `list` layout; presets in New page; posts
+        have a read time; the nav as a bar with the name on the left; a
+        square image fills an inline gallery; text reads at 600px. Parabola gained
+        `DsLinkList`, a ghost button's current state and a ghost theme
+        switch. Left with the site's pages: the page title (with the page
+        it sits under) and the section heading.
+      - **d. Seed script.** Done 2026-10-28: `npm run seed -- ilo` loads the
+        settings, categories, media, posts and pages, each marked as an
+        example (`metadata.example`), and skips anything already there.
+        Left: **Remove examples** in Settings, and seeding from setup, so a
+        maker without a terminal gets Ilo's site (the owner comes from
+        setup, not the script).
+      - **e. Media.** Done 2026-10-28 with three Y3K images of Ilo (the
+        portrait, the black-sand shore, the lake) and an 8-second loop of
+        her, 1.2 MB in all; three essays carry one each. Moments
+        are out of the seed (decisions, 2026-10-28).
       - **f. Install by AI** (decisions, 2026-10-26): `INSTALL.md`, the
         README's one prompt, the setup code. Done 2026-10-26; next, Alex
         runs it from scratch with a fresh AI chat. A deploy button and a
@@ -108,17 +114,34 @@ When a task changes an item, update this file in the same change.
       (R2) when a brand's volume needs it.
    7. **Custom code pages.** A page kind whose body is a component in the
       repo, listed and deletable in the admin, for one-off editorial pages.
-   8. **Release pass:** the docs still name Alex as the maintainer and his
+   8. **Portable from day one** (decisions, 2026-10-28; BEL-113). A
+      `schemaVersion` on every stored thing (posts, pages, categories,
+      media, settings, agent documents) and one migration step an import
+      runs, so a file from an older or newer Darmio still comes in. Then
+      the export: one file with a project's content, settings and agent
+      documents, plus its media, and the import of it, in the admin and
+      through the agent API. WordPress and Ghost in, WordPress out: later,
+      their formats are documented.
+      Done: a project exported from one install imports into a fresh one
+      and looks the same, after a schema change in between.
+   9. **Release pass:** the docs still name Alex as the maintainer and his
       sites in examples; go through them, add a leak check to `verify`, and
-      neutral package scope (`@beltechi/parabola` today). Then the
-      **pre-release tag** on 2026-11-25, the end of Alex's Y3K cohort 2;
-      beltechi.com moves from Framer onto it, and Y3K testers install it.
+      neutral package scope (`@beltechi/parabola` today). The legal pages
+      (decisions, 2026-10-28): the fair-use ask in the README ("Darmio is
+      MIT. Use it however you like. If you run it for clients on more than
+      5 projects, please buy an agency licence. It keeps Darmio going."),
+      a one-page trademark policy in Ghost's shape, and a contributor
+      agreement in `CONTRIBUTING.md`; the release copy says "open source
+      under MIT, run it yourself" and nothing about hosting or forever.
+      Then the **pre-release tag** on 2026-11-25, the end of Alex's Y3K
+      cohort 2; beltechi.com moves from Framer onto it, and Y3K testers
+      install it.
 
    Started 2026-10-24: the site name setting (Settings › Site), the rail
    mark as the project menu, Settings › Account with change password, and
    `npm run reset-password` for lock-outs.
-   Named **Darmio CMS** (decisions, 2026-10-26); the repo keeps
-   `beltechi-cms` for now.
+   Named **Darmio** (decisions, 2026-10-26); was Dharmify, and before
+   that Beltechi CMS (`beltechi-cms`).
    Replaces "Clean up for a first release": the walkthrough as "a
    photographer who wants to publish" is step 4's done test.
 
@@ -200,8 +223,9 @@ When a task changes an item, update this file in the same change.
   Regular passes through the app as a persona (a photographer, a painter, a
   designer) to find UX and bug issues. Results land here as items.
 - **Open-source readiness** — `shape`
-  Done: a non-technical person can install it locally with their agent,
-  following a README and agent skills that ship with the repo.
+  MIT `LICENSE` added 2026-10-27; the legal pages are step 9 of the
+  pre-release. Done: a non-technical person can install it locally with
+  their agent, following a README and agent skills that ship with the repo.
 - **Swappable connectors** — `shape`
   Every outside service behind one interface, shipped with one connector
   set up (decisions, 2026-10-24). Already there: the newsletter list
@@ -225,12 +249,120 @@ When a task changes an item, update this file in the same change.
   `~/.claude/skills/`. Done (v1.0): survived a few real curation batches;
   Alex calls it stable.
 
+## Launch flow
+
+What `positioning.md` asks of the product (decisions, 2026-10-29): launch a
+creator and their offer through five gated stages, Clarity, Interest,
+Conversations, First paid client, Repeat. Phase 1 ships this one flow well:
+interview, offer page, first client. Unscheduled until Alex places them.
+
+- **Onboarding interview** — `shape` (BEL-116)
+  The Dharma method: who you serve, the offer, the price, the proof you
+  have, answered by hand or with AI, saved as brain MD files in the library.
+  Done: a maker finishes it and the library holds who, offer and price.
+- **Offer page** — `shape`
+  One page template with one call to action, built from the interview's
+  answers, with the social posts and emails drawn from the same answers.
+  Done: from a finished interview, a live offer page in 7 days or fewer.
+- **Clients** — `shape`
+  `clients.csv` in the library, one row per person (name, email, source,
+  stage, offer, price, date, notes), edited by hand or by the agent; Stripe
+  as the record of payments, Kit sync optional.
+  Done: a booked call and a payment show up as rows without a spreadsheet
+  open.
+- **Weekly fit summary** — `shape`
+  The agent reads the signals (page analytics, `clients.csv`, Stripe) and
+  writes what works, what to change and whether to move to the next stage.
+  Done: a launch gets one each week, and the agent holds back effort until
+  its gate is passed.
+
+## Three Darmios
+
+Self-hosted free under MIT, a paid web version later, themes that work on
+both (decisions, 2026-10-28). These make room for it in the core without
+building the web version, which stays unannounced until the open-source
+release is out. Each is a Feature in Linear (project Darmio, milestone
+Feature roadmap), unscheduled until Alex places it.
+
+- **MCP connector** — `shape` (BEL-111)
+  An MCP server on every install over the agent API that exists today.
+  Any agent that speaks it (Claude Code, Claude Desktop, Cursor, one in
+  Slack) works on the site; Darmio never locks to one.
+  Done: from a fresh Claude Desktop, a maker connects their install in one
+  step and publishes a post by asking.
+- **Agent activity** — `shape` (BEL-114)
+  The admin shows what agents did: every change through the API with the
+  agent's name, and a short summary each agent leaves at the end of a
+  session through one tool. The web version's chat panel, a pasted key on
+  self-hosted, and a web chat that drives a local agent are later, and the
+  last only through the maker's own site.
+  Done: after a Claude Code session on the site, the admin says what
+  changed and why, in the agent's words.
+- **Web version** — later, unannounced
+  Darmio hosted by us, one deployment per customer running released
+  public code, our agent inside, billed monthly; private code is only
+  billing, accounts and the agent runtime. "Take it with you": a
+  self-hosted copy of the exact site, code and theme included. Not before
+  the open-source release.
+- **Parabola themes, customizable like shadcn** — `doing` (BEL-109)
+  Started 2026-10-28 (decisions): themes as data in a library per
+  project (Parabola and any added, one in use, picked in Settings › Design),
+  made on `/parabola` like shadcn's create page: theme colour, typography, buttons
+  and accent colour, light and dark, font families (Font, Heading, more), added
+  Google fonts, the type scale with weights, the radius (None to Large)
+  and the icon library (Lucide only). 2026-10-29: a **character** layer
+  above it (decisions): dials that set the look as a whole (base colour,
+  brightness, warmth, contrast, roundness, depth), every value under them
+  Auto until given its own; an agent sets a look by moving dials and
+  adding at most a couple of overrides, never by writing hexes. Next:
+  done the same day: Style (Mood, Serious to Wacky, moving dials and fonts;
+  Appearance) and the Taste pills with Shuffle (`taste.ts`). Then: a
+  Spacing dial (card padding, section gaps, margins through the
+  `--ds-space-*` tokens); a loudness dial (how much accent); an agent
+  growing the tastes from outside (font trends on Google Fonts, a Figma
+  file, Mobbin, an awards site) and setting a look from a screenshot as
+  dials; a story editor in the CMS (lines placed and dragged over a photo
+  or video, one to three of them, walking a narrative, as Instagram does;
+  an agent drafting one from a folder of images); a
+  section wearing a sub-theme (a hero in a derived variant); a brand brief
+  the theme exports (palette by role, fonts, a sample button, tone words,
+  image mood) for pages, decks, emails and images; tinted neutrals in
+  light (text a near-black of the base's hue); a periodic audit, like
+  /garden for the brain, that builds a sample page from the system and
+  proposes changes; icons through one Parabola
+  component so other libraries work, uploading a font file, spacing in the theme, import of
+  a theme file, and an agent setting it through the API.
+  A theme contract (which tokens and block variants a theme may set) and
+  themes as data (`*.theme.json`), imported and switched in Settings ›
+  Design or by an agent. Anyone can make their own design system from it.
+  Done: a maker's theme changes their whole site and comes off again,
+  without touching code.
+- **Extensions** — `shape` (BEL-110)
+  Blocks, page formats and interactions in a folder the install owns
+  (`src/extensions/`), each with a manifest the editor and agents read, so
+  they survive pulling Darmio's updates. Today blocks are a fixed list in
+  `src/lib/cms/types.ts`.
+  Done: a page format from outside the repo is added with one command and
+  shows up in the editor; a later pull doesn't conflict with it.
+- **Store-ready** — `shape` (BEL-112)
+  Paid themes and formats live outside the free repo: themes apply as
+  data, code installs from a registry with keys (as paid shadcn blocks do),
+  payments and keys through Polar. Ours, and other designers' on
+  commission; every theme installs on self-hosted and on the web version
+  alike. First a private repo sold through Polar, then the registry, then
+  a Design tab in the admin. The agency licence (one-off, perpetual,
+  unlimited) is sold the same way.
+  Done: a maker buys a theme on darmio.io, tells their agent to install
+  it, and their site has it.
+
 ## Later
 
 - **Agent as curator:** given the whole archive, propose case studies, series
   and collections.
 - **Post as email:** send a post to subscribers, publish it to the site, or
   both.
+- **Marketing, outreach and email** in both versions, the way Polsia covers
+  them: the list, posts to X and LinkedIn, follow-ups, one agent across it.
 - **Planner:** a Linear-like planner for makers.
 
 ## Done

@@ -1,6 +1,6 @@
 ---
 title: Make the small version first
-categories: writing
+categories: making
 date: 2025-11-20
 description: Everything I've finished started bigger and got smaller.
 ---

@@ -23,7 +23,7 @@ identical, promote it to a component then, not before.
 ## Installing
 
 Parabola is an npm package, `@beltechi/parabola`, published by version from
-`packages/parabola` in the beltechi-cms workspace. Install it and pin a
+`packages/parabola` in the Darmio workspace. Install it and pin a
 version; never copy the folder. Nothing checks for a newer version at run
 time: upgrading is a `package.json` change.
 
@@ -113,6 +113,119 @@ namespace, short and brand-free, so a rename never touches code:
 | Tailwind utilities | `*-ds-*` | `bg-ds-surface`, `text-ds-fg-muted`, `rounded-ds-lg` |
 | CSS utilities | `ds-*` | `ds-focus`, `ds-hover`, `ds-nav-fade` |
 
+## Themes
+
+A theme is data (`theme.ts`), much as shadcn's create page sets a style:
+
+- **Character** (`character.ts`, `DsCharacter`): the look as a whole, dials
+  every Auto value is worked out from: a base colour to start from (null:
+  white), hue, saturation, brightness, contrast, roundness and depth. A value given
+  its own (a colour, `radius`, `buttons`) stays when a dial moves; `null`
+  means Auto. `dsThemeRadius`, `dsThemeButtons` and `dsThemeColourTokens`
+  resolve a theme; `dsCharacterColourOptions` is what the colour
+  derivations take from it. An agent sets a look by moving dials. The
+  panel opens with **Taste** (`taste.ts`), aesthetics and personality:
+  the **Style** rail, one pick at a time as tabs are (`DS_TASTES`:
+  Classic, Minimal, Elegant, Tech, Natural, Retro, Sport;
+  `dsPickTaste`, `dsShuffleTaste`, `dsRandomTastes`), which chooses one chip on each section's rail
+  (`character.scoped`): a palette in Colour (`DS_PALETTES`,
+  `dsPaletteDraw`), a kind of type in Typography (`DS_TYPE_STYLES`,
+  `dsTypeStyleFonts`) and a kind of button in Buttons (`DS_BUTTON_LOOKS`,
+  `dsButtonLookAt`; Outline and Text have no fill, `dsButtonLookStyle`, the
+  primary button's fill "none"; Chunky a thick edge; only Tactile has a
+  gradient); each can be picked by hand after, one at a time. A style's own
+  look is the first of each of its lists; › draws from the rest. Then the **Mood**, the personality, a slider from Serious to Playful
+  (on to Wacky at its end; its track a 1px line, no labels under it; `dsThemeWithMood`); under it Shuffle draws another version of the style and Previous and Next step through those seen, the dice beside Taste's Restore starts over, which changes the look inside the style:
+  the kind of type's four font pairs, the buttons' roundness, the colour's
+  saturation (`dsMoodSaturation`) and the button colour (`dsPaletteButton`),
+  and the voice (`dsTasteVoice`; words placed loose from Playful,
+  `dsTasteTilt`).
+  Parabola's own is Classic and Balanced, with Classic, Classic and Soft.
+  **Colour** is the palettes, then the background as three bars: hue,
+  temperature (ice or paper on a white, the hue leaned blue or orange on a
+  colour) and a true brightness (black, the colour, white), with the
+  colours themselves behind "Show advanced options"; a palette sets how much
+  colour and the contrast, which have no bar. **Typography** has a Contrast
+  bar for the type (`character.ink`, `DsColourOptions.ink`): turned down,
+  the text becomes an ink of the page's hue, not a grey. Roundness is with
+  the buttons. Fields is its outline, no rail. A `DsScrollRow` slides its
+  picked item into view when it changes, so a rail a style changed shows
+  its new chip; a picked text button (a chip) wears the default button's
+  grey. The list is meant to grow. `DsColourField` (a swatch and a hex, the picker in a tray) is
+  there for any colour a form asks for.
+
+- **Colours** (`colours.ts`, `DsThemeColours`), six, named for what they
+  colour: base (`theme`, the website's background; Parabola's is white,
+  its cards a warm off-white #F7F5F2), type: primary (`text`, the text and
+  borders; black or white, whichever reads on the base), type: secondary
+  (`muted`, the quieter text; the primary type toward the page by
+  default), button (`accent`: `ds-button`, `ds-on-button`, selected states
+  and the highlight; the primary type's by default), field (`field`, the
+  fields' background; the base's by default) and surface (`surface`, cards
+  and panels; a shade of the base by default). Each is Parabola's own (null) or a
+  hex, picked for light; in dark it's based on the light one unless a dark
+  colour is picked for it: the page and cards the same hue, about 87% dark
+  (`dsCounterpart`, not a flip), text, buttons and the accent moved just
+  far enough to read on it (`dsInkCounterpart`). A
+  colour based on another can be shifted lighter or darker (`lightShift`,
+  `darkShift`, `dsShift`). `dsColourTokens` turns the six into every
+  colour token; `DsColourWheel` shows them all as points on one wheel (hue
+  round it, a tick on the ring for the chosen one, dragged round to turn it, saturation out from the centre, saturation and brightness on
+  the arcs, and below it the chosen one's saturation, hue and brightness as
+  small fields; one size, the chosen one filled, the others a thin ring; choose one
+  and drag its point, Delete to restore it), and `DsColourPicker` picks a single colour inline, with
+  `DsColourBar` its hue and brightness bars.
+- **Font families** (`families`): Font (text, always there) and Heading
+  (headlines) to start, and any the theme adds, each a name and a font.
+- **Fonts**: Parabola's (`DS_FONTS` in `fonts.ts`: Instrument Sans,
+  Instrument Serif, System), less any the theme took out (`hiddenFonts`;
+  never System), plus Google fonts it added (`customFonts`, from a name or a
+  link: `dsCustomFontFromInput`). Each font lists its weights.
+- **The type scale**: for each text style (`DS_TEXT_STYLES`) its name,
+  family, weight, size and line height. By default Display to H2 are in
+  Heading (Instrument Serif, Regular) and the rest, H3 included, in Font
+  (Instrument Sans, Medium).
+- **Buttons** (`button-style.ts`): the solid buttons' fill, solid or a
+  gradient of the button colour (contrast -1 to 1, 0 flat, above it the
+  top lighter), an inset outline (1 to 8px, with an opacity; off by default), a label text shadow cast from a
+  light's angle (`DsAngleDial`; never on the icons), each `none` until on
+  (`--ds-button-image`, `--ds-button-ring`, `--ds-button-text-shadow`); and
+  their roundness, the radius below, with the pills the same or their own
+  (`pillRadius`, `--ds-radius-chip`, `rounded-ds-chip`). Fields have their
+  own outline (`fields`: on, 2px, solid by default; `--ds-field-border-width`;
+  an invalid field's red outline, `DS_FIELD_INVALID_CLASS`, is always 2px).
+- **Radius** (`radius.ts`): None, Small (2px), Medium, Large (the default) or a
+  custom number of pixels (the cards' and pills' corner, the rest scaled),
+  for every corner (`rounded-ds-sm` … `rounded-ds-lg`) and the pill
+  (`rounded-ds-pill`: buttons, nav items, tooltips), which is fully round
+  only at Large. Switches, radios, progress bars and avatars stay round.
+- **Icons**: the library, Lucide for now.
+
+Themes are kept in a **library** (`DsThemeLibrary`): Parabola (the default)
+and any added, one of them in use. A style's weight snaps to the nearest one its family's
+font has (`dsNearestWeight`). The tokens a theme sets are `--ds-*` variables
+(`--ds-bg`… `--ds-highlight`, `--ds-family-<id>`, `--ds-font-<style>`,
+`--ds-text-<style>`, `--ds-text-<style>-leading`, `--ds-weight-<style>`,
+`--ds-radius-<sm|control|md|lg|pill>`), light
+on `:root` and dark on `.dark`, so a theme changes them at run time. Make
+themes on `/parabola`: Theme (the pieces in one 600px column, and the main
+choices in the panel on the right) and Typography (Font families, Type
+scale), with Undo, Redo, Publish and a ⋮ menu to restore defaults top right
+on every page. An app applies the theme in use once, on its website's
+pages (not its admin, which stays in Parabola's own), or on part of a page
+with `scope` (`DS_THEME_SCOPE`, as /parabola's canvas does):
+
+```tsx
+<DsThemeStyle theme={dsActiveTheme(library).theme} />                          {/* loads its Google fonts */}
+<DsThemeStyle theme={…} hosted={["instrument-sans", "instrument-serif", "system"]} />  {/* the app hosts these */}
+<DsThemeStyle theme={…} scope={DS_THEME_SCOPE} />                              {/* only <div className="ds-theme"> */}
+```
+
+An app that hosts Parabola's fonts (the CMS does, with next/font) sets
+`--ds-font-<id>` to its family names; each stack tries it first. Pass the
+library and a saver to `DsProvider` (`themeLibrary`, `onThemeLibraryChange`)
+and `/parabola` publishes too.
+
 ## Using it
 
 ```tsx
@@ -137,6 +250,9 @@ left-aligned in a row that wraps, never stretched. Opt out deliberately:
   `DsDialog` and `DsSidePanel` already do.
 
 Don't size fields with `max-w-[…]` per screen. See `/parabola/fields/form`.
+
+A switch sits right after its label (`gap-ds-8`), never pushed to the far
+edge of the row. Rows in a nav are 4px apart (`ds-4`).
 
 Colours come from tokens only. No raw Tailwind palette (`bg-zinc-100`,
 `text-emerald-600`) and no hex values in components. Content that carries a

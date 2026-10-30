@@ -8,16 +8,19 @@ import {
   DsDropdown,
   DsDropdownContent,
   DsDropdownItem,
+  DsDropdownLabel,
   DsDropdownSeparator,
   DsDropdownTrigger,
   DsListRow,
   DsPill,
   DsSearch,
   useDsConfirm,
+  DsTopBar,
 } from "@beltechi/parabola";
 import { AdminMenuButton } from "@/components/admin/layout";
 import { useOnSaved } from "@/components/admin/publish/events";
 import { describePageDeletion } from "@/components/admin/pages/page-deletion";
+import { PAGE_FORMAT_LABELS, PAGE_PRESETS, pageSettings } from "@/lib/cms/page-formats";
 import { buildSystemPages, type SystemPage } from "@/lib/cms/system-pages";
 import type { Entry } from "@/lib/cms/types";
 import { cn } from "@/lib/utils";
@@ -94,8 +97,10 @@ export function PagesWorkspace({ children }: { children: React.ReactNode }) {
   const query = searchQuery.trim().toLowerCase();
   const matches = (...texts: string[]) => !query || texts.some((t) => t.toLowerCase().includes(query));
   const customRows = pages.filter((p) => matches(pageTitle(p), p.slug));
-  const systemRows = systemPages.filter((p) => matches(p.title, p.path));
-  const total = pages.length + systemPages.length;
+  // A page at a system page's slug is its editable version and takes its place.
+  const systemRows = systemPages.filter((p) => matches(p.title, p.path) && !pages.some((e) => e.slug === p.slug));
+  const total = pages.length + systemPages.filter((p) => !pages.some((e) => e.slug === p.slug)).length;
+  const pagesBySlug = new Map(pages.map((p) => [p.slug, p]));
 
   const handleDelete = async (entry: Entry) => {
     const ok = await confirm({
@@ -132,16 +137,34 @@ export function PagesWorkspace({ children }: { children: React.ReactNode }) {
       >
         {/* Header and search stay pinned over the list, as in Posts (`ds-nav-fade`). The bar
             bleeds over the pane's side padding (-mx-5/px-5), so the fade spans the full width. */}
-        <div className="pointer-events-none sticky top-0 z-20 -mx-5 flex flex-col ds-nav-fade px-5 pb-5 [&>*]:pointer-events-auto">
-          <div className="flex items-center gap-2 py-5">
+        <DsTopBar className="mb-5 -mx-5 px-5 pb-3">
+          <div className="flex items-center gap-2 py-3">
             <h1 className="min-w-0 flex-1 truncate text-p text-ds-fg">Pages {!loading && `(${total})`}</h1>
-            <DsButton href="/admin/pages/new" iconLeft={Plus}>
-              Page
-            </DsButton>
+            <DsDropdown>
+              <DsDropdownTrigger asChild>
+                <DsButton iconLeft={Plus}>Page</DsButton>
+              </DsDropdownTrigger>
+              <DsDropdownContent align="end">
+                <DsDropdownItem iconLeft={File} onSelect={() => router.push("/admin/pages/new")}>
+                  Blank page
+                </DsDropdownItem>
+                <DsDropdownSeparator />
+                <DsDropdownLabel>Start from</DsDropdownLabel>
+                {PAGE_PRESETS.filter((preset) => !pagesBySlug.has(preset.slug)).map((preset) => (
+                  <DsDropdownItem
+                    key={preset.id}
+                    iconLeft={preset.format === "home" ? House : File}
+                    onSelect={() => router.push(`/admin/pages/new?preset=${preset.id}`)}
+                  >
+                    {preset.label}
+                  </DsDropdownItem>
+                ))}
+              </DsDropdownContent>
+            </DsDropdown>
             <AdminMenuButton />
           </div>
           <DsSearch aria-label="Search pages" value={searchQuery} onValueChange={setSearchQuery} className="w-full" />
-        </div>
+        </DsTopBar>
 
         {loading ? (
           <div className="flex justify-center py-20">
@@ -174,16 +197,25 @@ export function PagesWorkspace({ children }: { children: React.ReactNode }) {
             {customRows.map((entry) => {
               const title = pageTitle(entry);
               const published = entry.status === "published";
+              const settings = pageSettings(entry.data);
+              const parent = settings.parent ? pagesBySlug.get(settings.parent) : undefined;
+              const isHome = entry.slug === "home";
               return (
                 <li key={entry.id}>
                   <DsListRow
                     href={`/admin/pages/${entry.slug}`}
                     selected={open.custom === entry.slug}
-                    thumbnailIcon={File}
+                    thumbnailIcon={isHome ? House : File}
                     title={title}
                     pill={!published && <DsPill variant="dark">Draft</DsPill>}
-                    meta={`/${entry.slug}`}
-                    detail={published ? "Published" : undefined}
+                    meta={isHome ? "/" : `/${entry.slug}`}
+                    detail={[
+                      PAGE_FORMAT_LABELS[settings.format].label,
+                      parent ? `Under ${pageTitle(parent)}` : settings.nav ? "In the nav" : null,
+                      published ? "Published" : null,
+                    ]
+                      .filter(Boolean)
+                      .join(" · ")}
                     actions={
                       <DsDropdown>
                         <DsDropdownTrigger asChild>
@@ -200,7 +232,7 @@ export function PagesWorkspace({ children }: { children: React.ReactNode }) {
                             <>
                               <DsDropdownItem
                                 iconLeft={ExternalLink}
-                                onSelect={() => window.open(`/${entry.slug}`, "_blank")}
+                                onSelect={() => window.open(isHome ? "/" : `/${entry.slug}`, "_blank")}
                               >
                                 View on site
                               </DsDropdownItem>

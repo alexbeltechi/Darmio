@@ -5,25 +5,26 @@ import { cn } from "../cn";
 
 /**
  * Parabola pill (Figma: Folio Dharmify 699:6599): a small status or tag chip,
- * 22px tall, `text-small`, 8px corners (like the small button). Optional 12px icons sit before
+ * 22px tall, `text-small`, the theme's pill corner (`rounded-ds-chip`: the
+ * buttons' by default, so fully round at Large; Alex, 2026-10-29). Optional 12px icons sit before
  * and after the label, 4px from it. The pill itself isn't interactive; give
  * it `onRemove` and its trailing × becomes a real button.
  *
- * - dark: `ds-surface-inverse` with page-coloured text, e.g. "Draft".
+ * - dark: `ds-button` with `ds-on-button` text, e.g. "Published".
  * - light: `ds-surface`, the same stone as the default button.
  * - highlight: `ds-highlight` text on its solid light tint, e.g. "Claude".
  */
 export const dsPillVariants = cva(
   [
-    "inline-flex h-[22px] shrink-0 items-center justify-center gap-1 rounded-ds-control px-1.5",
+    "inline-flex h-[22px] shrink-0 items-center justify-center gap-1 rounded-ds-chip px-1.5",
     "text-small whitespace-nowrap",
     "[&_svg]:pointer-events-none [&_svg]:size-3 [&_svg]:shrink-0",
   ],
   {
     variants: {
       variant: {
-        dark: "bg-ds-surface-inverse text-ds-bg",
-        light: "bg-ds-surface/70 text-ds-fg",
+        dark: "bg-ds-button text-ds-on-button",
+        light: "bg-ds-surface/70 text-ds-on-surface",
         highlight: "bg-(--ds-highlight-tint) text-ds-highlight",
       },
     },

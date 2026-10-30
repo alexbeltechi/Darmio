@@ -425,7 +425,7 @@ function AutoRowsPreview({
   }, []);
 
   const aspects = items.map((item) => aspectOf(item.width, item.height));
-  const galleryWidth = liveGalleryWidth(viewport, width, items.length);
+  const galleryWidth = liveGalleryWidth(viewport, width, items.length, stacked ? "stack" : "auto");
   const rows = justifiedRows(
     aspects,
     galleryWidth,
@@ -609,7 +609,7 @@ const LAYOUT_OPTIONS = [
 // width from 20 images (galleryIsFull). "normal", from older posts, shows as Inline.
 const WIDTH_OPTIONS = [
   { value: "auto", label: "Auto (by number of images)" },
-  { value: "large", label: "Inline (up to 1024px)" },
+  { value: "large", label: "Inline" },
   { value: "full", label: "Full width" },
 ];
 

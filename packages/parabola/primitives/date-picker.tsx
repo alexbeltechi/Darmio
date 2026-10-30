@@ -5,7 +5,7 @@ import * as Popover from "@radix-ui/react-popover";
 import { Calendar, ChevronLeft, ChevronRight, CircleX } from "lucide-react";
 import { cn } from "../cn";
 import { DsButton } from "./button";
-import { DS_FIELD_BOX_CLASS, DS_FIELD_CLEAR_CLASS, useDsField, type DsControlProps } from "./field";
+import { DS_FIELD_BOX_CLASS, DS_FIELD_CLEAR_CLASS, DS_FIELD_INVALID_CLASS, useDsField, type DsControlProps } from "./field";
 import { DS_TRAY_CLASS } from "./tray";
 
 const WEEKDAYS = [
@@ -132,7 +132,7 @@ export function DsDatePicker(allProps: {
         data-focus={showFocus || undefined}
         data-invalid={invalid || undefined}
         data-state={open ? "open" : "closed"}
-        className={cn(DS_FIELD_BOX_CLASS, invalid && "border-ds-error", className)}
+        className={cn(DS_FIELD_BOX_CLASS, invalid && DS_FIELD_INVALID_CLASS, className)}
       >
         <Popover.Trigger
           id={id}
@@ -202,9 +202,9 @@ export function DsDatePicker(allProps: {
                       aria-current={sameDay(day, today) ? "date" : undefined}
                       onClick={() => pick(day)}
                       className={cn(
-                        "grid size-9 place-content-center rounded-full text-p transition-colors ds-focus",
+                        "grid size-9 place-content-center rounded-ds-pill text-p transition-colors ds-focus",
                         selected
-                          ? "bg-ds-surface-inverse text-ds-bg ds-hover-inverse"
+                          ? "bg-ds-button text-ds-on-button ds-hover-inverse"
                           : cn(
                               "ds-hover",
                               sameDay(day, today) && "bg-ds-surface/70",

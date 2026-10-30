@@ -7,22 +7,34 @@ import { useDsSetTheme } from "../provider";
 
 /**
  * Icon-only light/dark switch. Flips whichever theme is showing (the `dark`
- * class on <html>, so "system" works too) and hands the new one to the app
+ * class on <html>, so "system" works too, or the mode of the part of the
+ * page it's in: `data-ds-mode`, DsModeScope) and hands the new one to the app
  * through DsProvider `onThemeChange`. Extra props (and a ref) pass to the
- * button, so it can sit inside a DsTooltip.
+ * button, so it can sit inside a DsTooltip. `variant="text"` makes it a
+ * ghost, for a row of ghost buttons such as a site's nav; `size="small"`
+ * for a row of small controls.
  */
-export function DsThemeToggle({ onClick, ...props }: Omit<React.ComponentProps<"button">, "children">) {
+export function DsThemeToggle({
+  onClick,
+  variant = "default",
+  size = "default",
+  ...props
+}: Omit<React.ComponentProps<"button">, "children"> & { variant?: "default" | "text"; size?: "default" | "small" }) {
   const setTheme = useDsSetTheme();
 
   // Both icons render; CSS picks one so there's no hydration flash.
   return (
     <DsButton
       iconOnly
+      variant={variant}
+      size={size}
       aria-label="Toggle theme"
       {...props}
       onClick={(e) => {
         onClick?.(e);
-        setTheme(document.documentElement.classList.contains("dark") ? "light" : "dark");
+        const scope = e.currentTarget.closest<HTMLElement>("[data-ds-mode]");
+        const dark = scope ? scope.dataset.dsMode === "dark" : document.documentElement.classList.contains("dark");
+        setTheme(dark ? "light" : "dark");
       }}
     >
       <Moon className="dark:hidden" />

@@ -337,7 +337,7 @@ function SourceLineCard() {
       description="A link at the end of a post, back to where it first appeared"
       note="Each post picks its label in the editor; a post you share from here to X or LinkedIn gets its label by itself."
     >
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-ds-8">
           <label htmlFor="source-line-enabled" className="text-p text-ds-fg">
             Show the link on posts
           </label>

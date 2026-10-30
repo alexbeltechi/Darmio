@@ -14,7 +14,7 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { key: "posts", href: "/admin/posts", label: "Posts", icon: FileText },
   { key: "pages", href: "/admin/pages", label: "Pages", icon: File },
   { key: "categories", href: "/admin/categories", label: "Categories", icon: Tag },
-  // Images, video and documents (agent-made ones included): decisions, 2026-10-24.
+  // Images, video and documents (agent-made ones included).
   // An image for its icon, though it holds documents too: it reads as the pictures.
   { key: "library", href: "/admin/library", label: "Library", icon: Image },
   { key: "settings", href: "/admin/settings", label: "Settings", icon: Settings },

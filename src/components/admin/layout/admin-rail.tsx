@@ -10,7 +10,7 @@ import { AccountMenu } from "./account-menu";
 export const ADMIN_RAIL_WIDTH = "lg:pl-[76px]";
 
 /**
- * Desktop admin navigation (Figma: Folio Dharmify 701:7078), a Claude-style
+ * Desktop admin navigation, a Claude-style
  * icon rail with a 1px rule on its right edge: Home (every project, decisions
  * 2026-10-26), a rule, one icon button per section of the
  * current project with the current one inverse, and the theme switch and your
@@ -23,7 +23,7 @@ export function AdminRail() {
 
   return (
     <aside className="fixed inset-y-0 left-0 z-(--ds-z-nav) hidden w-[76px] flex-col items-center border-r border-ds-border bg-ds-bg p-5 lg:flex">
-      {/* Home: every project, and your settings (decisions, 2026-10-26). */}
+      {/* Home: every project, and your settings. */}
       <DsTooltip content="Home" side="right">
         <DsButton href="/admin" iconLeft={Home} aria-label="Home" variant="text" />
       </DsTooltip>

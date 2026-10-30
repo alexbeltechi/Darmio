@@ -15,7 +15,7 @@ interface HomeFeedProps {
 /**
  * The homepage (Figma 602:2410): every post, newest first. An empty site says
  * so quietly. A homepage with its own words is a page with the slug "home"
- * (decisions, 2026-10-27).
+ *.
  */
 export function HomeFeed({ posts, mediaItems, categories }: HomeFeedProps) {
   const mediaMap = useMemo(

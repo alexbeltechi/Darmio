@@ -36,8 +36,8 @@ function Fact({ label, children }: { label: string; children: React.ReactNode })
 }
 
 /**
- * What the install runs on, for every project at once (decisions,
- * 2026-10-27): the hosting, the MongoDB database and the image storage, each
+ * What the install runs on, for every project at once: the
+ * hosting, the MongoDB database and the image storage, each
  * set up once when Darmio was installed. Projects share all three: the free
  * tiers are the install's, not split per project. Bars measure against the
  * free tiers, since a site can't ask Vercel or Atlas which plan it's on. Each

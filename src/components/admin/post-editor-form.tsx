@@ -828,7 +828,7 @@ export function PostEditorForm({
     <div className="flex flex-col h-full bg-ds-bg">
       {/* Content */}
       <div className="flex-1 overflow-y-auto">
-      {/* Top bar (Figma: Folio Dharmify 702:7553): close and the title on the
+      {/* Top bar: close and the title on the
           left, actions on the right. No surface of its own: the buttons float
           over the content, which fades out beneath the Parabola nav fade (`ds-nav-fade`).
           The zero-height sticky wrapper pins it without taking up room, and the
@@ -915,7 +915,7 @@ export function PostEditorForm({
         {/* Clears the floating bar. */}
         <div aria-hidden className="h-[76px]" />
 
-        {/* Details (Figma: Folio Dharmify 702:7553) */}
+        {/* Details */}
         {/* `@container`: the DS_COLUMNS_CLASS rows below size to this form, not the screen. */}
         <div className={cn("@container px-5 pb-5", DS_FIELDS_CLASS)}>
           <DsField label="Title" required>

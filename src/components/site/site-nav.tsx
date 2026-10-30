@@ -101,7 +101,7 @@ const NAV_LINK_CLASS = "bg-transparent text-ds-fg-muted hover:bg-ds-surface/40 h
  * Site nav, rendered once in the persistent site layout so it never
  * unmounts (and never flickers) between route changes.
  *
- * From `sm` up it's the conventional bar (decisions, 2026-10-28): the site's
+ * From `sm` up it's the conventional bar: the site's
  * name on the left in H3, a little bigger than the links, the way home; on
  * the right the sections as ghost `DsButton`s 4px apart (muted text, a light
  * surface on hover, the current page not highlighted), then the theme
@@ -122,7 +122,7 @@ export function SiteNav({
   const pathname = usePathname();
   const override = useSyncExternalStore(subscribe, () => highlightOverride, () => null);
   const active = override ?? activeSlugForPath(pathname, sections);
-  // No Home: the site's name is the way home (decisions, 2026-10-28).
+  // No Home: the site's name is the way home.
   const NAV_ITEMS = sections.map((c) => ({ slug: c.slug, label: c.label, href: `/${c.slug}` }));
   const [mobileOpen, setMobileOpen] = useState(false);
   const closeMobile = useCallback(() => setMobileOpen(false), []);

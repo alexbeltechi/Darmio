@@ -52,13 +52,13 @@ export const STACKED_GALLERY_COUNT = 3;
 /**
  * No row is taller than this, about a laptop screen, so a stretched row never
  * runs off screen. The inline width matches it, so a square fills an inline
- * gallery edge to edge (decisions, 2026-10-28).
+ * gallery edge to edge.
  */
 const MAX_ROW_PX = 820;
 
 /**
  * How tall a row may get, in pixels: as tall as the gallery is wide, so a
- * square image fills the width (decisions, 2026-10-28); taller on a phone so
+ * square image fills the width; taller on a phone so
  * a portrait isn't left as a thumbnail; never more than MAX_ROW_PX.
  */
 function rowCap(containerWidth: number): number {
@@ -111,8 +111,8 @@ export function justifiedRows(
 /**
  * The reading width: the text column of posts and pages (`max-w-[600px]` in
  * their markup), and the width of a gallery that stacks its images one a row,
- * so a picture lines up with the text and a square fills it (decisions,
- * 2026-10-28; was 661px).
+ * so a picture lines up with the text and a square fills it
+ * (was 661px).
  */
 export const READING_WIDTH = 600;
 

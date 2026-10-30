@@ -1,4 +1,4 @@
-/** Home: the projects, a new one, and your account (decisions, 2026-10-26). */
+/** Home: the projects, a new one, and your account. */
 export const HOME_PATH = "/admin";
 export const ACCOUNT_PATH = "/admin/account";
 export const NEW_PROJECT_PATH = "/admin/projects/new";

@@ -30,7 +30,7 @@ import { PROJECT_NAME_MAX, type ProjectSummary } from "@/lib/cms/projects";
 import { formatChangedAt } from "@/lib/utils";
 
 /**
- * Home (decisions, 2026-10-26), the way Framer's dashboard opens: every
+ * Home, as a dashboard opens: every
  * project as a card (no thumbnails or icons): its name with a Published or
  * Not published pill beside it, then at the bottom its address when it's
  * published and when it last changed, with a ⋮ menu at the bottom right

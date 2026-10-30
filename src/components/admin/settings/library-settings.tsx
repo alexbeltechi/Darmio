@@ -22,7 +22,7 @@ interface Usage {
 /**
  * Settings › Library: how new uploads are made (AVIF quality), and this
  * project's share of the image storage every project shares (the whole store
- * is under Home › Settings, decisions 2026-10-27). Quality only applies to new uploads:
+ * is under Home › Settings). Quality only applies to new uploads:
  * going down later is possible from the stored copies, going up needs the
  * originals.
  */

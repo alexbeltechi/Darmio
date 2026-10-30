@@ -1,7 +1,7 @@
 /**
  * Load an example site into the database in `.env.local`: its settings,
  * categories, media, posts and pages (roadmap, pre-release step 4; the Ilo
- * Odena seed, decisions 2026-10-24 and 2026-10-28).
+ * Odena seed).
  *
  * Usage: npm run seed -- ilo
  *

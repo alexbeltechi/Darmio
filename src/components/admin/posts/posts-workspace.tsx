@@ -154,7 +154,7 @@ function PostPills({ entry }: { entry: Entry }) {
 }
 
 /**
- * The Posts section (Figma: Folio Dharmify 701:7078, 699:6154, 699:6599), laid
+ * The Posts section, laid
  * out like Claude desktop: the list on the left and the open post on the
  * right. It lives in the content layout, so it stays mounted (scroll, search
  * and selection kept) while you move between posts; the open post is the

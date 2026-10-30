@@ -1,7 +1,7 @@
 /**
  * Migration: move gallery blocks saved as "large" or "normal" (the old
  * default, never chosen) to the "auto" width, which sizes a gallery by how
- * many images it holds (decisions, 2026-10-20). "full" stays as it is.
+ * many images it holds. "full" stays as it is.
  * Covers the live version and any unpublished changes, so a published post
  * doesn't pick up a pending change from this.
  *

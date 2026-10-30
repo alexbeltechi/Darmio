@@ -8,7 +8,7 @@ import { DsButton, DsCopyField, DsField, DsInput } from "@beltechi/parabola";
 import { PASSWORD_MIN } from "@/lib/cms/password";
 
 /**
- * A new password from a one-time reset link (decisions, 2026-10-26): the
+ * A new password from a one-time reset link: the
  * owner's AI makes the link (`npm run reset-link`), the owner chooses the
  * password here, never in the chat, and is signed in. A link that's wrong,
  * spent or expired says so and offers the prompt for a new one. Floats on

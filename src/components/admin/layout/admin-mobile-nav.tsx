@@ -70,7 +70,7 @@ function useNavCounts(enabled: boolean) {
 }
 
 /**
- * Mobile admin navigation (Figma: Folio Dharmify 706:8731). Wraps the admin
+ * Mobile admin navigation. Wraps the admin
  * pages and opens when an AdminMenuButton is pressed. The menu is the
  * Parabola DsMenu: the project menu top left, theme and close top right,
  * and the sections as nav pills down the middle with their counts.

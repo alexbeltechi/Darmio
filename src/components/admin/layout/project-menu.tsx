@@ -18,7 +18,7 @@ import { HOME_PATH, ACCOUNT_PATH, NEW_PROJECT_PATH } from "@/components/admin/ho
 type ProjectList = { projects: ProjectSummary[]; current: string | null };
 
 /**
- * The projects menu (decisions, 2026-10-26), Home's sidebar in short: your
+ * The projects menu, Home's sidebar in short: your
  * projects, the current one ticked, each with a gear for its settings, New
  * project, then Home and your Settings. Picking a project opens it.
  *

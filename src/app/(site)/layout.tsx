@@ -17,8 +17,8 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   ]);
   const { siteName } = settings;
   // The nav grows with the site: each top-level category marked for it
-  // (decisions, 2026-10-26), then each top-level page marked for it, lit for
-  // the pages under it too (decisions, 2026-10-28).
+  //, then each top-level page marked for it, lit for
+  // the pages under it too.
   const sections = [
     ...categoryGroups(categories)
       .filter((g) => g.nav)

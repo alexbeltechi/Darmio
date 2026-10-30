@@ -1,5 +1,5 @@
 /**
- * The one-time setup code (decisions, 2026-10-26): set as SETUP_CODE in the
+ * The one-time setup code: set as SETUP_CODE in the
  * install's environment by whoever installs it (INSTALL.md), and handed to
  * the owner inside the setup link. Without it the setup screen can't create
  * the owner, so nobody who reaches a fresh install first can claim it.

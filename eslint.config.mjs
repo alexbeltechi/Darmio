@@ -65,7 +65,7 @@ const eslintConfig = defineConfig([
         { ignoreRestSiblings: true, argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
       ],
       // CMS media is served as made at upload, never through next/image's
-      // resizer (decisions, 2026-10-08), so <img> and MediaImage are the way.
+      // resizer, so <img> and MediaImage are the way.
       "@next/next/no-img-element": "off",
     },
   },

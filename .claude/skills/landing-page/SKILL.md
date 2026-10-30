@@ -1,11 +1,11 @@
 ---
 name: landing-page
-description: Make a new page in the CMS in one go: a draft page, its MD (Alex's own .md, or one written from his prompt) and a wireframe from real Parabola components. Use when the user wants a new page, says "create a page", "landing page", "let's make a page for…", shares an .md or an idea for a page, or wants another wireframe or to build an existing page from its wireframe.
+description: Make a new page in the CMS in one go: a draft page, its MD (the user's own .md, or one written from their prompt) and a wireframe from real Parabola components. Use when the user wants a new page, says "create a page", "landing page", "let's make a page for…", shares an .md or an idea for a page, or wants another wireframe or to build an existing page from its wireframe.
 ---
 
 # Make a page: document → page → wireframe
 
-When Alex says "create a page", he should arrive at a wireframe. One run, no
+When the user says "create a page", they should arrive at a wireframe. One run, no
 stops in between: by the end, admin › Pages › <page> shows the page, its MD
 and its wireframe.
 
@@ -18,21 +18,21 @@ and its wireframe.
 export $(grep CMS_AGENT_TOKEN .env.local | xargs)
 ```
 
-Local dev writes to the live database. Create only what the page needs;
+Local dev writes to the database in `.env.local`. Create only what the page needs;
 everything stays a draft.
 
 ## 1. The MD
 
-Alex can also drop anything else readable into a page's Documents (notes, HTML, text, CSV, JSON): read them with `GET /docs/{id}?format=md` before working on the page.
+The user can also drop anything else readable into a page's Documents (notes, HTML, text, CSV, JSON): read them with `GET /docs/{id}?format=md` before working on the page.
 
 The MD is the page's memory: what it's for and what it says, so work can pick
 up from it later. One per page, named after the page: `work-with-me.md`.
 
-- **Alex gave an .md file**: attach it word for word. Don't rewrite it,
+- **The user gave an .md file**: attach it word for word. Don't rewrite it,
   restructure it or summarise it.
-- **Alex gave only a prompt**: write the MD from it. Plain Markdown: the goal
+- **The user gave only a prompt**: write the MD from it. Plain Markdown: the goal
   in a line, who it's for, then the page top to bottom as real copy (a `##`
-  per section). Keep his words where he used them. Put what you assumed under
+  per section). Keep their words where they used them. Put what you assumed under
   `## Open questions` at the end, not in the chat.
 
 Create it with `POST /docs`:
@@ -52,7 +52,7 @@ docs: <the MD's id>
 ---
 ```
 
-The page stays empty until Alex approves a wireframe.
+The page stays empty until the user approves a wireframe.
 
 ## 3. The wireframe
 
@@ -77,21 +77,21 @@ never imitations. It shows under Wireframes on the page.
 7. Check `/api/admin/wireframes/{id}` in the browser at desktop and phone
    width: no sideways scroll, and nothing broken.
 
-Then tell Alex it's on the page, in two or three lines: what's on it and what
-you had to make up. Ask the open questions after he's seen it, not before.
+Then tell the user it's on the page, in two or three lines: what's on it and what
+you had to make up. Ask the open questions after they've seen it, not before.
 
 ## Iterating
 
 - Feedback on layout: rebuild and `PATCH /wireframes/{id}`, or add a variant
   to compare.
 - Feedback that changes content: update the MD first (`PATCH /docs/{id}`),
-  then the wireframe. When Alex gave the MD, ask before editing it.
+  then the wireframe. When the user gave the MD, ask before editing it.
 
 ## Building the page
 
-Only when Alex says so. Write the page from the MD and the approved
+Only when the user says so. Write the page from the MD and the approved
 wireframe with the existing blocks
 (`PUT /collections/pages/entries/{slug}/markdown`). Where a section needs a
 block that doesn't exist, propose it (existing block, a variant, or a new
-block in `packages/parabola/blocks/`) and build it only after he
-agrees, following the block contract in the Parabola README. Never publish.
+block in `packages/parabola/blocks/`) and build it only after they
+agree, following the block contract in the Parabola README. Never publish.

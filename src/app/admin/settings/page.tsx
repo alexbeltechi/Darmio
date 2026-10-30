@@ -11,11 +11,10 @@ import { AgentSettings } from "@/components/admin/settings/agent-settings";
 /**
  * The current project's settings, one section per thing a project can vary,
  * in the order you'd set them up: the site, its library, the accounts it
- * works with, the agent's brain and rules (decisions, 2026-10-24). Your own
- * account is at /admin/account, for the whole install (decisions,
- * 2026-10-26). Design, the project's Parabola theme, follows the site
- * (decisions, 2026-10-28). Each section has an anchor (`#site`, `#design`, `#library`,
- * `#integrations`, `#agent`).
+ * works with, the agent's brain and rules. Your own account is at
+ * /admin/account, for the whole install. Design, the project's Parabola
+ * theme, follows the site. Each section has an anchor (`#site`, `#design`,
+ * `#library`, `#integrations`, `#agent`).
  */
 export default function SettingsPage() {
   return (

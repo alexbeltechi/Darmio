@@ -3,8 +3,8 @@ import { ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /**
- * One block on the settings page, on a `ds-surface-subtle` panel (decisions,
- * 2026-10-27): the H3 title, then one short muted line saying what it is or
+ * One block on the settings page, on a `ds-surface-subtle` panel:
+ * the H3 title, then one short muted line saying what it is or
  * runs on ("MongoDB Atlas", "Not published"), then, apart from that, the
  * `note` in the same muted text for the longer explanation, then its content.
  * A card with nothing below its title has no body, so its padding stays even.

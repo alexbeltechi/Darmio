@@ -8,7 +8,7 @@ import { PROJECT_NAME_MAX } from "@/lib/cms/projects";
 import { HOME_PATH } from "@/components/admin/home/home-routes";
 
 /**
- * New project: one field, its name (decisions, 2026-10-26). It gets its own
+ * New project: one field, its name. It gets its own
  * database, and you're back on Home with its card there; the rest is set
  * later from its settings.
  */
@@ -29,7 +29,7 @@ export default function NewProjectPage() {
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error);
-      // Back to Home, where its card now shows; you open it from there (decisions, 2026-10-26).
+      // Back to Home, where its card now shows; you open it from there.
       window.location.assign(HOME_PATH);
     } catch (error) {
       dsToast.error("Couldn't create the project", { description: error instanceof Error ? error.message : undefined });

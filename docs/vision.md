@@ -1,5 +1,5 @@
 ---
-reviewed: 2026-10-28
+reviewed: 2026-10-29
 owner: Alex
 ---
 
@@ -10,9 +10,14 @@ if a request seems to pull against it, say so.
 
 ## What it is
 
-A publishing platform for makers: photographers, designers, artists, anyone
-who makes things and wants to show them. Publish agentically (ask your agent)
-or by hand, through a simple, minimal, clean interface.
+**Turn your practice into a business people take seriously. Built with AI,
+always yours.** A publishing platform for creators: makers, solo founders,
+coaches, instructors, photographers, designers, artists, anyone launching or
+relaunching a practice. It launches the person and their offer first, with
+their agent or by hand, through a simple, minimal, clean interface.
+Who it sells to, the launch flow, the phases and the competition are in
+`positioning.md`, which leads where the two disagree (decisions,
+2026-10-29).
 
 Alex is the first customer: beltechi.com moves onto it at the pre-release
 (2026-11-25); until then it's on Framer. The CMS is **Darmio** (decisions,
@@ -35,9 +40,12 @@ Alex is the first customer: beltechi.com moves onto it at the pre-release
 
 ## Who it's for
 
-Non-technical makers who trust their agent. They shouldn't need to read code.
-The platform has to carry its own context: how to upload, how to curate, how to
-build a page, as optional skills any agent can read and act on.
+Creators who trust their agent: first coaches, instructors and creators;
+not SMBs or larger businesses (`positioning.md`). Until the web version,
+they're technical, or willing to set up with their own AI reading the docs;
+after it, nobody should need to read code. The platform has to carry its own
+context: how to upload, how to curate, how to build a page, as optional
+skills any agent can read and act on.
 
 ## Principles
 

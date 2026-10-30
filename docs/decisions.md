@@ -10,6 +10,19 @@ with the why. To change one, add a new line that overrides it.
 
 ## Product
 
+- 2026-10-29 — **Positioning: a business people take seriously.**
+  Darmio is for creators launching or relaunching a practice: first
+  coaches, instructors and creators (photographers, designers and artists
+  count), not SMBs (Alex). Headline: "Turn your practice into a business
+  people take seriously. Built with AI, always yours." It launches the
+  person and their offer first, through five gated stages (Clarity,
+  Interest, Conversations, First paid client, Repeat), with clients in a
+  `clients.csv` in the library. Phase 1 is the agency wedge (self-hosted,
+  run by your own Claude Code, sites and offers for clients and Alex's own
+  micro-brands); Phase 2, the hosted platform, opens at 5 live sites.
+  Bootstrapped, no investors; Polsia and Ghost are the main competitors.
+  The whole of it, with prices still hypotheses, is `positioning.md`, which
+  leads where `vision.md` disagrees. Fits the three Darmios (2026-10-28).
 - 2026-10-29 — **Each style has its own type contrast.** Alex: rerolling
   should change the type's contrast too, "different styles have different
   contrast levels". A style holds a range (Classic and Sport full, Minimal

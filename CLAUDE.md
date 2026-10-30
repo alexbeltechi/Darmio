@@ -12,14 +12,12 @@ settings live in its database; its keys in its deployment's environment.
 
 ## Read first
 
-- `docs/vision.md`: what this is, who it's for, principles.
-- `docs/positioning.md`: who it sells to, the launch flow, phases,
-  competitors and prices; it leads where vision disagrees.
-- `docs/roadmap.md`: what to work on, in order, with what done looks like.
-- `docs/decisions.md`: calls already made. Don't reopen them; flag a conflict
-  instead.
 - `docs/conventions.md`: the one way to do each common job (ids, slugs,
   toasts, database access, comments…). Use it; don't write a second way.
+- `CLAUDE.local.md`, if there is one (it stays out of git): the maintainer's
+  private context, with intent, decisions and the roadmap. Read what it
+  points to before changing anything; a call made there isn't reopened, a
+  conflict is flagged.
 
 ## Before you commit
 
@@ -29,11 +27,9 @@ thing: the message names it. Don't silence a rule to get past it.
 
 ## Keep the docs current
 
-Docs hold intent and decisions, not code structure (read the code for that).
-When a task changes direction, finishes a roadmap item or settles a decision,
-update `roadmap.md` or `decisions.md` in the same change and bump its
-`reviewed:` date. Don't save project facts only to private memory; put them
-here so Alex and other agents can see them.
+This repo holds only what ships: code, README, INSTALL, conventions. Intent,
+decisions and plans stay out of it. When a change settles a call or finishes
+a planned item, record it where `CLAUDE.local.md` points.
 
 ## Design system
 

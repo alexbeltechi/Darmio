@@ -111,7 +111,7 @@ const eslintConfig = defineConfig([
   },
   {
     // Known debt, to be paved over, not copied. Remove a file once it's fixed;
-    // never add one. See docs/roadmap.md, "Gardening".
+    // never add one. See docs/conventions.md, "Known debt".
     files: [
       "src/components/admin/media-detail-modal.tsx", // raw Radix Dialog → a Parabola modal
       "src/components/admin/media-picker.tsx", // raw Radix Dialog → a Parabola modal

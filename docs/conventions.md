@@ -59,7 +59,7 @@ changes in the running app with read-only actions (see `CLAUDE.md`).
 ## Comments
 
 A comment says what the code can't: why it's this way, a constraint, a
-decision (cite `docs/decisions.md`), or what a long screen's section is.
+decision (cite it by date), or what a long screen's section is.
 Never what the next line does (`// Get the entry`), and never history
 ("replaces the old…"); git has the history.
 

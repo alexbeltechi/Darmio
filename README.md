@@ -28,7 +28,8 @@ open `http://localhost:3010/admin/setup?code=<SETUP_CODE>`.
 
 ## Read first
 
-`docs/vision.md`, `docs/roadmap.md`, `docs/decisions.md`, `docs/conventions.md`.
+`docs/conventions.md` (the one way to do each common job) and
+`packages/parabola/README.md` (the design system).
 
 ## Installs
 

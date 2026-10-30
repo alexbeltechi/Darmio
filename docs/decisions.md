@@ -630,10 +630,26 @@ with the why. To change one, add a new line that overrides it.
   are later, and the latter only ever through the maker's own site, never
   a bridge of ours. Why: transparency without cost to us, and no agent
   lock-in.
+- 2026-10-27 — **No home headline setting.** The headline and button over
+  the homepage feed are gone from Settings. A homepage with its own words
+  is a page with the slug "home", made like any other; otherwise the
+  homepage is just the posts. In Settings, "Original post link" is now
+  **Link back**, and "Agent" is **Brain** (a "Brain link" field, then the
+  rules).
+- 2026-10-27 — **Settings cards: title, one short line, then the rest.** The
+  line under a card's title says only what it is or runs on ("Vercel",
+  "MongoDB Atlas", "Not published"); the longer explanation sits apart below
+  it, in the same muted text. Services link out in that grey, underlined,
+  with a small ↗ (Vercel, the cluster, Vercel Blob) instead of a button.
+  Written for makers, not developers: before the site is deployed, the cards
+  say "Not deployed yet" and what shows once it is, never "this computer,
+  ready for…". "Image storage" is **Storage**: it holds images and video. A
+  project's card says Published at its address, or Not published. Usage
+  bars lead with the percentage used ("40% used", "<0.1% used").
 - 2026-10-27 — **Usage bars split by project.** Parabola's `DsProgress` takes
   `segments`: parts of the fill side by side, each in one of Parabola's
   accents in a fixed order (blue, orange, green, violet, pink, teal, sky,
-  stone, red), with a legend. Settings' Database and Image storage bars show
+  stone, red), with a legend. Settings' Database and Storage bars show
   each project's share; a project keeps its colour everywhere (its place in
   the project list), and its own Library section shows its share in that
   colour against the others in grey.

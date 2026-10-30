@@ -4,7 +4,6 @@ import { getMediaByIds } from "@/lib/cms/media";
 import { listCategories } from "@/lib/db/categories";
 import { PageView } from "@/components/site/page-view";
 import { feedCategory, getPreviewCandidateIds } from "@/components/site/post-grid-shared";
-import { getSiteSettings } from "@/lib/db/settings";
 import { pageSettings } from "@/lib/cms/page-formats";
 import type { Entry } from "@/lib/cms/types";
 
@@ -35,11 +34,7 @@ export default async function HomePage() {
   // Only each post's preview media is needed for the feed.
   const mediaIds = new Set(allEntries.flatMap(getPreviewCandidateIds));
 
-  const [mediaItems, categories, { homeHero }] = await Promise.all([
-    getMediaByIds(Array.from(mediaIds)),
-    listCategories(),
-    getSiteSettings(),
-  ]);
+  const [mediaItems, categories] = await Promise.all([getMediaByIds(Array.from(mediaIds)), listCategories()]);
 
   return (
     <main className="flex w-full flex-1 flex-col">
@@ -47,7 +42,6 @@ export default async function HomePage() {
         posts={allEntries}
         mediaItems={mediaItems}
         categories={categories.map(feedCategory)}
-        hero={homeHero}
       />
     </main>
   );

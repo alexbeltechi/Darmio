@@ -1,7 +1,7 @@
 /**
  * How a view's intro is set. What each section says and how it's laid out
- * lives on its category (headline, description, layout); the homepage's
- * headline is in Settings › Site.
+ * lives on its category (headline, description, layout). The homepage is
+ * the posts, or a page with the slug "home".
  */
 import type { CategoryLayout } from "@/lib/cms/types";
 

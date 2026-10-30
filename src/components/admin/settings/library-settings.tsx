@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { DsField, DsLink, DsProgress, DsSelect, dsSegmentColor, dsToast } from "@beltechi/parabola";
-import { gbOrMb, mb } from "./install-settings";
+import { files, gbOrMb, mb, percentUsed } from "./install-settings";
 import type { InstallUsage } from "@/lib/db/install";
 import { ACCOUNT_PATH } from "@/components/admin/home/home-routes";
 import { SettingsSection } from "./settings-section";
@@ -74,7 +74,8 @@ export function LibrarySettings() {
     <SettingsSection
       id="library"
       title="Library"
-      description="Every upload is saved once as AVIF at a few widths (up to 2560px) plus a JPEG for older browsers. Pages pick the width each screen needs."
+      description="AVIF at a few widths, up to 2560px"
+      note="Every upload is saved once as AVIF, plus a JPEG for older browsers. Pages pick the width each screen needs."
     >
       <DsField
         label="Quality for new uploads"
@@ -91,17 +92,21 @@ export function LibrarySettings() {
       {usage && share && (
         <DsProgress
           max={share.freeBytes}
-          title="Storage"
+          title={`Storage, ${percentUsed(share.totalBytes, share.freeBytes)}`}
           meta={`${mb(share.totalBytes)} of ${gbOrMb(share.freeBytes)}`}
-          segments={[
-            { value: share.mine, label: "This project", meta: mb(share.mine), color: dsSegmentColor(share.index) },
-            ...(share.others > 0
-              ? [{ value: share.others, label: "Your other projects", meta: mb(share.others), color: "var(--ds-fg-subtle)" }]
-              : []),
-          ]}
+          segments={
+            share.totalBytes === 0
+              ? []
+              : [
+                  { value: share.mine, label: "This project", meta: mb(share.mine), color: dsSegmentColor(share.index) },
+                  ...(share.others > 0
+                    ? [{ value: share.others, label: "Your other projects", meta: mb(share.others), color: "var(--ds-fg-subtle)" }]
+                    : []),
+                ]
+          }
           description={
             <>
-              {usage.items} media items in this project. The image storage is shared by every project:{" "}
+              {usage.items === 0 ? "Nothing uploaded to this project yet." : `${files(usage.items)} in this project.`} Storage is shared by every project:{" "}
               <DsLink href={`${ACCOUNT_PATH}#storage`} className="text-ds-fg underline underline-offset-4">
                 see all of it in Settings
               </DsLink>

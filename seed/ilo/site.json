@@ -1,5 +1,7 @@
 {
   "siteName": "Ilo Odena",
+  "label": "Ilo's site",
+  "about": "A maker's site to learn from: six essays, a home page, About and Work with me, with her photos.",
   "categories": [
     {
       "slug": "writing",

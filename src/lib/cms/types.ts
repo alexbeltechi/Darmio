@@ -400,6 +400,8 @@ export interface MediaItem {
 
   // Where this came from - see ContentSource
   source?: ContentSource;
+  /** Extensibility bucket, as on entries: `{ example: true, seed }` for an example site's media. */
+  metadata?: Record<string, unknown>;
 
   // Dates
   /** When the asset was made: its capture date when known (backdated for archive imports), else the upload time. */
@@ -449,6 +451,7 @@ export interface UploadMetadata {
   keywordsBy?: string;
   capturedAt?: string; // ISO date the asset was originally made; becomes createdAt (uploadedAt stays the real upload time)
   source?: MediaItem["source"];
+  metadata?: MediaItem["metadata"];
 }
 
 // ============================================

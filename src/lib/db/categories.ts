@@ -31,6 +31,8 @@ export interface Category {
     title?: string;
     description?: string;
   };
+  /** Extensibility bucket, as on entries: `{ example: true, seed }` for an example site's categories. */
+  metadata?: Record<string, unknown>;
   createdAt: string;
   updatedAt: string;
 }
@@ -137,6 +139,7 @@ export async function createCategory(
     headline: data.headline,
     layout: data.layout,
     seo: data.seo,
+    ...(data.metadata ? { metadata: data.metadata } : {}),
     createdAt: now,
     updatedAt: now,
   };

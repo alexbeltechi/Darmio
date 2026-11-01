@@ -102,6 +102,20 @@ export async function getMediaByIds(ids: string[]): Promise<MediaItem[]> {
     .filter((item): item is MediaItem => item !== undefined);
 }
 
+/**
+ * The library items marked as an example site's (`metadata.example`), and
+ * those an example seed uploaded before media carried the mark: the seed
+ * script's own batch (`seed-<name>`, one of `seedBatches`).
+ */
+export async function listExampleMedia(seedBatches: string[]): Promise<MediaItem[]> {
+  const db = await getDb();
+  const docs = await db
+    .collection(Collections.MEDIA)
+    .find({ $or: [{ "metadata.example": true }, { "source.origin": "script", "source.batchId": { $in: seedBatches } }] })
+    .toArray();
+  return docs.map((doc) => withoutId<MediaItem>(doc));
+}
+
 export async function createMedia(media: MediaItem): Promise<MediaItem> {
   const db = await getDb();
   const collection = db.collection(Collections.MEDIA);

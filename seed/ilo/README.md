@@ -4,12 +4,17 @@ The example site a fresh install can start as, shaped like a creator's
 personal site: writing, a home page, about, work with me. Every post
 and page is marked as an example (`metadata.example`).
 
+A fresh install offers it on the setup screen ("Start with"), and
+Settings › Examples adds it later or removes it in one step: every example
+goes, except what the maker changed or still uses (their post in Writing,
+their page under About). On a computer, the same load is:
+
 ```sh
 npm run seed -- ilo
 ```
 
 It loads into the database in `.env.local` and skips anything already
-there. Posts and pages are in the CMS's own agent format
+there. `site.json`'s `label` and `about` are what the setup screen shows. Posts and pages are in the CMS's own agent format
 (`src/lib/agent/markdown.ts`); an image is written `![alt](file:name.jpg)`
 and a video `::video media=file:name.mp4`, and each becomes an upload from
 `media/`. Pages are made in file-name

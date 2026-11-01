@@ -27,6 +27,11 @@ const nextConfig: NextConfig = {
       { source: "/lifestyle", destination: "/journal", permanent: true },
     ];
   },
+  // The example sites (seed/) are read from disk by the routes that offer and load them (lib/cms/examples.ts).
+  outputFileTracingIncludes: {
+    "/api/setup": ["./seed/**/*"],
+    "/api/admin/examples": ["./seed/**/*"],
+  },
   // Exclude ffmpeg packages from bundling - they use native binaries
   serverExternalPackages: [
     "fluent-ffmpeg",

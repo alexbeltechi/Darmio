@@ -1,13 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { DsButton, DsCopyField, DsField, DsInput } from "@beltechi/parabola";
+import { DsButton, DsCopyField, DsField, DsInput, DsRadio, DsRadioGroup, dsToast } from "@beltechi/parabola";
 import { PASSWORD_MIN } from "@/lib/cms/password";
 import { isEmail } from "@/lib/cms/email";
 import { InstallProblemNotice } from "@/components/admin/install-problem";
 import { installProblem, type InstallProblem } from "@/lib/cms/install-problems";
+import type { ExampleSite } from "@/lib/cms/examples";
+
+// The "Start with" choices: an example by its folder name, or nothing.
+const EMPTY = "empty";
+const exampleChoice = (name: string) => `example:${name}`;
 
 /**
  * First-run onboarding. A fresh install has no users,
@@ -18,7 +23,10 @@ import { installProblem, type InstallProblem } from "@/lib/cms/install-problems"
  * INSTALL.md) hands you: `/admin/setup?code=…`. A good code opens straight on
  * the one step, your account for the whole install (email and password; a
  * name is optional, under Account). Creating it also makes a first project
- * and opens the admin.
+ * and opens the admin. When the install carries example sites, the step also
+ * asks what the site starts with: the first example (preselected, so a new
+ * maker sees a whole site first) or nothing. The example loads once they're
+ * signed in, and Settings › Examples takes it out again in one go.
  *
  * Without a good code (no link, a wrong one, or a lost one) there is no form:
  * the page says the site isn't set up yet and hands over a prompt that asks
@@ -36,7 +44,11 @@ export default function SetupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [repeat, setRepeat] = useState("");
+  const [examples, setExamples] = useState<ExampleSite[]>([]);
+  const [startWith, setStartWith] = useState(EMPTY);
   const [saving, setSaving] = useState(false);
+  // While the account is being made, the check below would see it and leave for sign-in mid-way.
+  const savingRef = useRef(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -47,6 +59,7 @@ export default function SetupPage() {
       fetch(first && fromLink ? `/api/setup?code=${encodeURIComponent(fromLink)}` : "/api/setup")
         .then((res) => res.json())
         .then((json) => {
+          if (savingRef.current) return;
           // The install can't do its job yet (no database, say): say so, and keep checking.
           const found = installProblem(json.code);
           setProblem(found);
@@ -56,6 +69,9 @@ export default function SetupPage() {
           // A good code in the link opens the account step; anything else, the not-set-up page.
           if (json.data?.codeOk) setCode(fromLink);
           else setBadLink(Boolean(fromLink));
+          const offered: ExampleSite[] = Array.isArray(json.data?.examples) ? json.data.examples : [];
+          setExamples(offered);
+          setStartWith(offered[0] ? exampleChoice(offered[0].name) : EMPTY);
           setChecking(false);
         })
         .catch(() => first && setChecking(false));
@@ -70,21 +86,40 @@ export default function SetupPage() {
   async function create() {
     if (!youReady || saving) return;
     setSaving(true);
+    savingRef.current = true;
     setError(null);
+    let json: { data?: { email: string }; error?: string };
     try {
       const res = await fetch("/api/setup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ code, email, password }),
       });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error);
-      const signedIn = await signIn("credentials", { username: json.data.email, password, redirect: false });
-      router.replace(signedIn?.ok ? "/admin" : "/admin/login");
+      json = await res.json();
+      if (!res.ok || !json.data) throw new Error(json.error);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Couldn't set up");
       setSaving(false);
+      savingRef.current = false;
+      return;
     }
+    const signedIn = await signIn("credentials", { username: json.data.email, password, redirect: false });
+    if (!signedIn?.ok) return router.replace("/admin/login");
+    // Signed in, the example loads into the new project like any admin change, off this public route.
+    const example = examples.find((site) => exampleChoice(site.name) === startWith);
+    if (example) {
+      const res = await fetch("/api/admin/examples", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: example.name }),
+      }).catch(() => null);
+      if (!res?.ok) {
+        dsToast.error("Couldn't add the example site", {
+          description: "Your account is ready. Add it from Settings › Examples.",
+        });
+      }
+    }
+    router.replace("/admin");
   }
 
   if (checking) return <div className="min-h-screen bg-ds-bg" />;
@@ -134,11 +169,35 @@ export default function SetupPage() {
               <DsInput type="password" value={repeat} onChange={(e) => setRepeat(e.target.value)} autoComplete="new-password" />
             </DsField>
           </div>
+          {examples.length > 0 && (
+            <div role="group" aria-labelledby="start-with" className="flex flex-col gap-ds-8">
+              <p id="start-with" className="text-p">Start with</p>
+              <DsRadioGroup value={startWith} onValueChange={setStartWith} className="gap-ds-16" aria-labelledby="start-with">
+                {[
+                  ...examples.map((site) => ({
+                    value: exampleChoice(site.name),
+                    label: site.label,
+                    hint: `${site.about ? `${site.about} ` : ""}Remove it in Settings when you're ready for your own.`,
+                  })),
+                  { value: EMPTY, label: "An empty site", hint: "Nothing in it yet. You write the first post." },
+                ].map(({ value, label, hint }) => (
+                  <label key={value} htmlFor={`start-with-${value}`} className="flex cursor-pointer items-start gap-ds-8">
+                    <DsRadio value={value} id={`start-with-${value}`} className="mt-[3px]" />
+                    <span className="flex flex-1 flex-col gap-1">
+                      <span className="text-p">{label}</span>
+                      <span className="text-small text-ds-fg-muted">{hint}</span>
+                    </span>
+                  </label>
+                ))}
+              </DsRadioGroup>
+            </div>
+          )}
           {error && <p className="text-p text-ds-error">{error}</p>}
-          <div>
+          <div className="flex flex-col items-start gap-ds-8">
             <DsButton variant="primary" type="submit" loading={saving} disabled={!youReady}>
               Create my account
             </DsButton>
+            {saving && startWith !== EMPTY && <p className="text-small text-ds-fg-muted">Setting up your site with the example. This takes a moment.</p>}
           </div>
         </form>
       </div>

@@ -198,6 +198,7 @@ export async function uploadMedia(
     createdAt: meta.capturedAt || new Date().toISOString(),
     uploadedAt: new Date().toISOString(),
     source: meta.source,
+    ...(meta.metadata ? { metadata: meta.metadata } : {}),
   };
 
   const id = crypto.randomUUID();

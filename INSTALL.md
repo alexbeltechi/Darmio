@@ -171,7 +171,9 @@ When it's live, `GET <address>/api/setup` answers
 Give them one link: `<address>/admin/setup?code=<SETUP_CODE>`. Call it
 their setup link; don't explain the code inside it. Tell them to open it
 and choose their email and password **there** (never in this chat); that
-creates their account and a first project, and opens their admin. If they
+creates their account and a first project, and opens their admin. The same
+screen asks what the site starts with: an example site to learn from
+(removed later in one step, Settings › Examples) or an empty one. If they
 lose the link, give it to them again.
 
 **"Give me the setup link for my Darmio site at <address>"**: that's the

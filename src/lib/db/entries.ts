@@ -74,6 +74,23 @@ export async function listEntries(
   return { entries, total };
 }
 
+/** Every entry in every collection, for work across the whole site (Remove examples). */
+export async function listAllEntries(): Promise<Entry[]> {
+  const db = await getDb();
+  const docs = await db.collection(Collections.ENTRIES).find({}).toArray();
+  return docs.map((doc) => withoutId<Entry>(doc));
+}
+
+/** How many entries in each collection are marked as an example site's (`metadata.example`). */
+export async function countExampleEntries(): Promise<Record<string, number>> {
+  const db = await getDb();
+  const rows = await db
+    .collection(Collections.ENTRIES)
+    .aggregate<{ _id: string; count: number }>([{ $match: { "metadata.example": true } }, { $group: { _id: "$collection", count: { $sum: 1 } } }])
+    .toArray();
+  return Object.fromEntries(rows.map((row) => [row._id, row.count]));
+}
+
 export async function getEntry(
   collection: string,
   slug: string

@@ -20,7 +20,7 @@ three.
 ## Before you commit
 
 `npm run verify`: route types, typecheck (app and `scripts/`), lint with no warnings allowed,
-Parabola's token check, and a production build (the dev server lets a client component import
+Parabola's token check, the leak check, the unit tests (`npm test`), and a production build (the dev server lets a client component import
 server code, such as the database; Vercel's build doesn't). It must pass. Data is the live database, so check UI
 changes in the running app with read-only actions (see `CLAUDE.md`).
 
@@ -53,6 +53,9 @@ changes in the running app with read-only actions (see `CLAUDE.md`).
 | Loading a whole admin list (posts, pages, media) | `fetchAll` from `@/lib/api/fetch-all`: pages through `{ data, total }`; a bare `fetch` stops at the API's default 50 | |
 | API responses | `{ data }` on success, `{ error }` with a 4xx/5xx status on failure, `{ success: true }` from DELETE | |
 | A field with a fixed set of values | An `as const` list beside the type in `src/lib/cms/types.ts` (`GALLERY_LAYOUTS`); agent input is checked against it and rejected with the allowed values, never cast | |
+| Writing a stored thing (entry, category, media, settings, doc) | A new row goes through `withSchemaVersion` (`@/lib/cms/schema-version`); an edit never sets `schemaVersion` | |
+| Changing a stored shape | Raise `SCHEMA_VERSION` and add a step to `MIGRATIONS` (`src/lib/cms/schema-version.ts`) that leaves a thing already in the new shape as it is; an import runs `migrateStored` on everything it brings in | |
+| A test | `node:test` in a `*.test.ts` beside the code, run by `npm test` (part of verify); invented data only, never a database | |
 | Leaving a field out | `const { secret, ...rest } = obj` (lint allows the unused name) | |
 
 ## Comments
@@ -80,7 +83,7 @@ and that list only shrinks.
   Needs one route wrapper in `src/lib/api`.
 - `src/app/admin/media/page.tsx` (~1,600 lines) and
   `src/components/admin/post-editor-form.tsx` (~1,300) need splitting.
-- No tests yet.
+- Tests cover only `schema-version.ts` so far.
 - `src/middleware.ts` uses the file name Next 16 deprecates; it becomes
   `src/proxy.ts` (exporting `proxy`). It's the auth gate, so move it on its own
   and check sign-in and agent-token access after.

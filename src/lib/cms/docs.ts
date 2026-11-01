@@ -29,6 +29,8 @@ export type Doc = {
   createdBy: Actor;
   createdAt: string;
   updatedAt: string;
+  /** The shape version it was written in (see lib/cms/schema-version.ts); none means 1. */
+  schemaVersion?: number;
 };
 
 /** Where a doc is attached: a post or page, by collection and slug. */

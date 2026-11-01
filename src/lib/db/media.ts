@@ -11,6 +11,7 @@ import type { Db } from "mongodb";
 import { storedBytes } from "@/lib/cms/stored-bytes";
 import { getDb, Collections, withoutId } from "@/lib/db/mongodb";
 import type { MediaItem } from "@/lib/cms/types";
+import { withSchemaVersion } from "@/lib/cms/schema-version";
 
 /**
  * List all media items with optional filtering and pagination
@@ -120,9 +121,10 @@ export async function createMedia(media: MediaItem): Promise<MediaItem> {
   const db = await getDb();
   const collection = db.collection(Collections.MEDIA);
 
-  await collection.insertOne(media as unknown as Record<string, unknown>);
+  const stored = withSchemaVersion(media);
+  await collection.insertOne(stored as unknown as Record<string, unknown>);
 
-  return media;
+  return stored;
 }
 
 export async function updateMedia(
@@ -132,14 +134,11 @@ export async function updateMedia(
   const db = await getDb();
   const collection = db.collection(Collections.MEDIA);
 
+  // Its version stays as stored: an edit doesn't migrate it.
+  const { schemaVersion, ...fields } = updates;
   const result = await collection.findOneAndUpdate(
     { id },
-    { 
-      $set: { 
-        ...updates, 
-        updatedAt: new Date().toISOString() 
-      } 
-    },
+    { $set: { ...fields, updatedAt: new Date().toISOString() } },
     { returnDocument: "after" }
   );
 

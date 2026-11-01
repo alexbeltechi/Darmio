@@ -9,6 +9,7 @@ import { getDb, Collections, withoutId } from "@/lib/db/mongodb";
 import { normalizeCategoryColor, toStoredCategoryColor } from "@/lib/cms/category-colors";
 import { CATEGORY_LAYOUTS, type CategoryLayout } from "@/lib/cms/types";
 import { slugify } from "@/lib/slug";
+import { withSchemaVersion } from "@/lib/cms/schema-version";
 
 export interface Category {
   id: string;
@@ -35,6 +36,8 @@ export interface Category {
   metadata?: Record<string, unknown>;
   createdAt: string;
   updatedAt: string;
+  /** The shape version it was written in (see lib/cms/schema-version.ts); none means 1. */
+  schemaVersion?: number;
 }
 
 /**
@@ -125,7 +128,7 @@ export async function createCategory(
     .toArray();
   const nextOrder = maxOrder.length > 0 ? (maxOrder[0].order || 0) + 1 : 0;
 
-  const category: Category = {
+  const category: Category = withSchemaVersion({
     id,
     slug,
     name: data.name || data.label,
@@ -142,7 +145,7 @@ export async function createCategory(
     ...(data.metadata ? { metadata: data.metadata } : {}),
     createdAt: now,
     updatedAt: now,
-  };
+  });
 
   await collection.insertOne(category as unknown as Record<string, unknown>);
 
@@ -162,8 +165,10 @@ export async function updateCategory(
   }
   if (updates.parentId !== undefined) await checkParent(id, updates.parentId);
 
-  // Fields left out of the update stay as they are (undefined would be stored as null).
-  const given = Object.fromEntries(Object.entries(updates).filter(([, v]) => v !== undefined));
+  // Fields left out of the update stay as they are (undefined would be stored as null),
+  // and so does its version: an edit doesn't migrate it.
+  const { schemaVersion, ...rest } = updates;
+  const given = Object.fromEntries(Object.entries(rest).filter(([, v]) => v !== undefined));
   const updatedData = {
     ...given,
     ...(updates.color !== undefined && { color: toStoredCategoryColor(updates.color) }),

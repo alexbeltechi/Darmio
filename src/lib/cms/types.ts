@@ -120,6 +120,8 @@ export interface ContentSource {
 
 export interface EntryBase<T = Record<string, unknown>> {
   id: string;
+  /** The shape version it was written in (see lib/cms/schema-version.ts); none means 1. */
+  schemaVersion?: number;
   collection: string;
   slug: string;
   previousSlugs?: string[]; // Track slug history for redirect mapping on migration
@@ -320,6 +322,8 @@ export interface ImageVariant {
 
 export interface MediaItem {
   id: string;
+  /** The shape version it was written in (see lib/cms/schema-version.ts); none means 1. */
+  schemaVersion?: number;
 
   // File identification
   filename: string; // Sanitized SEO-friendly filename (e.g., beach-sunset-x7k9.jpg)

@@ -36,3 +36,12 @@ open `http://localhost:3010/admin/setup?code=<SETUP_CODE>`.
 A maker's site is an install: their own copy of this repo, their own
 database and keys. Installs pull updates from here. Customise through
 settings, themes and blocks rather than code, and updates stay easy to take.
+
+## Licence
+
+Darmio is MIT. Use it however you like. If you run it for clients on more
+than 5 projects, please buy an agency licence. It keeps Darmio going.
+
+That last part is a request, not a licence term. The code is plain MIT (see
+`LICENSE`). The name "Darmio" has its own short policy: `TRADEMARK.md`. To
+help build it, see `CONTRIBUTING.md`.

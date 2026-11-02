@@ -106,5 +106,10 @@ export function migrateStored(
  */
 export function withSchemaVersion<T extends object>(doc: T): T & { schemaVersion: number } {
   const own = (doc as { schemaVersion?: unknown }).schemaVersion;
-  return { ...doc, schemaVersion: typeof own === "number" ? own : SCHEMA_VERSION };
+  // No version: stamp the current one. With a version: validate it the same way imports are read.
+  if (own === undefined || own === null) {
+    return { ...doc, schemaVersion: SCHEMA_VERSION };
+  }
+  const valid = storedVersion(doc as unknown as StoredDoc);
+  return { ...doc, schemaVersion: valid };
 }

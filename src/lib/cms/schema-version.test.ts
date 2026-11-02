@@ -126,6 +126,12 @@ describe("the core's version", () => {
     assert.equal(withSchemaVersion({ id: "n2", schemaVersion: SCHEMA_VERSION + 4 }).schemaVersion, SCHEMA_VERSION + 4);
   });
 
+  it("rejects an own version that isn't a whole number from 1", () => {
+    for (const schemaVersion of [0, -1, 1.5, "2", true, Number.NaN]) {
+      assert.throws(() => withSchemaVersion({ id: "bad", schemaVersion } as any), /schemaVersion must be/);
+    }
+  });
+
   it("reads a missing version as 1", () => {
     assert.equal(storedVersion({}), 1);
     assert.equal(storedVersion({ schemaVersion: null }), 1);

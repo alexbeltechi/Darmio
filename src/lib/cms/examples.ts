@@ -22,7 +22,7 @@ import { metaToData } from "@/lib/agent/post-markdown-io";
 import { createCategory, deleteCategory, listCategories, parseCategoryLayout } from "@/lib/db/categories";
 import { countExampleEntries, createEntry, deleteEntry, getEntry, listAllEntries } from "@/lib/db/entries";
 import { listExampleMedia } from "@/lib/db/media";
-import { getCurrentProject } from "@/lib/db/mongodb";
+import { getCurrentProject, getDb } from "@/lib/db/mongodb";
 import { deletePageBelongings, pageDeletionPlan } from "@/lib/db/page-cascade";
 import { updateProject } from "@/lib/db/projects";
 import { DEFAULT_SETTINGS, getSiteSettings, updateSiteSettings } from "@/lib/db/settings";
@@ -32,6 +32,34 @@ const SEED_DIR = path.join(process.cwd(), "seed");
 
 /** Prevent two concurrent example loads on the same server instance. */
 let exampleLoadInProgress = false;
+const EXAMPLE_LOAD_LOCK_KEY = "examples:load";
+const EXAMPLE_LOAD_TTL_MS = 2 * 60 * 1000; // 2 minutes: generous for image renditions
+
+async function acquireExampleLoadDbLock(): Promise<boolean> {
+  try {
+    const db = await getDb();
+    const locks = db.collection("locks");
+    // Expire lock documents automatically; ensure uniqueness on key
+    await locks.createIndex({ expireAt: 1 }, { expireAfterSeconds: 0 });
+    await locks.createIndex({ key: 1 }, { unique: true });
+    const expireAt = new Date(Date.now() + EXAMPLE_LOAD_TTL_MS);
+    // Insert succeeds only if not present
+    await locks.insertOne({ key: EXAMPLE_LOAD_LOCK_KEY, expireAt });
+    return true;
+  } catch {
+    // Duplicate key -> lock already held
+    return false;
+  }
+}
+
+async function releaseExampleLoadDbLock(): Promise<void> {
+  try {
+    const db = await getDb();
+    await db.collection("locks").deleteOne({ key: EXAMPLE_LOAD_LOCK_KEY });
+  } catch {
+    // Best-effort: TTL will clear it if this fails
+  }
+}
 
 type SeedSite = {
   siteName?: string;
@@ -108,7 +136,13 @@ export type ExampleCounts = { posts: number; pages: number; categories: number; 
  * already named keeps theirs. `log` hears each step (the script prints them).
  */
 export async function loadExampleSite(name: string, log: (line: string) => void = () => {}): Promise<ExampleCounts> {
+  // First, a fast in-process guard.
   if (exampleLoadInProgress) {
+    throw new Error("An example load is already in progress");
+  }
+  // Then, a cross-instance DB lock.
+  const gotDbLock = await acquireExampleLoadDbLock();
+  if (!gotDbLock) {
     throw new Error("An example load is already in progress");
   }
   exampleLoadInProgress = true;
@@ -212,6 +246,7 @@ export async function loadExampleSite(name: string, log: (line: string) => void 
   return made;
   } finally {
     exampleLoadInProgress = false;
+    await releaseExampleLoadDbLock();
   }
 }
 

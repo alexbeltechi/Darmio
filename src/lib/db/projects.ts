@@ -10,6 +10,7 @@ import { Collections, forgetProjects, getHubDb, getMongoClient, hubProjects, wit
 import { SETTINGS_KEY } from "@/lib/db/settings";
 import { parseBrain, parseProjectName, PROJECTS_MAX, type ProjectSummary } from "@/lib/cms/projects";
 import { slugify } from "@/lib/slug";
+import { SCHEMA_VERSION } from "@/lib/cms/schema-version";
 
 export const toSummary = ({ slug, name, brain }: ProjectRow): ProjectSummary => ({ slug, name, ...(brain ? { brain } : {}) });
 
@@ -94,7 +95,7 @@ export async function createProject(input: { name: unknown; brain?: unknown }): 
     .collection(Collections.SETTINGS)
     .updateOne(
       { key: SETTINGS_KEY },
-      { $setOnInsert: { key: SETTINGS_KEY, siteName: name, updatedAt: row.createdAt } },
+      { $setOnInsert: newProjectSettingsInsertDoc(name, row.createdAt) },
       { upsert: true }
     );
   await hub.collection(Collections.PROJECTS).insertOne({ ...row });
@@ -187,4 +188,13 @@ export async function removeProject(row: ProjectRow): Promise<void> {
   }
   await hub.collection(Collections.PROJECTS).deleteOne({ slug: row.slug });
   forgetProjects();
+}
+
+/**
+ * The settings document a brand-new project's database starts with, written by createProject
+ * via $setOnInsert. It carries the schema version at first write so the later settings
+ * upserts don't have to stamp it.
+ */
+export function newProjectSettingsInsertDoc(siteName: string, createdAtISO: string) {
+  return { key: SETTINGS_KEY, siteName, updatedAt: createdAtISO, schemaVersion: SCHEMA_VERSION };
 }

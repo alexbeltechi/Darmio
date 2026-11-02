@@ -9,6 +9,7 @@
  */
 
 import type { Actor } from "@/lib/agent/actor";
+import { withSchemaVersion } from "@/lib/cms/schema-version";
 import { Collections, getDb, withoutId } from "@/lib/db/mongodb";
 
 import type { Doc, DocKind, DocLink, DocStage, DocUsage, DocWithUsage } from "@/lib/cms/docs";
@@ -66,7 +67,7 @@ export async function createDoc(input: {
   createdBy: Actor;
 }): Promise<Doc> {
   const now = new Date().toISOString();
-  const doc: Doc = { id: crypto.randomUUID(), ...input, createdAt: now, updatedAt: now };
+  const doc: Doc = withSchemaVersion({ id: crypto.randomUUID(), ...input, createdAt: now, updatedAt: now });
   if (!doc.filename) delete doc.filename;
   if (!doc.stage) delete doc.stage;
   if (!doc.links?.length) delete doc.links;

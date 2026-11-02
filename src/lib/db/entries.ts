@@ -7,6 +7,7 @@
 import { getDb, Collections, withoutId } from "@/lib/db/mongodb";
 import type { ContentSource, Entry, EntryStatus } from "@/lib/cms/types";
 import { getCollection, validateEntryData } from "@/lib/cms/schema";
+import { withSchemaVersion } from "@/lib/cms/schema-version";
 import { slugify } from "@/lib/slug";
 
 /**
@@ -22,10 +23,13 @@ export function withoutPending<T extends Entry>(entry: T): T {
   return rest;
 }
 
-/** Write an entry back, dropping `pendingData` from the document when it's gone. */
+/**
+ * Write an entry back, dropping `pendingData` from the document when it's
+ * gone. Its `schemaVersion` stays as stored: an edit doesn't migrate it.
+ */
 async function saveDoc(collection: string, slug: string, entry: Entry) {
   const db = await getDb();
-  const { pendingData, ...rest } = entry;
+  const { pendingData, schemaVersion, ...rest } = entry;
   await db.collection(Collections.ENTRIES).updateOne(
     { collection, slug },
     pendingData ? { $set: { ...rest, pendingData } } : { $set: rest, $unset: { pendingData: "" } }
@@ -125,7 +129,7 @@ export async function createEntry(
 
   const now = new Date().toISOString();
 
-  const entry: Entry = {
+  const entry: Entry = withSchemaVersion({
     id: crypto.randomUUID(),
     collection,
     slug,
@@ -145,7 +149,7 @@ export async function createEntry(
     data: data.data as Entry["data"],
     metadata: data.metadata,
     source: data.source || { origin: "web", ingestedAt: now },
-  };
+  });
 
   await entriesCollection.insertOne(entry as unknown as Record<string, unknown>);
 

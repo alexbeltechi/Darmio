@@ -17,6 +17,7 @@ import {
   type DsThemeLibrary,
 } from "@beltechi/parabola";
 import { DEFAULT_IMAGE_QUALITY } from "@/lib/cms/image-processing";
+import { SCHEMA_VERSION } from "@/lib/cms/schema-version";
 import { parseSiteName } from "@/lib/cms/site";
 import {
   DEFAULT_SOURCE_LABELS,
@@ -141,7 +142,8 @@ export async function getSiteSettings(): Promise<SiteSettings> {
 }
 
 /**
- * Update (upsert) the site settings. Only known fields are persisted.
+ * Update (upsert) the site settings. Only known fields are persisted. The
+ * version is stamped when the document is first written, and an edit leaves it.
  */
 export async function updateSiteSettings(
   updates: Partial<Omit<SiteSettings, "updatedAt">> & {
@@ -198,7 +200,7 @@ export async function updateSiteSettings(
 
   await collection.updateOne(
     { key: SETTINGS_KEY },
-    { $set: set, $setOnInsert: { key: SETTINGS_KEY } },
+    { $set: set, $setOnInsert: { key: SETTINGS_KEY, schemaVersion: SCHEMA_VERSION } },
     { upsert: true }
   );
 

@@ -128,7 +128,8 @@ describe("the core's version", () => {
 
   it("rejects an own version that isn't a whole number from 1", () => {
     for (const schemaVersion of [0, -1, 1.5, "2", true, Number.NaN]) {
-      assert.throws(() => withSchemaVersion({ id: "bad", schemaVersion } as any), /schemaVersion must be/);
+      const bad = { id: "bad", schemaVersion } as Record<string, unknown>;
+      assert.throws(() => withSchemaVersion(bad), /schemaVersion must be/);
     }
   });
 

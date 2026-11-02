@@ -118,7 +118,11 @@ export async function POST(request: NextRequest) {
         revalidatePath("/", "layout");
       } catch (error) {
         console.error("Setup: couldn't load the example site:", error);
-        exampleError = error instanceof Error ? error.message : "Couldn't load the example site";
+        if (error instanceof Error && /already in progress/i.test(error.message)) {
+          exampleError = "Another example load is already in progress. Try again in a moment.";
+        } else {
+          exampleError = error instanceof Error ? error.message : "Couldn't load the example site";
+        }
       }
     }
 

@@ -36,6 +36,9 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Failed to load the example site:", error);
     if (isDatabaseError(error)) return handleDatabaseError(error);
+    if (error instanceof Error && /already in progress/i.test(error.message)) {
+      return NextResponse.json({ error: "Another example load is already in progress. Try again in a moment." }, { status: 409 });
+    }
     return NextResponse.json({ error: error instanceof Error ? error.message : "Couldn't load the example site" }, { status: 500 });
   }
 }

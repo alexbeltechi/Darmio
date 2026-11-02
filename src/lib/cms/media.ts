@@ -294,14 +294,22 @@ export async function uploadMedia(
 
   if (isVideo) {
     try {
+      // Timebox expensive video work to keep serverless routes under 60s.
+      // If poster generation runs long, skip it — the upload still succeeds.
+      const withTimeout = async <T>(promise: Promise<T>, ms: number, label: string): Promise<T> => {
+        return await Promise.race<T>([
+          promise,
+          new Promise<T>((_, reject) => setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms)),
+        ]);
+      };
       // Get video metadata (dimensions, duration)
-      videoMetadata = await getVideoMetadata(file) || undefined;
+      videoMetadata = (await withTimeout(getVideoMetadata(file), 4_000, "getVideoMetadata")) || undefined;
       
-      const thumbnail = await extractVideoThumbnail(file, {
+      const thumbnail = await withTimeout(extractVideoThumbnail(file, {
         timestamp: 0.5, // 0.5 seconds in to avoid black frames
         maxWidth: 768,
         quality: 5,
-      });
+      }), 5_000, "extractVideoThumbnail");
       
       if (thumbnail) {
         const posterFilename = buildVariantFilename(sanitizedName, shortId, "poster", ".jpg");

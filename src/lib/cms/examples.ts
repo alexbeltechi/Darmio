@@ -30,6 +30,9 @@ import { DEFAULT_SETTINGS, getSiteSettings, updateSiteSettings } from "@/lib/db/
 // Next copies the folder into the server build for the routes that read it (next.config.ts).
 const SEED_DIR = path.join(process.cwd(), "seed");
 
+/** Prevent two concurrent example loads on the same server instance. */
+let exampleLoadInProgress = false;
+
 type SeedSite = {
   siteName?: string;
   /** What the setup screen and Settings call it ("… site"). */
@@ -105,6 +108,11 @@ export type ExampleCounts = { posts: number; pages: number; categories: number; 
  * already named keeps theirs. `log` hears each step (the script prints them).
  */
 export async function loadExampleSite(name: string, log: (line: string) => void = () => {}): Promise<ExampleCounts> {
+  if (exampleLoadInProgress) {
+    throw new Error("An example load is already in progress");
+  }
+  exampleLoadInProgress = true;
+  try {
   const dir = path.join(SEED_DIR, await parseExampleName(name));
   const site = await readSeed(name);
   const source = { origin: "script" as const, batchId: `seed-${name}`, ingestedAt: new Date().toISOString() };
@@ -202,6 +210,41 @@ export async function loadExampleSite(name: string, log: (line: string) => void 
   await seedFolder("posts");
   await seedFolder("pages");
   return made;
+  } finally {
+    exampleLoadInProgress = false;
+  }
+}
+
+/** Seeds present in the current project, inferred from example-marked items and seed batches. */
+async function detectLoadedSeeds(): Promise<Set<string>> {
+  const seeds = new Set<string>();
+  // Example entries carry metadata.seed
+  for (const entry of await listAllEntries()) {
+    if (isExample(entry) && typeof entry.metadata?.seed === "string") seeds.add(String(entry.metadata.seed));
+  }
+  // Categories may carry it now; older ones don't.
+  for (const category of await listCategories()) {
+    if (isExample(category) && typeof category.metadata?.seed === "string") seeds.add(String(category.metadata.seed));
+  }
+  // Media uploaded by the seed script carries batchId "seed-<name>"
+  for (const item of await listExampleMedia(await seedBatches())) {
+    const batch = item.source?.batchId;
+    if (item.source?.origin === "script" && typeof batch === "string" && batch.startsWith("seed-")) {
+      seeds.add(batch.slice("seed-".length));
+    }
+  }
+  return seeds;
+}
+
+/** Slugs of categories that belong to loaded seeds but may predate example marking (legacy seed runs). */
+async function legacyExampleCategorySlugs(seeds: Set<string>): Promise<Set<string>> {
+  const slugs = new Set<string>();
+  for (const seed of seeds) {
+    const site = await readSeed(seed).catch(() => null);
+    if (!site?.categories) continue;
+    for (const c of site.categories) slugs.add(c.slug);
+  }
+  return slugs;
 }
 
 /** The batches the seed script gave uploads before media carried the example mark. */
@@ -214,11 +257,16 @@ const countOf = (entries: { collection: string }[], collection: string) => entri
 /** How much of the current project is examples. */
 export async function exampleCounts(): Promise<ExampleCounts> {
   const entries = await countExampleEntries();
+  const allCategories = await listCategories();
+  const seeds = await detectLoadedSeeds();
+  const legacySlugs = await legacyExampleCategorySlugs(seeds);
+  const categories = allCategories.filter((c) => isExample(c) || legacySlugs.has(c.slug)).length;
+  const media = (await listExampleMedia(await seedBatches())).length;
   return {
     posts: entries.posts ?? 0,
     pages: entries.pages ?? 0,
-    categories: (await listCategories()).filter(isExample).length,
-    media: (await listExampleMedia(await seedBatches())).length,
+    categories,
+    media,
   };
 }
 
@@ -236,8 +284,13 @@ export type ExampleRemoval = {
  */
 export async function removeExamples(): Promise<ExampleRemoval> {
   const entries = await listAllEntries();
-  const categories = await listCategories();
+  const categoriesInDb = await listCategories();
   const media = await listExampleMedia(await seedBatches());
+  // Treat legacy seed categories (matching loaded seeds' slugs) as examples for planning purposes,
+  // so earlier runs without metadata.example are still removable when unused.
+  const seeds = await detectLoadedSeeds();
+  const legacySlugs = await legacyExampleCategorySlugs(seeds);
+  const categories = categoriesInDb.map((c) => (legacySlugs.has(c.slug) ? { ...c, metadata: { ...(c.metadata || {}), example: true } } : c));
   const plan = planExampleRemoval({ entries, categories, exampleMedia: media.map((item) => item.id) });
 
   for (const entry of plan.entries) {
@@ -249,11 +302,11 @@ export async function removeExamples(): Promise<ExampleRemoval> {
   let mediaRemoved = 0;
   for (const id of plan.media) if ((await deleteMedia(id)).success) mediaRemoved++;
 
-  const seeds = new Set<string>();
-  for (const item of [...entries, ...categories]) if (isExample(item) && typeof item.metadata?.seed === "string") seeds.add(item.metadata.seed);
-  for (const item of media) if (item.source?.batchId?.startsWith("seed-")) seeds.add(item.source.batchId.slice("seed-".length));
+  const touchedSeeds = new Set<string>();
+  for (const item of [...entries, ...categories]) if (isExample(item) && typeof item.metadata?.seed === "string") touchedSeeds.add(item.metadata.seed);
+  for (const item of media) if (item.source?.batchId?.startsWith("seed-")) touchedSeeds.add(item.source.batchId.slice("seed-".length));
   const { siteName } = await getSiteSettings();
-  for (const seed of seeds) {
+  for (const seed of touchedSeeds) {
     const site = await readSeed(seed).catch(() => null);
     if (site?.siteName && site.siteName === siteName) {
       await nameSite(DEFAULT_SETTINGS.siteName);

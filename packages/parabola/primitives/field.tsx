@@ -3,6 +3,8 @@
 import * as React from "react";
 import { CircleX, Search, type LucideIcon } from "lucide-react";
 import { cn } from "../cn";
+import { DsCopyButton } from "./copy-button";
+import { DS_SHOW_MORE_CLOSED_CLASS, DsShowMoreButton, useDsShowMore } from "./show-more";
 
 /**
  * Parabola fields, the style used by the
@@ -321,9 +323,18 @@ export function DsSearch({
  * `bare` drops the box and grows from one line, like writing on the page.
  */
 export function DsTextarea(
-  allProps: React.ComponentProps<"textarea"> & { invalid?: boolean; showFocus?: boolean; bare?: boolean }
+  allProps: React.ComponentProps<"textarea"> & {
+    invalid?: boolean;
+    showFocus?: boolean;
+    bare?: boolean;
+    /** A copy button inside on the right that copies the whole text (DsCopyButton). */
+    copyable?: boolean;
+    /** Six lines with Show more under them for the rest (show-more.tsx). */
+    collapsible?: boolean;
+  }
 ) {
-  const { invalid, showFocus, bare, className, ...props } = useDsField(allProps);
+  const { invalid, showFocus, bare, copyable, collapsible, className, ...props } = useDsField(allProps);
+  const { setElement, element, open, toggle, overflows, closed } = useDsShowMore<HTMLTextAreaElement>(Boolean(collapsible), props.value ?? props.defaultValue);
   return (
     <div
       data-slot="ds-textarea"
@@ -331,15 +342,25 @@ export function DsTextarea(
       data-invalid={invalid || undefined}
       className={cn(
         bare ? [DS_FIELD_BARE_CLASS, "items-start"] : [DS_FIELD_BOX_CLASS, "h-auto items-start py-2", invalid && DS_FIELD_INVALID_CLASS],
+        "relative",
+        collapsible && "flex-col items-stretch gap-ds-8",
         className
       )}
     >
       <textarea
+        ref={setElement}
         rows={bare ? 1 : 3}
         aria-invalid={invalid || undefined}
-        className={cn(DS_FIELD_INPUT_CLASS, bare ? "min-h-[22px]" : "min-h-[66px]", "resize-none [field-sizing:content]")}
+        className={cn(
+          DS_FIELD_INPUT_CLASS,
+          bare ? "min-h-[22px]" : "min-h-[66px]",
+          "resize-none [field-sizing:content]",
+          closed && DS_SHOW_MORE_CLOSED_CLASS
+        )}
         {...props}
       />
+      {overflows && <DsShowMoreButton open={open} onToggle={toggle} />}
+      {copyable && <DsCopyButton floating value={() => element?.value ?? ""} />}
     </div>
   );
 }

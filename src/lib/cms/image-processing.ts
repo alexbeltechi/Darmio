@@ -1,4 +1,4 @@
-import sharp from "sharp";
+import sharp, { type Sharp } from "sharp";
 import crypto from "crypto";
 import path from "path";
 import { slugify } from "@/lib/slug";
@@ -95,7 +95,7 @@ export async function makeRenditions(
   const hasAlpha = info.channels === 4 && (await sharp(data, raw).stats()).isOpaque === false;
 
   const at = (width: number) => sharp(data, raw).resize(width, undefined, { withoutEnlargement: true });
-  const sized = async (pipeline: sharp.Sharp) => {
+  const sized = async (pipeline: Sharp) => {
     const { data: out, info: o } = await pipeline.toBuffer({ resolveWithObject: true });
     return { buffer: out, width: o.width, height: o.height };
   };

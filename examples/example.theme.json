@@ -1,0 +1,22 @@
+{
+  "format": "darmio-theme",
+  "version": 1,
+  "name": "Example: warm paper",
+  "description": "A warm, quiet theme: cream background, ink text, a terracotta accent, serif headlines.",
+  "theme": {
+    "colours": {
+      "theme": { "light": "#F6F0E6", "dark": "#1C1814" },
+      "text": { "light": "#2A2118", "dark": "#F1E9DC" },
+      "accent": { "light": "#B5532F", "dark": "#E08A63" }
+    },
+    "families": [
+      { "id": "body", "label": "Font", "font": "instrument-sans" },
+      { "id": "heading", "label": "Heading", "font": "instrument-serif" }
+    ],
+    "type": {
+      "h1": { "size": 44, "lineHeight": 52 }
+    },
+    "radius": "small",
+    "icons": "lucide"
+  }
+}

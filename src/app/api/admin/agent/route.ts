@@ -74,6 +74,13 @@ Self-contained HTML sketches of a page, before it's built. They belong to the pa
 - DELETE /wireframes/{id}
 - Deleting a page deletes its wireframes and the docs only it uses (DELETE …/pages/entries/{slug}?dryRun=1 shows what).
 
+## Themes
+A theme file (\`name.theme.json\`) changes how the whole site looks; the guide to writing one is docs/themes.md in the repo. The owner sees the themes in Settings › Design.
+- GET    /themes                                        The themes and which one the site wears
+- POST   /themes {"file": {...}, "activate"?: false}    Add a theme file (checked; a mistake comes back with the allowed values) and put it on the site unless activate is false
+- DELETE /themes?id={id}                                Remove it; if the site wore it, the site goes back to Parabola's own
+- Put a theme on the site only when the owner asks.
+
 ## Media
 - GET  /media?fields=summary&q=word&limit=50            Compact list; q searches names, title, caption, tags and keywords. fields: id,name,url,mime,width,height,size,alt,caption,title,description,tags,keywords,createdAt,fingerprint,sha256,sourcePath
        q also finds an image by the file it was uploaded from ("DSCF6400").

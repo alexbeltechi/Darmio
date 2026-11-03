@@ -49,3 +49,6 @@ next-env.d.ts
 
 # private context for the maintainer's agents
 CLAUDE.local.md
+
+# built by scripts/build-parabola-cli.mjs
+/packages/parabola/bin/

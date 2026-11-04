@@ -167,4 +167,15 @@ describe("theme file", () => {
       assert.equal(dsThemeCss(back.theme), dsThemeCss(stored), JSON.stringify(raw));
     }
   });
+
+  it("takes the axes a Google font link may carry, bounding only the weight", () => {
+    for (const google of ["Roboto:ital@0;1", "Inter:wght@400;700", "Inter:ital,wght@0,400;1,700", "Inter:wght@100..900"]) {
+      assert.ok(dsThemeFileParse(file({ customFonts: [{ id: "f", label: "F", google }] })).ok, google);
+      assert.equal(parseDsThemeConfig({ customFonts: [{ id: "f", label: "F", google }] }).customFonts.length, 1, google);
+      assert.ok(dsCustomFontFromInput(`https://fonts.googleapis.com/css2?family=${google}`), google);
+    }
+    for (const google of ["Inter:wght@100000000000000000000", "Inter:ital,wght@2,400", "Inter:ital,wght@0,5000"]) {
+      assert.equal(dsThemeFileParse(file({ customFonts: [{ id: "f", label: "F", google }] })).ok, false, google);
+    }
+  });
 });

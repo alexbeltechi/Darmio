@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { describe, it } from "node:test";
 
-import { DS_DEFAULT_THEME } from "../../../packages/parabola/theme";
+import { dsCustomFont } from "../../../packages/parabola/fonts";
+import { DS_DEFAULT_THEME, dsThemeCss, parseDsThemeConfig } from "../../../packages/parabola/theme";
 import { dsThemeFileName, dsThemeFileParse, dsThemeFileText } from "../../../packages/parabola/theme-file";
 
 const file = (theme: unknown, extra: Record<string, unknown> = {}) => ({
@@ -70,5 +71,38 @@ describe("theme file", () => {
 
   it("names the file from the theme's name", () => {
     assert.equal(dsThemeFileName("Warm Paper!"), "warm-paper.theme.json");
+  });
+  it("refuses a custom font name that could break out of the CSS", () => {
+    for (const label of ["</style><script>alert(1)</script>", 'a"; } body { display:none', "x\\", "a{b}"]) {
+      const result = dsThemeFileParse(file({ customFonts: [{ id: "bad", label, google: "Fraunces" }] }));
+      assert.equal(result.ok, false, label);
+    }
+    assert.ok(dsThemeFileParse(file({ customFonts: [{ id: "ok", label: "Fraunces 72pt-O'Neil_x.1", google: "Fraunces" }] })).ok);
+    assert.ok(dsThemeFileParse(file({ customFonts: [{ id: "ok", label: "Zeichen Über", google: "Fraunces" }] })).ok);
+  });
+
+  it("keeps stored data safe too: the font stack and the theme CSS carry no markup", () => {
+    const evil = "</style><script>alert(1)</script>";
+    assert.ok(!dsCustomFont({ id: "x", label: evil, google: "Fraunces" }).family.includes("<"));
+    const stored = parseDsThemeConfig({
+      customFonts: [
+        { id: "x", label: evil, google: "Fraunces" },
+        { id: "y", label: "Fine", google: 'A"><script>' },
+        { id: 'z"]', label: "Fine", google: "Fraunces" },
+      ],
+      families: [{ id: "body", label: "Font", font: "x" }],
+    });
+    assert.deepEqual(stored.customFonts.map((f) => f.id), ["x"]);
+    assert.ok(!dsThemeCss(stored).includes("<"));
+  });
+
+  it("keeps a partial file's colours", () => {
+    const result = dsThemeFileParse(file({ colours: { accent: { light: "#FF0000" }, surface: { light: "#112233" } } }));
+    assert.ok(result.ok);
+    assert.equal(result.theme.colours.accent.light, "#FF0000");
+    assert.equal(result.theme.colours.surface.light, "#112233");
+    const only = dsThemeFileParse(file({ colours: { accent: { light: "#00FF00" } } }));
+    assert.ok(only.ok);
+    assert.equal(only.theme.colours.accent.light, "#00FF00");
   });
 });

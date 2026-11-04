@@ -15,10 +15,10 @@ const DAY = new Intl.DateTimeFormat("en", { month: "short", day: "numeric", year
  * title, its line and how many posts, then each post as its title in the
  * size of a home page's lists, the start of its text, and its own
  * categories (each a link to its page) with the date after them in small
- * text, the three lines evenly apart; its picture, when it has one, sits to
- * the right, centred on the text, in its own shape and at least as tall as
- * the text (post-list-row.tsx; a video plays muted, on a loop). Posts with and without
- * pictures sit in the same stream, the text in line either way.
+ * text, the three lines evenly apart; its picture, when it has one, sits on
+ * the left, centred on the text, in its own shape, at least as tall as the
+ * text and at most 150px (post-list-row.tsx; a video plays muted, on a
+ * loop). Posts with and without pictures sit in the same stream.
  */
 export function PostList({
   intro,

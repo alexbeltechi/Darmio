@@ -6,17 +6,20 @@ import { signIn } from "next-auth/react";
 import { Loader2 } from "lucide-react";
 import { DsButton, DsCopyField, DsField, DsInput } from "@beltechi/parabola";
 import { PASSWORD_MIN } from "@/lib/cms/password";
+import { isEmail } from "@/lib/cms/email";
 
 /**
  * A new password from a one-time reset link: the
  * owner's AI makes the link (`npm run reset-link`), the owner chooses the
- * password here, never in the chat, and is signed in. A link that's wrong,
+ * password here, never in the chat, and is signed in. The email they sign
+ * in with is shown filled in and can be changed here too. A link that's wrong,
  * spent or expired says so and offers the prompt for a new one. Floats on
  * the page like sign-in and setup.
  */
 function ResetForm() {
   const token = useSearchParams().get("token") ?? "";
   const [email, setEmail] = useState<string | null>(null);
+  const [newEmail, setNewEmail] = useState("");
   const [checked, setChecked] = useState(false);
   const [address, setAddress] = useState("");
   const [password, setPassword] = useState("");
@@ -28,7 +31,10 @@ function ResetForm() {
     document.title = "New password";
     fetch(`/api/reset?token=${encodeURIComponent(token)}`)
       .then((res) => res.json())
-      .then((json) => setEmail(json.data?.ok ? json.data.email : null))
+      .then((json) => {
+        setEmail(json.data?.ok ? json.data.email : null);
+        if (json.data?.ok) setNewEmail(json.data.email);
+      })
       .catch(() => setEmail(null))
       .finally(() => {
         setAddress(window.location.origin);
@@ -37,7 +43,8 @@ function ResetForm() {
   }, [token]);
 
   const mismatch = repeat.length > 0 && password !== repeat;
-  const ready = password.length >= PASSWORD_MIN && password === repeat;
+  const badEmail = newEmail.trim().length > 0 && !isEmail(newEmail);
+  const ready = password.length >= PASSWORD_MIN && password === repeat && isEmail(newEmail);
 
   async function save(event: React.FormEvent) {
     event.preventDefault();
@@ -48,7 +55,7 @@ function ResetForm() {
       const res = await fetch("/api/reset", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, password }),
+        body: JSON.stringify({ token, password, email: newEmail }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error);
@@ -67,12 +74,15 @@ function ResetForm() {
       <div className="flex w-full max-w-[440px] flex-col gap-ds-40">
         <div className="flex flex-col gap-ds-8">
           <h1 className="text-h2">New password</h1>
-          {email && <p className="text-p text-ds-fg-muted">For {email}.</p>}
+          {email && <p className="text-p text-ds-fg-muted">Check the email you sign in with, and choose a password.</p>}
         </div>
 
         {email ? (
           <form onSubmit={save} className="flex flex-col gap-ds-40">
             <div className="flex flex-col gap-ds-20">
+              <DsField label="Email" error={badEmail ? "That doesn't look like an email" : undefined}>
+                <DsInput type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} autoComplete="email" />
+              </DsField>
               <DsField label="New password" description={`At least ${PASSWORD_MIN} characters.`}>
                 <DsInput type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" autoFocus />
               </DsField>

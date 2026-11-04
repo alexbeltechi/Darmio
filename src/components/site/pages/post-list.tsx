@@ -12,9 +12,9 @@ const DAY = new Intl.DateTimeFormat("en", { month: "short", day: "numeric", year
  * A category's posts stacked like a blog, newest first, left-aligned in the
  * reading column (the `list` category layout): the
  * title, its line and how many posts, then each post as its title in the
- * size of a home page's lists, the start of its text, and a row with its own
- * categories (each a link to its page) on the left and the date on the
- * right; its picture, when it has one, sits small to the right of the text
+ * size of a home page's lists, the start of its text, and its own
+ * categories (each a link to its page) with the date after them in small
+ * text, the three lines evenly apart; its picture, when it has one, sits small to the right of the text
  * in its own shape (a video plays muted, on a loop). Posts with and without
  * pictures sit in the same stream, the text in line either way.
  */
@@ -62,7 +62,7 @@ function PostListEntry({ post, media, categories }: { post: Entry; media?: Media
 
   return (
     <article className="flex items-start gap-ds-20">
-      <div className="flex min-w-0 flex-1 flex-col gap-ds-4">
+      <div className="flex min-w-0 flex-1 flex-col gap-ds-8">
         <h2 className="text-prose text-ds-fg">
           <Link
             href={href}
@@ -72,7 +72,7 @@ function PostListEntry({ post, media, categories }: { post: Entry; media?: Media
           </Link>
         </h2>
         {text && <p className="text-p text-ds-fg-muted">{text}</p>}
-        <div className="flex items-baseline justify-between gap-4 pt-ds-4 text-p text-ds-fg-subtle">
+        <div className="flex items-baseline gap-ds-16 text-small text-ds-fg-subtle">
           <span className="min-w-0 truncate">
             {categories.map((category, i) => (
               <span key={category.id}>

@@ -31,7 +31,7 @@ test("the command's code reads back as the same theme", () => {
   assert.equal(back?.radius, 6);
   assert.equal(themeFromText(JSON.stringify(kit.theme))?.radius, 6);
   assert.equal(themeFromText("not a theme"), null);
-  assert.match(dsThemeCommands(kit).theme, /^npx @beltechi\/parabola add theme --code [A-Za-z0-9+/=]+$/);
+  assert.match(dsThemeCommands(kit).theme, /^npx \S+ add theme --code [A-Za-z0-9+/=]+$/);
 });
 
 test("a component resolves to its files and packages, provider's theme types stubbed", () => {

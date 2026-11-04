@@ -105,4 +105,19 @@ describe("theme file", () => {
     assert.ok(only.ok);
     assert.equal(only.theme.colours.accent.light, "#00FF00");
   });
+  it("reads a character with colour and brightness as the current dials", () => {
+    const result = dsThemeFileParse(file({ character: { hue: 120, colour: 1, brightness: 0.5 } }));
+    assert.ok(result.ok);
+    assert.equal(result.theme.character.brightness, 0.5);
+    assert.equal(result.theme.character.colour, 1);
+    assert.equal(result.theme.character.hue, 120);
+  });
+
+  it("exports a stored preset colour as hex, and reads it back", () => {
+    const stored = parseDsThemeConfig({ colours: { accent: { light: "blue" }, text: { light: "stone" } } });
+    assert.equal(stored.colours.accent.light, "blue");
+    const back = dsThemeFileParse(dsThemeFileText(stored, "Preset"));
+    assert.ok(back.ok, back.ok ? "" : back.errors.join("\n"));
+    assert.equal(back.theme.colours.accent.light, "#1D4ED8");
+  });
 });

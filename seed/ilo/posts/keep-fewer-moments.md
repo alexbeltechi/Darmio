@@ -1,6 +1,6 @@
 ---
 title: Keep fewer moments
-categories: habits
+categories: making
 date: 2026-06-02
 description: My glasses could keep everything. I keep about one moment a week.
 ---

@@ -1,10 +1,9 @@
 /**
  * What Remove examples takes out, worked out from the site as it is, with no
  * database access (so it can be checked on its own). An example site's posts,
- * pages, categories and media carry `metadata.example`. They all go, except
- * the maker's own work and what it still needs:
- * - an example post or page they changed (it was saved after it was made, or
- *   has unpublished edits) is theirs now;
+ * pages, categories and media carry `metadata.example`. They all go, edited
+ * or not (Remove means the example is gone), except what the maker's own
+ * work still needs:
  * - an example page one of their pages sits under;
  * - an example category one of their posts is in, one of their pages lists
  *   (Home's posts), or one of their categories sits inside;
@@ -24,7 +23,7 @@ type CategoryLike = { id: string; slug: string; parentId?: string | null; image?
 export type ExampleRemovalPlan<C extends CategoryLike = CategoryLike> = {
   /** Example posts and pages to delete. */
   entries: Entry[];
-  /** Example posts and pages kept: changed since they were made, or a page that stays sits under them. */
+  /** Example pages kept because one of the maker's pages sits under them. */
   keptEntries: Entry[];
   /** Example categories to delete, the ones inside others first. */
   categories: C[];
@@ -55,11 +54,6 @@ function categoriesOf(entry: Entry): string[] {
     .filter((ref): ref is string => typeof ref === "string" && ref.length > 0);
 }
 
-/** Saved since it was made, or carrying unpublished edits: the maker has worked on it. */
-function changed(entry: Entry): boolean {
-  return Boolean(entry.pendingData) || (Boolean(entry.updatedAt) && entry.updatedAt !== entry.createdAt);
-}
-
 export function planExampleRemoval<C extends CategoryLike>(input: {
   /** Every post and page on the site, examples and not. */
   entries: Entry[];
@@ -68,7 +62,7 @@ export function planExampleRemoval<C extends CategoryLike>(input: {
   /** The ids of media marked as examples. */
   exampleMedia: string[];
 }): ExampleRemovalPlan<C> {
-  const keptEntries = new Set(input.entries.filter((entry) => !isExample(entry) || changed(entry)));
+  const keptEntries = new Set(input.entries.filter((entry) => !isExample(entry)));
 
   // A page that stays keeps the example page it sits under (and that one's own parent).
   for (let grew = true; grew; ) {

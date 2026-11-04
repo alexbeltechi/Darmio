@@ -91,7 +91,7 @@ describe("planExampleRemoval", () => {
     assert(!plan.entries.some((e) => e.slug === "about"));
   });
 
-  it("keeps edited examples and the media they use", () => {
+  it("removes edited examples and the media only they use", () => {
     const edited: Entry = makeEntry({
       collection: "posts",
       slug: "p1",
@@ -100,8 +100,9 @@ describe("planExampleRemoval", () => {
       data: { title: "p1", content: [{ type: "image", id: "b1", mediaId: "m1" }], categories: [] },
     });
     const plan = planExampleRemoval({ entries: [edited], categories: [], exampleMedia: ["m1", "m2"] });
-    assert(plan.keptEntries.some((e) => e.slug === "p1"));
-    assert(plan.keptMedia.includes("m1"));
+    assert(plan.entries.some((e) => e.slug === "p1"));
+    assert.equal(plan.keptEntries.length, 0);
+    assert.deepEqual(plan.media, ["m1", "m2"]);
   });
 
   it("keeps media used by maker entries, SEO image and category images", () => {

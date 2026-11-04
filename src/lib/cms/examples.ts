@@ -313,7 +313,7 @@ export type ExampleRemoval = {
 
 /**
  * Take every example out of the current project, leaving the plain feed and
- * whatever the maker made or changed (examples-plan.ts). A page's wireframes and its own docs go with it,
+ * whatever the maker made and what it uses (examples-plan.ts). A page's wireframes and its own docs go with it,
  * as when it's deleted by hand. The site goes back to setup's name if it
  * still has the example's.
  */

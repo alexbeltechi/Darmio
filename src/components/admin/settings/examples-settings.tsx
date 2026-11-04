@@ -24,7 +24,7 @@ function listed({ posts, pages, categories, media }: Partial<ExampleCounts>): st
 /**
  * Settings › Examples: an example site's posts, pages, categories and photos
  * (marked as examples when they were loaded), and one button to take them all
- * out, which leaves the plain feed and anything the maker made or changed.
+ * out, edited or not, which leaves the plain feed and anything the maker made.
  * With none, or only part of one (a load that stopped half-way), it offers to
  * load the install's example site, after asking, since it goes live.
  */
@@ -54,7 +54,7 @@ export function ExamplesSettings() {
     const ok = await confirm({
       title: "Remove the examples?",
       description:
-        "Their posts, pages, categories and photos go. Anything you made or changed stays, and so does what it uses. This can't be undone.",
+        "The example posts, pages, categories and photos go, even ones you've edited. Anything you made yourself stays, and so does what it uses. This can't be undone.",
       confirmLabel: "Remove",
       destructive: true,
     });
@@ -67,7 +67,7 @@ export function ExamplesSettings() {
       const { removed, kept } = json as ExampleRemoval;
       const keptLine = listed(kept);
       if (!listed(removed) && !keptLine) dsToast.success("There were no examples left to remove");
-      else dsToast.success("Examples removed", { description: keptLine ? `Kept ${keptLine} that you changed or still use.` : undefined });
+      else dsToast.success("Examples removed", { description: keptLine ? `Kept ${keptLine} that your own posts or pages still use.` : undefined });
       announceSiteSettingsChanged();
       await refresh();
     } catch (error) {

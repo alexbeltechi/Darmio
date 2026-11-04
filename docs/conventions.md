@@ -45,7 +45,7 @@ changes in the running app with read-only actions (see `CLAUDE.md`).
 | Logging another action on a folder's post (publish, delete, replace) | `scripts/ingest/activity.ts add` | |
 | Searching media | `mediaMatches` from `@/lib/cms/media-search` (library, picker and `GET /media?q=`) | |
 | Spacing (gaps, margins, section padding) | Parabola's spacings, named by size (`/parabola/spacing/scale`): 4, 8, 16, 20, 40, 80, 160 as `gap-ds-20`, `px-ds-20`, `pt-ds-160`, `space-y-ds-40`… Layouts that do arithmetic use `DS_SPACES` / `DS_GUTTER_PX`. New code uses these, not raw `gap-5` | `check:parabola` keeps CSS and TS in step |
-| Field widths and form layout | Parabola's standard field width (`--ds-field-width`): leave fields their default size and lay a form out with `DS_FIELDS_CLASS`. `w-full` only for a field that fills its row, `ds-fields-fill` on a container one field wide. No per-screen `max-w-[…]` on fields | |
+| Field widths and form layout | Parabola's standard field width (`--ds-field-width`): leave fields their default size and lay a form out with `DS_FIELDS_CLASS` (one field under the other, never side by side). `w-full` only for a field that fills its row, `ds-fields-fill` on a container one field wide. No per-screen `max-w-[…]` on fields | |
 | Space between pictures (galleries, post grids, feeds) | The gutter (`DS_GUTTER_PX`, 20px across and down): no gallery or grid sets its own gap | |
 | Showing an uploaded image | `MediaImage` (renditions as a srcset); a plain URL from `@/lib/cms/media-url` only for legacy uploads and admin thumbnails | |
 | Who may call `/api/admin/*` | `src/middleware.ts` (session or agent token). Routes don't check auth themselves | lint: no `getServerSession` |

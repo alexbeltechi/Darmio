@@ -11,11 +11,12 @@ const DAY = new Intl.DateTimeFormat("en", { month: "short", day: "numeric", year
 /**
  * A category's posts stacked like a blog, newest first, left-aligned in the
  * reading column (the `list` category layout): the
- * title, its line and how many posts, then each post as its picture (when it
- * has one; a video plays muted, on a loop), its title in the size of a home
- * page's lists, the start of its text, and a row with its own categories
- * (each a link to its page) on the left and the date on the right. Posts with
- * and without pictures sit in the same stream.
+ * title, its line and how many posts, then each post as its title in the
+ * size of a home page's lists, the start of its text, and a row with its own
+ * categories (each a link to its page) on the left and the date on the
+ * right; its picture, when it has one, sits small to the right of the text
+ * in its own shape (a video plays muted, on a loop). Posts with and without
+ * pictures sit in the same stream, the text in line either way.
  */
 export function PostList({
   intro,
@@ -60,25 +61,8 @@ function PostListEntry({ post, media, categories }: { post: Entry; media?: Media
   const isVideo = media?.mime.startsWith("video/");
 
   return (
-    <article className="flex flex-col gap-ds-16">
-      {media && (
-        <Link href={href} aria-label={title} className="block">
-          {isVideo ? (
-            <video
-              src={media.url}
-              poster={media.poster?.url}
-              autoPlay
-              muted
-              loop
-              playsInline
-              className="h-auto w-full"
-            />
-          ) : (
-            <MediaImage item={media} alt={media.alt || title} sizes="(max-width: 640px) 100vw, 600px" className="h-auto w-full" />
-          )}
-        </Link>
-      )}
-      <div className="flex flex-col gap-ds-4">
+    <article className="flex items-start gap-ds-20">
+      <div className="flex min-w-0 flex-1 flex-col gap-ds-4">
         <h2 className="text-prose text-ds-fg">
           <Link
             href={href}
@@ -102,6 +86,23 @@ function PostListEntry({ post, media, categories }: { post: Entry; media?: Media
           <span className="shrink-0 tabular-nums">{DAY.format(entryDate(post))}</span>
         </div>
       </div>
+      {media && (
+        <Link href={href} aria-label={title} tabIndex={-1} className="block w-24 shrink-0 sm:w-36">
+          {isVideo ? (
+            <video
+              src={media.url}
+              poster={media.poster?.url}
+              autoPlay
+              muted
+              loop
+              playsInline
+              className="h-auto w-full"
+            />
+          ) : (
+            <MediaImage item={media} alt={media.alt || title} sizes="(max-width: 640px) 96px, 144px" className="h-auto w-full" />
+          )}
+        </Link>
+      )}
     </article>
   );
 }

@@ -46,12 +46,12 @@ explains how.
 | File | Becomes |
 | --- | --- |
 | `site.json` | The site's name; Writing (stacked like a blog, in the nav) with Listening and Making inside it |
-| `media/` | Her portrait, the black-sand shore, the lake and an 8-second loop of her, from Y3K |
+| `media/` | Her portrait, the black-sand shore and the lake, from Y3K; an 8-second loop of her, not on the site yet |
 | `pages/01-home.md` | Home: the portrait, two short paragraphs; the format adds Writing, Follow and the newsletter |
 | `pages/02-about.md` | About (in the nav): a few lines, one image |
-| `pages/03-collaborate.md` | Collaborate (in the nav): three ways, and how to write |
+| `pages/03-collaborate.md` | Collaborate (in the nav): 1:1, In a group, Ceremonies. No email |
 | `pages/04-follow.md` | Follow: YouTube, Newsletter, Instagram, X, Y3K Club |
-| `posts/*.md` | Four short posts in Writing, 2025–2026, each with a picture or the loop. Placeholders, meant to be replaced |
+| `posts/*.md` | Seven short posts in Writing, 2025–2026: three with a picture, four text only, mixed. Placeholders, meant to be replaced |
 
 ## Made up for the seed
 
@@ -59,8 +59,8 @@ Beyond the Y3K story (Hollow, the lake, the glasses, cohort 02), these are
 invented, and yours to change:
 
 - She keeps about one moment a week.
-- Two Hollows a year on commission, listening walks, and four-session
-  "small version" mentoring (Collaborate).
-- The handles (@iloodena, @ilo.odena) and the address ilo@example.com
-  (`example.com` is reserved for examples, so it reaches nobody).
+- Collaborate: a season one to one, a slow morning in a group, and
+  ceremonies (a stone cut for a place, and a morning there).
+- The handles (@iloodena, @ilo.odena). She has no email: there's none in
+  her year, so Collaborate ends "You know where to find me."
 - The posts, all placeholders.

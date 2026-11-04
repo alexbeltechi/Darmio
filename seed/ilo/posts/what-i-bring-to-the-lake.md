@@ -9,6 +9,6 @@ description: A short list, kept short on purpose.
 ![Ilo in a sheer teal gown, walking along a black-sand shore, reflected in still water](file:ilo-black-sand.jpg)
 :::
 
-A notebook, one pencil, a flask of something warm. No phone. The list gets shorter every summer.
+A notebook, one pencil, a flask of something warm. The list gets shorter every summer.
 
 Whatever I forget, the lake doesn't miss.

@@ -1,23 +1,21 @@
 ---
 title: Collaborate
 slug: collaborate
-description: A few things I make with other people, a few at a time.
+description: Three ways to make something with me.
 format: text
 nav: yes
 ---
 
-## A stone for your water
+## 1:1
 
-Two a year, each for one lake, river or shore that matters to someone. I spend a season there listening before I cut the stone.
+A season together, one to one. We find the one thing you're meant to make, cut it down to its small version, and set the day it's finished.
 
-## Listening walks
+## In a group
 
-A slow morning outside with up to eight people. No phones. Everyone leaves with one thing they noticed.
+A slow morning outside with up to eight people. We listen, stop often, and each person leaves with one thing they noticed and what they'll make of it.
 
-## The small version
+## Ceremonies
 
-Four sessions for a maker stuck on something too big. We cut it down to one thing and one finished day.
+For a beginning or an ending: a stone cut for one lake, river or shore, and a morning there with the people it matters to.
 
-## Write to me
-
-[ilo@example.com](mailto:ilo@example.com): what you have in mind, where, and when. I answer within a week.
+You know where to find me.

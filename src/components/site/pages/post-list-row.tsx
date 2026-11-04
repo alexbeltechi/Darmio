@@ -52,7 +52,7 @@ export function PostListRow({
     : `min(calc(var(--list-picture) / ${aspect}), ${MAX_HEIGHT}px)`;
 
   return (
-    <article ref={rowRef} className="flex items-center gap-ds-20 sm:gap-ds-40">
+    <article ref={rowRef} className="flex items-center gap-ds-20 sm:gap-ds-32">
       {picture && (
         <div
           className="relative shrink-0 overflow-hidden [--list-picture:6rem] sm:[--list-picture:9rem]"

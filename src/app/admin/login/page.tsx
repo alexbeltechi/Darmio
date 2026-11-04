@@ -10,7 +10,7 @@
 import { useEffect, useState, Suspense } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ChevronDown, Loader2, Eye, EyeOff } from "lucide-react";
+import { ChevronDown, Loader2 } from "lucide-react";
 import { DsButton, DsCopyField, DsField, DsInput } from "@beltechi/parabola";
 import { LOCKED_PREFIX } from "@/lib/cms/password";
 import { installProblem, type InstallProblem } from "@/lib/cms/install-problems";
@@ -64,7 +64,6 @@ function LoginForm() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [problem, setProblem] = useState<InstallProblem | null>(null);
@@ -129,27 +128,14 @@ function LoginForm() {
           </DsField>
 
           <DsField label="Password">
-            <div className="relative">
-              <DsInput
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                autoComplete="current-password"
-                disabled={loading}
-                className="pr-10"
-              />
-              <DsButton
-                type="button"
-                variant="text"
-                size="small"
-                iconLeft={showPassword ? EyeOff : Eye}
-                aria-label={showPassword ? "Hide password" : "Show password"}
-                onClick={() => setShowPassword(!showPassword)}
-                disabled={loading}
-                className="absolute right-3 top-1/2 -translate-y-1/2"
-              />
-            </div>
+            <DsInput
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              autoComplete="current-password"
+              disabled={loading}
+            />
           </DsField>
         </div>
 

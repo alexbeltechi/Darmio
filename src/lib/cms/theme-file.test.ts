@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { describe, it } from "node:test";
 
-import { dsCustomFont } from "../../../packages/parabola/fonts";
+import { dsCustomFont, dsCustomFontFromInput, dsGoogleWeights } from "../../../packages/parabola/fonts";
 import { DS_DEFAULT_THEME, dsThemeCss, parseDsThemeConfig } from "../../../packages/parabola/theme";
 import { dsThemeFileName, dsThemeFileParse, dsThemeFileText } from "../../../packages/parabola/theme-file";
 
@@ -119,5 +119,38 @@ describe("theme file", () => {
     const back = dsThemeFileParse(dsThemeFileText(stored, "Preset"));
     assert.ok(back.ok, back.ok ? "" : back.errors.join("\n"));
     assert.equal(back.theme.colours.accent.light, "#1D4ED8");
+  });
+  it("bounds the weights a custom font asks for, and never loops on stored data", () => {
+    const huge = "H:wght@100000000000000000000..100000000000000000000";
+    assert.equal(dsThemeFileParse(file({ customFonts: [{ id: "h", label: "H", google: huge }] })).ok, false);
+    assert.equal(dsThemeFileParse(file({ customFonts: [{ id: "h", label: "H", google: "H:wght@0..2000" }] })).ok, false);
+    assert.ok(dsThemeFileParse(file({ customFonts: [{ id: "h", label: "H", google: "H:ital,wght@0,100..900;1,400" }] })).ok);
+    // Stored data from any path: returns, with weights inside 1 to 1000.
+    assert.deepEqual(dsGoogleWeights(huge), [1000]);
+    const w = dsGoogleWeights("H:wght@1..99999999999");
+    assert.ok(w.length <= 12 && w.every((n) => n >= 1 && n <= 1000));
+    assert.equal(parseDsThemeConfig({ customFonts: [{ id: "h", label: "H", google: huge }] }).customFonts.length, 0);
+  });
+
+  it("reads the ids the builder makes, digits first included", () => {
+    const font = dsCustomFontFromInput("42dot Sans");
+    assert.ok(font);
+    assert.equal(font.id, "42dot-sans");
+    assert.ok(dsThemeFileParse(file({ customFonts: [font], families: [{ id: "body", label: "Font", font: font.id }] })).ok);
+  });
+
+  it("exports a text preset so the rendered text stays", () => {
+    const stored = parseDsThemeConfig({ colours: { text: { light: "slate" } } });
+    const back = dsThemeFileParse(dsThemeFileText(stored, "Slate"));
+    assert.ok(back.ok, back.ok ? "" : back.errors.join("\n"));
+    const vars = (css: string, name: string) => css.match(new RegExp(`${name}:\\s*([^;]+);`))?.[1];
+    const before = dsThemeCss(stored);
+    const after = dsThemeCss(back.theme);
+    for (const name of ["--ds-fg", "--ds-fg-muted"]) assert.equal(vars(after, name), vars(before, name), name);
+  });
+
+  it("cuts a long name on export so the file reads back", () => {
+    const back = dsThemeFileParse(dsThemeFileText(DS_DEFAULT_THEME, "N".repeat(90)));
+    assert.ok(back.ok);
   });
 });

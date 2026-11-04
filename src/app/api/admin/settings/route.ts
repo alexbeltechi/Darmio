@@ -35,6 +35,7 @@ export async function PATCH(request: NextRequest) {
       themes: body.themes,
       publishedTheme: body.publishedTheme,
       activeTheme: body.activeTheme,
+      menuOrder: body.menuOrder,
     });
 
     // One name: the site's name is also its project's name in the menu behind the letter.
@@ -43,7 +44,7 @@ export async function PATCH(request: NextRequest) {
       if (project && project.name !== settings.siteName) await updateProject(project.slug, { name: settings.siteName });
     }
 
-    // The site's name, home and theme are on every page: cached pages are made again with them.
+    // The site's name, menu, home and theme are on every page: cached pages are made again with them.
     revalidatePath("/", "layout");
 
     return NextResponse.json({ data: settings });

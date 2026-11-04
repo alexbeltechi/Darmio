@@ -46,6 +46,12 @@ export interface SiteSettings {
    * first: the site wears the library's own (`sitePublishedTheme`).
    */
   publishedTheme: DsThemeEntry | null;
+  /**
+   * The site menu's order, by slug (categories and pages share the site's
+   * paths, so a slug names one of either). What it doesn't name follows, in
+   * its own order (lib/cms/menu-order.ts). Set by dragging in admin › Pages.
+   */
+  menuOrder: string[];
   updatedAt: string;
 }
 
@@ -57,6 +63,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   imageQuality: DEFAULT_IMAGE_QUALITY,
   themes: DS_DEFAULT_LIBRARY,
   publishedTheme: null,
+  menuOrder: [],
   updatedAt: new Date(0).toISOString(),
 };
 
@@ -110,6 +117,15 @@ export function parseImageQuality(value: unknown): number {
   return value;
 }
 
+/** A list of slugs, each once, at most 100. Throws on anything else. */
+export function parseMenuOrder(value: unknown): string[] {
+  if (!Array.isArray(value)) throw new Error("menuOrder must be a list of slugs");
+  if (value.length > 100) throw new Error("menuOrder can name at most 100 items");
+  const slugs = value.map((item) => (typeof item === "string" ? item.trim() : ""));
+  if (slugs.some((slug) => !/^[a-z0-9][a-z0-9-]*$/.test(slug))) throw new Error("menuOrder takes slugs: lowercase letters, numbers and dashes");
+  return [...new Set(slugs)];
+}
+
 function tryParse<T>(parse: (v: unknown) => T, value: unknown, fallback: T): T {
   if (value === undefined) return fallback;
   try {
@@ -137,6 +153,7 @@ export async function getSiteSettings(): Promise<SiteSettings> {
     // `theme` was one theme, before the library; it becomes Default.
     themes: parseDsThemeLibrary(doc.themes, doc.theme),
     publishedTheme: parsePublishedTheme(doc.publishedTheme),
+    menuOrder: tryParse(parseMenuOrder, doc.menuOrder, DEFAULT_SETTINGS.menuOrder),
     updatedAt: (doc.updatedAt as string) || DEFAULT_SETTINGS.updatedAt,
   };
 }
@@ -187,6 +204,10 @@ export async function updateSiteSettings(
     const entry = parsePublishedTheme(updates.publishedTheme);
     if (!entry) throw new Error("A published theme needs an id, a name and a theme");
     set.publishedTheme = entry;
+  }
+
+  if (updates.menuOrder !== undefined) {
+    set.menuOrder = parseMenuOrder(updates.menuOrder);
   }
 
   if (updates.activeTheme !== undefined) {

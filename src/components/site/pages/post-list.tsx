@@ -5,6 +5,7 @@ import type { Entry, MediaItem } from "@/lib/cms/types";
 import { getPostMediaItems, getPreviewText, type Category } from "../post-grid-shared";
 import type { ViewIntro } from "../site-views";
 import { PageColumn } from "./page-layout";
+import { PostListRow } from "./post-list-row";
 
 const DAY = new Intl.DateTimeFormat("en", { month: "short", day: "numeric", year: "numeric" });
 
@@ -14,8 +15,9 @@ const DAY = new Intl.DateTimeFormat("en", { month: "short", day: "numeric", year
  * title, its line and how many posts, then each post as its title in the
  * size of a home page's lists, the start of its text, and its own
  * categories (each a link to its page) with the date after them in small
- * text, the three lines evenly apart; its picture, when it has one, sits small to the right of the text
- * in its own shape (a video plays muted, on a loop). Posts with and without
+ * text, the three lines evenly apart; its picture, when it has one, sits to
+ * the right, centred on the text, in its own shape and at least as tall as
+ * the text (post-list-row.tsx; a video plays muted, on a loop). Posts with and without
  * pictures sit in the same stream, the text in line either way.
  */
 export function PostList({
@@ -60,49 +62,48 @@ function PostListEntry({ post, media, categories }: { post: Entry; media?: Media
   const text = getPreviewText(post);
   const isVideo = media?.mime.startsWith("video/");
 
-  return (
-    <article className="flex items-start gap-ds-20">
-      <div className="flex min-w-0 flex-1 flex-col gap-ds-8">
-        <h2 className="text-prose text-ds-fg">
-          <Link
-            href={href}
-            className="underline decoration-ds-border underline-offset-4 transition-colors hover:decoration-ds-fg"
-          >
-            {title}
-          </Link>
-        </h2>
-        {text && <p className="text-p text-ds-fg-muted">{text}</p>}
-        <div className="flex items-baseline gap-ds-16 text-small text-ds-fg-subtle">
-          <span className="min-w-0 truncate">
-            {categories.map((category, i) => (
-              <span key={category.id}>
-                {i > 0 && ", "}
-                <Link href={`/${category.slug}`} className="hover:text-ds-fg">
-                  {category.label}
-                </Link>
-              </span>
-            ))}
-          </span>
-          <span className="shrink-0 tabular-nums">{DAY.format(entryDate(post))}</span>
-        </div>
-      </div>
-      {media && (
-        <Link href={href} aria-label={title} tabIndex={-1} className="block w-24 shrink-0 sm:w-36">
-          {isVideo ? (
-            <video
-              src={media.url}
-              poster={media.poster?.url}
-              autoPlay
-              muted
-              loop
-              playsInline
-              className="h-auto w-full"
-            />
-          ) : (
-            <MediaImage item={media} alt={media.alt || title} sizes="(max-width: 640px) 96px, 144px" className="h-auto w-full" />
-          )}
-        </Link>
+  const picture = media && (
+    <Link href={href} aria-label={title} tabIndex={-1} className="absolute inset-0 block">
+      {isVideo ? (
+        <video
+          src={media.url}
+          poster={media.poster?.url}
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="size-full object-cover"
+        />
+      ) : (
+        <MediaImage item={media} alt={media.alt || title} fill sizes="(max-width: 640px) 160px, 280px" className="object-cover" />
       )}
-    </article>
+    </Link>
+  );
+
+  return (
+    <PostListRow picture={picture} aspect={media?.width && media.height ? media.width / media.height : 3 / 2}>
+      <h2 className="text-prose text-ds-fg">
+        <Link
+          href={href}
+          className="underline decoration-ds-border underline-offset-4 transition-colors hover:decoration-ds-fg"
+        >
+          {title}
+        </Link>
+      </h2>
+      {text && <p className="text-p text-ds-fg-muted">{text}</p>}
+      <div className="flex items-baseline gap-ds-16 text-small text-ds-fg-subtle">
+        <span className="min-w-0 truncate">
+          {categories.map((category, i) => (
+            <span key={category.id}>
+              {i > 0 && ", "}
+              <Link href={`/${category.slug}`} className="hover:text-ds-fg">
+                {category.label}
+              </Link>
+            </span>
+          ))}
+        </span>
+        <span className="shrink-0 tabular-nums">{DAY.format(entryDate(post))}</span>
+      </div>
+    </PostListRow>
   );
 }

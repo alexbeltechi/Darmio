@@ -63,7 +63,7 @@ export function CategoryFeed({ layout, sections, mediaItems, categories }: Categ
 
   if (layout === "wall") {
     return (
-      <div data-content-start="" className="pt-24 pb-24 sm:pt-20">
+      <div className="pt-24 pb-24 sm:pt-20">
         <PostGrid
           posts={sections.flatMap((section) => section.posts)}
           mediaMap={mediaMap}
@@ -96,7 +96,6 @@ export function CategoryFeed({ layout, sections, mediaItems, categories }: Categ
       {sections.map((section, index) => (
         <section
           key={index}
-          data-content-start=""
           className="flex flex-col items-center gap-14 sm:gap-ds-40 min-[1180px]:grid min-[1180px]:grid-cols-[359px_700px] min-[1180px]:items-start min-[1180px]:justify-center min-[1180px]:gap-x-[74px]"
         >
           <IntroText

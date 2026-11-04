@@ -14,7 +14,7 @@ import {
   RotateCcw,
 } from "lucide-react";
 import type { MediaItem } from "@/lib/cms/types";
-import { DsButton, DsCheckbox, DsPill, DsSearch } from "@beltechi/parabola";
+import { DsButton, DsCheckbox, DsPill, DsSearch, DsTopBar } from "@beltechi/parabola";
 import { cn } from "@/lib/utils";
 import {
   compressImages,
@@ -476,7 +476,7 @@ export function MediaPicker({
               fade (`ds-nav-fade`); clicks pass through the gradient's empty space. The
               bar ends 20px under the search and the grid starts right below it. */}
           <div className="min-h-0 flex-1 overflow-y-auto">
-          <div className="pointer-events-none sticky top-0 z-20 flex flex-col gap-4 p-5 ds-nav-fade [&>*]:pointer-events-auto">
+          <DsTopBar surface="blur" className="gap-4 p-5">
             <div className="flex items-start gap-2">
               <div className="flex min-w-0 flex-1 flex-col gap-2 pt-1.5">
                 <Dialog.Title className="text-h3">Choose from library</Dialog.Title>
@@ -559,7 +559,7 @@ export function MediaPicker({
                 ))}
               </ul>
             )}
-          </div>
+          </DsTopBar>
 
           {/* Media grid */}
           <div className="relative px-5 pb-5">

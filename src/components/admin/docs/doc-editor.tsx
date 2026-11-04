@@ -14,6 +14,7 @@ import {
   DsTextarea,
   dsToast,
   useDsConfirm,
+  DsTopBar,
 } from "@beltechi/parabola";
 import {
   DOC_ACCEPT,
@@ -136,7 +137,7 @@ export function DocEditor({
         {/* Top bar, as in the post editor: floats over the content, which fades
             out beneath it (`ds-nav-fade`); clicks pass through all but its controls. */}
         <div className="sticky top-0 z-20 h-0">
-          <div className="pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between gap-2 ds-nav-fade px-5 pt-5 pb-10 [&>*]:pointer-events-auto">
+          <DsTopBar surface="blur" className="flex-row top-0 absolute inset-x-0 items-center justify-between gap-2 px-5 pt-5 pb-10">
             <div className="flex min-w-0 items-center gap-3">
               <DsButton iconLeft={X} aria-label="Close" onClick={onClose} />
               <h1 className="min-w-0 truncate text-h3 text-ds-fg">{mdName({ title, filename })}</h1>
@@ -156,7 +157,7 @@ export function DocEditor({
                 </DsDropdownContent>
               </DsDropdown>
             </div>
-          </div>
+          </DsTopBar>
         </div>
 
         {/* Clears the floating bar. */}

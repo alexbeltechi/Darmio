@@ -40,6 +40,7 @@ import {
   DS_COLUMNS_CLASS,
   DS_FIELDS_CLASS,
   cn,
+  DsTopBar,
 } from "@beltechi/parabola";
 import { UnsavedChangesModal } from "@/components/admin/unsaved-changes-modal";
 import { announceSaved, publishPosts, useOnPublished } from "@/components/admin/publish/events";
@@ -834,7 +835,7 @@ export function PostEditorForm({
           The zero-height sticky wrapper pins it without taking up room, and the
           bar lets clicks through everywhere but its controls. */}
       <div className="sticky top-0 z-20 h-0">
-        <div className="pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between gap-2 ds-nav-fade px-5 pt-5 pb-10 [&>*]:pointer-events-auto">
+        <DsTopBar surface="blur" className="flex-row top-0 absolute inset-x-0 items-center justify-between gap-2 px-5 pt-5 pb-10">
         <div className="flex min-w-0 items-center gap-3">
           <DsButton iconLeft={X} aria-label="Close" onClick={handleClose} />
           <div className="hidden min-w-0 items-center gap-2 md:flex">
@@ -909,7 +910,7 @@ export function PostEditorForm({
             </DsDropdown>
           )}
         </div>
-      </div>
+      </DsTopBar>
       </div>
 
         {/* Clears the floating bar. */}

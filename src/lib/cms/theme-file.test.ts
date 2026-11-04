@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { describe, it } from "node:test";
 
 import { dsCustomFont, dsCustomFontFromInput, dsGoogleWeights } from "../../../packages/parabola/fonts";
+import { DS_ACCENT_COLOURS, DS_BASE_COLOURS } from "../../../packages/parabola/colours";
 import { DS_DEFAULT_THEME, dsThemeCss, parseDsThemeConfig } from "../../../packages/parabola/theme";
 import { dsThemeFileName, dsThemeFileParse, dsThemeFileText } from "../../../packages/parabola/theme-file";
 
@@ -113,12 +114,12 @@ describe("theme file", () => {
     assert.equal(result.theme.character.hue, 120);
   });
 
-  it("exports a stored preset colour as hex, and reads it back", () => {
+  it("exports a stored preset colour as the preset, and reads it back", () => {
     const stored = parseDsThemeConfig({ colours: { accent: { light: "blue" }, text: { light: "stone" } } });
     assert.equal(stored.colours.accent.light, "blue");
     const back = dsThemeFileParse(dsThemeFileText(stored, "Preset"));
     assert.ok(back.ok, back.ok ? "" : back.errors.join("\n"));
-    assert.equal(back.theme.colours.accent.light, "#1D4ED8");
+    assert.equal(back.theme.colours.accent.light, "blue");
   });
   it("bounds the weights a custom font asks for, and never loops on stored data", () => {
     const huge = "H:wght@100000000000000000000..100000000000000000000";
@@ -152,5 +153,18 @@ describe("theme file", () => {
   it("cuts a long name on export so the file reads back", () => {
     const back = dsThemeFileParse(dsThemeFileText(DS_DEFAULT_THEME, "N".repeat(90)));
     assert.ok(back.ok);
+  });
+
+  it("keeps the whole rendering (light and dark) for every accent and text preset", () => {
+    const cases = [
+      ...DS_ACCENT_COLOURS.map((c) => ({ colours: { accent: { light: c.id } } })),
+      ...DS_BASE_COLOURS.map((c) => ({ colours: { text: { light: c.id } } })),
+    ];
+    for (const raw of cases) {
+      const stored = parseDsThemeConfig(raw);
+      const back = dsThemeFileParse(dsThemeFileText(stored, "Preset"));
+      assert.ok(back.ok, back.ok ? "" : back.errors.join("\n"));
+      assert.equal(dsThemeCss(back.theme), dsThemeCss(stored), JSON.stringify(raw));
+    }
   });
 });

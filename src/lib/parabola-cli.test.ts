@@ -73,3 +73,29 @@ test("add button copies it with its imports and keeps files that exist", () => {
   assert.equal(readFileSync(join(cwd, "src/parabola/cn.ts"), "utf8"), "mine");
   assert.equal(run(["add", "nope"], cwd, pkgRoot, io), 1);
 });
+
+test("add theme keeps the app's own Google Fonts import and replaces only its own", () => {
+  const { cwd, io } = project();
+  const css = join(cwd, "src/app/globals.css");
+  const roboto = '@import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");\n';
+  writeFileSync(css, `${roboto}@import "tailwindcss";\n`);
+  const theme = (radius: number) => dsThemeCode(dsBrandKit({ ...DS_DEFAULT_THEME, radius }, "T"));
+  run(["add", "theme", "--code", theme(4)], cwd, pkgRoot, io);
+  run(["add", "theme", "--code", theme(8)], cwd, pkgRoot, io);
+  const after = readFileSync(css, "utf8");
+  assert.ok(after.includes(roboto), "Roboto import kept");
+  assert.equal(after.split("/* parabola:fonts */").length - 1, 1, "one CLI-written fonts import");
+});
+
+test("--from, --css and --dir accept absolute paths", () => {
+  const { cwd, io } = project();
+  const other = mkdtempSync(join(tmpdir(), "parabola-abs-"));
+  writeFileSync(join(other, "t.json"), JSON.stringify(kit.theme));
+  writeFileSync(join(other, "g.css"), '@import "tailwindcss";\n');
+  const args = ["add", "theme", "--from", join(other, "t.json"), "--css", join(other, "g.css"), "--dir", join(other, "out")];
+  assert.equal(run(args, cwd, pkgRoot, io), 0);
+  assert.ok(existsSync(join(other, "out/tokens.css")));
+  assert.match(readFileSync(join(other, "g.css"), "utf8"), /out\/tokens\.css/);
+  assert.equal(run(["add", "button", "--dir", join(other, "comp")], cwd, pkgRoot, io), 0);
+  assert.ok(existsSync(join(other, "comp/primitives/button.tsx")));
+});

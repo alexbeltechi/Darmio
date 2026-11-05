@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { ExternalLink, Mail } from "lucide-react";
 import { DS_FIELDS_CLASS, DsButton, DsConfirmDialog, DsField, DsInput, DsPill, DsSelect, dsToast } from "@beltechi/parabola";
 import { KIT_DEVELOPER_URL, KIT_URL, type KitOption, type KitStatus } from "@/lib/newsletter/types";
+import { AiInstructions } from "./settings-section";
 
 const STATE_PILL: Record<KitStatus["state"], { label: string; variant: "dark" | "light" | "highlight" }> = {
   connected: { label: "Connected", variant: "dark" },
@@ -163,16 +164,6 @@ export function KitSection() {
 
       {showKeyField && (
         <div className="flex flex-col gap-3">
-          <ol className="flex list-decimal flex-col gap-2 pl-5 text-p text-ds-fg-muted">
-            <li>
-              In Kit, open{" "}
-              <a href={KIT_DEVELOPER_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-ds-fg underline underline-offset-2 hover:opacity-70">
-                Settings → Developer <ExternalLink className="size-3" />
-              </a>{" "}
-              and create a <strong className="text-ds-fg">v4 API key</strong>.
-            </li>
-            <li>Paste it here. It&apos;s stored encrypted and never shown again.</li>
-          </ol>
           <div className="flex flex-wrap items-center gap-2">
             <DsInput
               type="password"
@@ -244,6 +235,24 @@ export function KitSection() {
           </DsButton>
         </div>
       )}
+
+      <AiInstructions
+        prompts={[{ prompt: "Connect Kit to <site> for newsletter sign-ups: walk me through making the API key, then pick the form and the tag." }]}
+      >
+        <div className="flex flex-col gap-ds-8 text-p text-ds-fg-muted">
+          <span>Or by hand:</span>
+          <ol className="flex list-decimal flex-col gap-2 pl-5">
+            <li>
+              In Kit, open{" "}
+              <a href={KIT_DEVELOPER_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-ds-fg underline underline-offset-2 hover:opacity-70">
+                Settings → Developer <ExternalLink className="size-3" />
+              </a>{" "}
+              and create a <strong className="text-ds-fg">v4 API key</strong>.
+            </li>
+            <li>Paste it here. It&apos;s stored encrypted and never shown again.</li>
+          </ol>
+        </div>
+      </AiInstructions>
 
       <DsConfirmDialog
         open={confirmDisconnect}

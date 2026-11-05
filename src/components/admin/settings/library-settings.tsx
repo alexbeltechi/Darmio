@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Check, X } from "lucide-react";
 import { DsField, DsLink, DsProgress, DsSelect, dsSegmentColor, dsToast } from "@beltechi/parabola";
 import { files, gbOrMb, mb, percentUsed } from "./install-settings";
 import type { InstallUsage } from "@/lib/db/install";
@@ -20,7 +21,9 @@ interface Usage {
 
 
 /**
- * Settings › Library: how new uploads are made (AVIF quality), and this
+ * Settings › Library: first whether the database answers (a tick, the
+ * service, and how much of its free plan the install uses), then how new
+ * uploads are made (AVIF quality), and this
  * project's share of the image storage every project shares (the whole store
  * is under Home › Settings). Quality only applies to new uploads:
  * going down later is possible from the stored copies, going up needs the
@@ -31,6 +34,8 @@ export function LibrarySettings() {
   const [usage, setUsage] = useState<Usage | null>(null);
   // This project's share of the store every project uses, in its colour from the project list.
   const [share, setShare] = useState<{ mine: number; others: number; totalBytes: number; freeBytes: number; index: number } | null>(null);
+  // The database: working (it answered, with its size), or not reachable.
+  const [database, setDatabase] = useState<InstallUsage["database"] | "unreachable" | null>(null);
 
   useEffect(() => {
     fetch("/api/admin/settings")
@@ -45,12 +50,13 @@ export function LibrarySettings() {
       .then((res) => (res.ok ? res.json() : null))
       .then((json) => {
         const install = json?.data as InstallUsage | undefined;
+        setDatabase(install?.database ?? "unreachable");
         if (!install) return;
         const index = Math.max(0, install.storage.projects.findIndex((p) => p.slug === install.current));
         const mine = install.storage.projects[index]?.bytes ?? 0;
         setShare({ mine, others: install.storage.totalBytes - mine, totalBytes: install.storage.totalBytes, freeBytes: install.storage.freeBytes, index });
       })
-      .catch(() => {});
+      .catch(() => setDatabase("unreachable"));
   }, []);
 
   async function save(next: string) {
@@ -73,10 +79,29 @@ export function LibrarySettings() {
   return (
     <SettingsSection
       id="library"
+      ai={[{ prompt: "Check the database and image storage of <site>: are they working, how much of the free plans they use, and what to do before they fill up." }]}
       title="Library"
-      description="AVIF at a few widths, up to 2560px"
+      description="Your database, image storage, and how uploads are saved"
       note="Every upload is saved once as AVIF, plus a JPEG for older browsers. Pages pick the width each screen needs."
     >
+      {database === "unreachable" ? (
+        <p className="flex items-center gap-ds-8 text-p text-ds-fg">
+          <X aria-hidden className="size-4 shrink-0 text-ds-error" />
+          Can&apos;t reach the database right now. Try again in a minute, or ask your AI below.
+        </p>
+      ) : (
+        database && (
+          <p className="flex flex-wrap items-center gap-x-ds-8 text-p">
+            <Check aria-hidden className="size-4 shrink-0 text-ds-fg" />
+            <span className="text-ds-fg">Database working</span>
+            <span className="text-ds-fg-muted">
+              {database.atlas ? "MongoDB Atlas" : "MongoDB"} · {mb(database.totalBytes)} of {gbOrMb(database.freeBytes)}
+              {database.atlas ? " on the free plan" : ""}
+            </span>
+          </p>
+        )
+      )}
+
       <DsField
         label="Quality for new uploads"
         description="Higher keeps more detail and film grain, and takes more storage. Uploads already made keep their quality."

@@ -67,6 +67,7 @@ export function SiteSettings() {
   return (
     <SettingsSection
       id="site"
+      ai={[{ prompt: "Help me set up <site>: its name, its home page and its menu. Ask me what the site is for first." }]}
       title="Project"
       description={
         current &&

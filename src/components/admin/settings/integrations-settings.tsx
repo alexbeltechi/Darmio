@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { Copy, ExternalLink, Plus, X } from "lucide-react";
-import { SettingsSection } from "./settings-section";
+import { AiInstructions, SettingsSection } from "./settings-section";
 import { KitSection } from "./kit-settings";
 import { DsButton, DsConfirmDialog, DsDivider, DsInput, DsPill, DsSelect, DsSwitch, dsToast } from "@beltechi/parabola";
 import { PLATFORM_ICONS } from "@/components/admin/post-crosspost";
@@ -190,7 +190,7 @@ function PlatformSection({
       </>
     );
   } else if (state === "unconfigured") {
-    detail = <SetupSteps platform={platform} />;
+    detail = <p>Not set up yet. The AI instructions below say how.</p>;
   }
 
   return (
@@ -234,6 +234,18 @@ function PlatformSection({
           )}
         </div>
       )}
+      <AiInstructions
+        prompts={[
+          { prompt: `Connect ${meta.name} to <site>, so posts can be shared there. Walk me through the developer app it needs, and set its keys.` },
+        ]}
+      >
+        {state === "unconfigured" && (
+          <div className="flex flex-col gap-ds-8 text-p text-ds-fg-muted">
+            <span>Or by hand:</span>
+            <SetupSteps platform={platform} />
+          </div>
+        )}
+      </AiInstructions>
     </section>
   );
 }
@@ -333,6 +345,7 @@ function SourceLineCard() {
   return (
     <SettingsSection
       id="link-back"
+      ai={[{ prompt: "Set up the link back on <site>: the text before it, and a label for each place I post first." }]}
       title="Link back"
       description="A link at the end of a post, back to where it first appeared"
       note="Each post picks its label in the editor; a post you share from here to X or LinkedIn gets its label by itself."

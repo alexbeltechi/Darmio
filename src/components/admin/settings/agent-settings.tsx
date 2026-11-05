@@ -73,6 +73,7 @@ export function AgentSettings() {
   return (
     <SettingsSection
       id="agent"
+      ai={[{ prompt: "Connect to <site> as its agent: pull its settings, read its agent guide and its brain, then tell me what you would do first." }]}
       title="Brain"
       description="What your agent reads before it works on this site"
     >

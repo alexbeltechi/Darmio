@@ -1,15 +1,16 @@
 "use client";
 
-import { mediaMatches } from "@/lib/cms/media-search";
 import { useMediaDelete } from "@/components/admin/media-delete-dialog";
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { DOCUMENTS_PATH, LIBRARY_TYPES } from "@/components/admin/docs/documents-workspace";
+import { downloadDoc } from "@/components/admin/docs/doc-editor";
+import { uploadDocument } from "@/components/admin/docs/upload-document";
+import { LibraryThumb } from "@/components/admin/library/library-thumb";
 import {
   Upload,
+  Download,
   Trash2,
-  Image as ImageIcon,
-  Film,
   Loader2,
   X,
   Plus,
@@ -28,6 +29,19 @@ import {
   ExternalLink,
 } from "lucide-react";
 import type { MediaItem } from "@/lib/cms/types";
+import { DOC_ACCEPT, mdName, type DocWithUsage } from "@/lib/cms/docs";
+import {
+  entryAddedAt,
+  entryCreatedAt,
+  entryId,
+  entryKind,
+  entryMatches,
+  entryName,
+  entrySize,
+  fileLibraryKind,
+  mediaLibraryKind,
+  type LibraryEntry,
+} from "@/lib/cms/library";
 import { MediaDetailModal } from "@/components/admin/media-detail-modal";
 import { DsEmptyState,
   DsButton,
@@ -64,14 +78,11 @@ import {
 } from "@/lib/image-compression";
 import { PostEditorForm } from "@/components/admin/post-editor-form";
 import { MediaBulkEditModal } from "@/components/admin/media-bulk-edit-modal";
-import { thumbnailUrl } from "@/lib/cms/media-url";
 
-type FilterType = "all" | "images" | "video";
+/** The grid's types; documents have their own list (Library › Documents). */
+type FilterType = "all" | "images" | "video" | "files";
 type UsageFilter = "all" | "used" | "unused";
 type SortOption = "newest" | "oldest" | "created-newest" | "created-oldest" | "largest" | "smallest" | "name-asc" | "name-desc";
-
-/** When it was uploaded; older items without the field fall back to their creation date. */
-const uploadedTime = (item: MediaItem) => new Date(item.uploadedAt || item.source?.ingestedAt || item.createdAt).getTime();
 
 const ITEMS_PER_PAGE = 50;
 
@@ -92,6 +103,7 @@ interface UploadProgress {
 export default function MediaLibraryPage() {
   const router = useRouter();
   const [media, setMedia] = useState<MediaItem[]>([]);
+  const [docs, setDocs] = useState<DocWithUsage[]>([]);
   const [usedMediaIds, setUsedMediaIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [selectedMediaId, setSelectedMediaId] = useState<string | null>(null);
@@ -111,7 +123,7 @@ export default function MediaLibraryPage() {
   // Back from Library › Documents with another type picked (`?type=images`).
   useEffect(() => {
     const type = new URLSearchParams(window.location.search).get("type");
-    if (type === "images" || type === "video") setTypeFilter(type);
+    if (type === "images" || type === "video" || type === "files") setTypeFilter(type);
   }, []);
   const [usageFilter, setUsageFilter] = useState<UsageFilter>("all");
   const [dateFilter, setDateFilter] = useState<string>("all");
@@ -158,14 +170,17 @@ export default function MediaLibraryPage() {
 
   const fetchMedia = useCallback(async () => {
     try {
-      const [mediaRes, usedRes] = await Promise.all([
+      const [mediaRes, usedRes, docsRes] = await Promise.all([
         fetch("/api/admin/media?limit=1000"), // Load all for client-side filtering/pagination
         fetch("/api/admin/media/used"),
+        fetch("/api/admin/docs"),
       ]);
       const mediaData = await mediaRes.json();
       const usedData: UsedMediaResponse = await usedRes.json();
+      const docsData = await docsRes.json();
 
       setMedia(mediaData.data || []);
+      setDocs(docsData.data || []);
       setUsedMediaIds(new Set(usedData.usedMediaIds || []));
     } catch (error) {
       console.error("Failed to fetch media:", error);
@@ -200,7 +215,7 @@ export default function MediaLibraryPage() {
   // Get unique months from media for date filter
   const availableMonths = useMemo(() => {
     const months = new Map<string, string>();
-    media.forEach((item) => {
+    [...media, ...docs].forEach((item) => {
       const date = new Date(item.createdAt);
       const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
       const label = date.toLocaleDateString("en-US", {
@@ -210,27 +225,35 @@ export default function MediaLibraryPage() {
       months.set(key, label);
     });
     return Array.from(months.entries()).sort((a, b) => b[0].localeCompare(a[0]));
-  }, [media]);
+  }, [media, docs]);
 
-  const filteredMedia = useMemo(() => {
-    const filtered = media.filter((item) => {
-      if (!mediaMatches(item, searchQuery)) return false;
+  // Everything in the Library as one list: uploaded files and documents together.
+  const entries = useMemo<LibraryEntry[]>(
+    () => [...media.map((item) => ({ kind: "media" as const, item })), ...docs.map((doc) => ({ kind: "doc" as const, doc }))],
+    [media, docs]
+  );
 
-      if (typeFilter === "images" && !item.mime.startsWith("image/")) {
-        return false;
-      }
-      if (typeFilter === "video" && !item.mime.startsWith("video/")) {
-        return false;
-      }
-      if (usageFilter === "used" && !usedMediaIds.has(item.id)) {
-        return false;
-      }
-      if (usageFilter === "unused" && usedMediaIds.has(item.id)) {
-        return false;
-      }
+  /** In use: a file a post or page shows, a document attached to one (a rule is read site-wide). */
+  const isUsed = useCallback(
+    (entry: LibraryEntry) =>
+      entry.kind === "doc" ? entry.doc.usedBy.length > 0 || entry.doc.kind === "guide" : usedMediaIds.has(entry.item.id),
+    [usedMediaIds]
+  );
+
+  const filteredEntries = useMemo(() => {
+    const filtered = entries.filter((entry) => {
+      if (!entryMatches(entry, searchQuery)) return false;
+
+      const kind = entryKind(entry);
+      if (typeFilter === "images" && kind !== "image") return false;
+      if (typeFilter === "video" && kind !== "video") return false;
+      if (typeFilter === "files" && kind !== "file") return false;
+
+      if (usageFilter === "used" && !isUsed(entry)) return false;
+      if (usageFilter === "unused" && isUsed(entry)) return false;
 
       if (dateFilter !== "all") {
-        const date = new Date(item.createdAt);
+        const date = new Date(entryCreatedAt(entry));
         const itemMonth = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
         if (itemMonth !== dateFilter) {
           return false;
@@ -243,33 +266,39 @@ export default function MediaLibraryPage() {
     return filtered.sort((a, b) => {
       switch (sortBy) {
         case "newest":
-          return uploadedTime(b) - uploadedTime(a);
+          return entryAddedAt(b) - entryAddedAt(a);
         case "oldest":
-          return uploadedTime(a) - uploadedTime(b);
+          return entryAddedAt(a) - entryAddedAt(b);
         case "created-newest":
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          return entryCreatedAt(b) - entryCreatedAt(a);
         case "created-oldest":
-          return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+          return entryCreatedAt(a) - entryCreatedAt(b);
         case "largest":
-          return (b.size || 0) - (a.size || 0);
+          return entrySize(b) - entrySize(a);
         case "smallest":
-          return (a.size || 0) - (b.size || 0);
+          return entrySize(a) - entrySize(b);
         case "name-asc":
-          return (a.title || a.filename).localeCompare(b.title || b.filename);
+          return entryName(a).localeCompare(entryName(b));
         case "name-desc":
-          return (b.title || b.filename).localeCompare(a.title || a.filename);
+          return entryName(b).localeCompare(entryName(a));
         default:
           return 0;
       }
     });
-  }, [media, searchQuery, typeFilter, usageFilter, dateFilter, usedMediaIds, sortBy]);
+  }, [entries, searchQuery, typeFilter, usageFilter, dateFilter, isUsed, sortBy]);
 
-  const totalPages = Math.ceil(filteredMedia.length / ITEMS_PER_PAGE);
-  
-  const paginatedMedia = useMemo(() => {
+  const totalPages = Math.ceil(filteredEntries.length / ITEMS_PER_PAGE);
+
+  const paginatedEntries = useMemo(() => {
     const start = (currentPage - 1) * ITEMS_PER_PAGE;
-    return filteredMedia.slice(start, start + ITEMS_PER_PAGE);
-  }, [filteredMedia, currentPage]);
+    return filteredEntries.slice(start, start + ITEMS_PER_PAGE);
+  }, [filteredEntries, currentPage]);
+
+  // The uploaded files on this page: what the details pop-up steps through and bulk actions select.
+  const paginatedMedia = useMemo(
+    () => paginatedEntries.flatMap((entry) => (entry.kind === "media" ? [entry.item] : [])),
+    [paginatedEntries]
+  );
 
   useEffect(() => {
     setCurrentPage(1);
@@ -306,19 +335,19 @@ export default function MediaLibraryPage() {
   }, [selectedMediaId, handleNavigate]);
 
   const handleUpload = async (files: FileList | File[]) => {
-    const fileArray = Array.from(files);
-    if (fileArray.length === 0) return;
+    const allFiles = Array.from(files);
+    if (allFiles.length === 0) return;
 
     setUploadError(null);
 
-    const validationError = validateFilesForUpload(fileArray);
+    const validationError = validateFilesForUpload(allFiles);
     if (validationError) {
       setUploadError(validationError);
       return;
     }
 
     const initialProgress = new Map<string, UploadProgress>();
-    fileArray.forEach((file) => {
+    allFiles.forEach((file) => {
       initialProgress.set(file.name, {
         fileName: file.name,
         status: isCompressibleImage(file) ? "compressing" : "uploading",
@@ -327,6 +356,21 @@ export default function MediaLibraryPage() {
       });
     });
     setUploadProgress(initialProgress);
+
+    // Text files become documents (editable in the Library); everything else is stored as the file it is.
+    const fileArray = allFiles.filter((file) => fileLibraryKind(file) !== "document");
+    for (const file of allFiles.filter((f) => fileLibraryKind(f) === "document")) {
+      const { error } = await uploadDocument(file, "source");
+      setUploadProgress((prev) =>
+        new Map(prev).set(file.name, {
+          fileName: file.name,
+          status: error ? "error" : "done",
+          progress: error ? 0 : 100,
+          originalSize: file.size,
+          error,
+        })
+      );
+    }
 
     try {
       const compressionResults = await compressImages(
@@ -452,6 +496,56 @@ export default function MediaLibraryPage() {
 
   const handleBulkDelete = () => deleteItems([...selectedIds]);
 
+  /** Delete a document, after saying where it's attached. */
+  const deleteDocument = async (doc: DocWithUsage) => {
+    const where = doc.usedBy.length;
+    const ok = await confirm({
+      title: `Delete ${mdName(doc)}?`,
+      description:
+        where > 0
+          ? `It's attached to ${where === 1 ? "1 post or page" : `${where} posts and pages`}, and will be removed from ${where === 1 ? "it" : "them"}. This can't be undone.`
+          : "This document will be deleted for good. This can't be undone.",
+      confirmLabel: "Delete",
+      destructive: true,
+    });
+    if (!ok) return;
+    const res = await fetch(`/api/admin/docs/${doc.id}`, { method: "DELETE" });
+    if (res.ok) setDocs((prev) => prev.filter((d) => d.id !== doc.id));
+    else dsToast("Couldn't delete the document");
+  };
+
+  // A document keeps its id when its file is replaced, so every post, page and rule that uses it has the new text.
+  const [replaceDoc, setReplaceDoc] = useState<DocWithUsage | null>(null);
+  const replaceDocInputRef = useRef<HTMLInputElement>(null);
+  const handleReplaceDocument = (doc: DocWithUsage) => {
+    setReplaceDoc(doc);
+    replaceDocInputRef.current?.click();
+  };
+  const handleReplaceDocFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    const doc = replaceDoc;
+    setReplaceDoc(null);
+    if (!file || !doc) return;
+    if (fileLibraryKind(file) !== "document") {
+      dsToast("Couldn't replace the document", { description: `A document is a text file up to 512 KB: ${DOC_ACCEPT.replaceAll(",", " ")}` });
+      return;
+    }
+    try {
+      const res = await fetch(`/api/admin/docs/${doc.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ body: await file.text(), filename: file.name }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error);
+      setDocs((prev) => prev.map((d) => (d.id === doc.id ? json.data : d)));
+      dsToast.success("File replaced", { description: doc.usedBy.length > 0 ? "Everything that uses it has the new one." : undefined });
+    } catch (error) {
+      dsToast("Couldn't replace the document", { description: error instanceof Error ? error.message : undefined });
+    }
+  };
+
   const toggleSelect = (id: string) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
@@ -494,8 +588,12 @@ export default function MediaLibraryPage() {
   };
 
   const createPostWithMedia = () => {
-    if (selectedIds.size === 0) return;
-    const mediaIds = Array.from(selectedIds);
+    // A post's gallery shows pictures and video; other files stay out of it.
+    const mediaIds = media.filter((m) => selectedIds.has(m.id) && mediaLibraryKind(m) !== "file").map((m) => m.id);
+    if (mediaIds.length === 0) {
+      dsToast("A post takes images and video", { description: "None of the selected files is one." });
+      return;
+    }
     
     if (isDesktop) {
       setPreSelectedMediaIds(mediaIds);
@@ -923,7 +1021,7 @@ export default function MediaLibraryPage() {
       {/* Header */}
       <div className="flex items-center gap-2 px-5 py-3">
         <h1 className="min-w-0 flex-1 truncate text-p text-ds-fg">
-          Library {!loading && `(${media.length})`}
+          Library {!loading && `(${entries.length})`}
         </h1>
         <DsButton iconLeft={Upload} loading={isUploading} onClick={() => uploadInputRef.current?.click()}>
           {isUploading ? "Processing…" : "Upload"}
@@ -933,7 +1031,6 @@ export default function MediaLibraryPage() {
           ref={uploadInputRef}
           type="file"
           multiple
-          accept="image/*,video/*"
           onChange={(e) => {
             if (e.target.files && e.target.files.length > 0) {
               handleUpload(e.target.files);
@@ -949,7 +1046,7 @@ export default function MediaLibraryPage() {
       <div className="flex items-center gap-2 px-5">
 
         <DsSearch
-          aria-label="Search media"
+          aria-label="Search the library"
           value={searchQuery}
           onValueChange={setSearchQuery}
           className="min-w-0 flex-1"
@@ -1002,7 +1099,7 @@ export default function MediaLibraryPage() {
         )}
 
         <DsDropdown>
-          <DsTooltip content={selectedIds.size ? `${selectedIds.size} selected` : "Select media"}>
+          <DsTooltip content={selectedIds.size ? `${selectedIds.size} selected` : "Select files"}>
             <DsDropdownTrigger asChild>
               <DsButton iconLeft={MoreVertical} aria-label="Bulk actions" />
             </DsDropdownTrigger>
@@ -1149,7 +1246,7 @@ export default function MediaLibraryPage() {
           <div className="flex justify-center py-20">
             <Loader2 aria-label="Loading media" className="size-6 animate-spin text-ds-fg-subtle" />
           </div>
-        ) : filteredMedia.length === 0 && media.length === 0 ? (
+        ) : entries.length === 0 ? (
           <DsEmptyState
             action={
               <DsButton iconLeft={Upload} onClick={() => uploadInputRef.current?.click()}>
@@ -1159,7 +1256,7 @@ export default function MediaLibraryPage() {
           >
             Nothing here yet. Drop files anywhere, or upload.
           </DsEmptyState>
-        ) : filteredMedia.length === 0 ? (
+        ) : filteredEntries.length === 0 ? (
           <DsEmptyState
             action={
               hasActiveFilters && (
@@ -1169,63 +1266,54 @@ export default function MediaLibraryPage() {
               )
             }
           >
-            No media matches
+            Nothing matches
           </DsEmptyState>
         ) : (
           <div className="grid grid-cols-1 gap-x-4 gap-y-6 min-[480px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
-            {paginatedMedia.map((item) => {
-              const name = item.title || item.originalName || item.filename;
-              const selected = selectedIds.has(item.id);
+            {paginatedEntries.map((entry) => {
+              const id = entryId(entry);
+              const name = entryName(entry);
+              const kind = entryKind(entry);
+              const item = entry.kind === "media" ? entry.item : null;
+              const doc = entry.kind === "doc" ? entry.doc : null;
+              const selected = selectedIds.has(id);
+              // A document opens in its editor (Library › Documents); any other file in the details pop-up.
+              const open = () => (doc ? router.push(`${DOCUMENTS_PATH}/${id}`) : setSelectedMediaId(id));
+              const remove = () => (doc ? deleteDocument(doc) : handleDelete(id));
               return (
-                <div key={item.id} className="flex min-w-0 flex-col gap-3">
+                <div key={id} data-kind={kind} className="flex min-w-0 flex-col gap-3">
                   {/* The same tile as a post's gallery: click to open, delete top right on hover (always on touch). */}
                   <div className="group/thumb relative">
                   <button
                     type="button"
-                    onClick={() => setSelectedMediaId(item.id)}
+                    onClick={open}
                     aria-label={`Open ${name}`}
                     className="relative block aspect-square w-full cursor-pointer overflow-hidden rounded-ds-md bg-ds-surface ds-focus"
                   >
-                    {item.mime.startsWith("image/") || item.poster?.url ? (
-                      <img
-                        src={item.mime.startsWith("image/") ? thumbnailUrl(item) : item.poster!.url}
-                        alt={item.alt || ""}
-                        className="size-full object-cover"
-                      />
-                    ) : (
-                      <span className="flex size-full items-center justify-center">
-                        <Film aria-hidden className="size-8 text-ds-fg-subtle" />
-                      </span>
-                    )}
-
-                    {/* Type, top left */}
-                    <span className="absolute top-2 left-2">
-                      {item.mime.startsWith("image/") ? (
-                        <ImageIcon aria-hidden className="size-4 text-white drop-shadow-md" />
-                      ) : (
-                        <Film aria-hidden className="size-4 text-white drop-shadow-md" />
-                      )}
-                    </span>
+                    <LibraryThumb entry={entry} />
                   </button>
                   <div className="absolute top-2 right-2 opacity-0 transition-opacity group-hover/thumb:opacity-100 focus-within:opacity-100 [@media(hover:none)]:opacity-100">
-                    <DsButton size="small" iconLeft={X} aria-label={`Delete ${name}`} onClick={() => handleDelete(item.id)} />
+                    <DsButton size="small" iconLeft={Trash2} aria-label={`Delete ${name}`} onClick={remove} />
                   </div>
                   </div>
 
                   <div className="flex items-center gap-3">
+                    {/* Selecting is for the bulk actions, which work on uploaded files; a document keeps the space. */}
                     <div className="flex size-6 shrink-0 items-center justify-center">
-                      <DsCheckbox
-                        checked={selected}
-                        onCheckedChange={() => toggleSelect(item.id)}
-                        aria-label={`Select ${name}`}
-                      />
+                      {item && (
+                        <DsCheckbox
+                          checked={selected}
+                          onCheckedChange={() => toggleSelect(id)}
+                          aria-label={`Select ${name}`}
+                        />
+                      )}
                     </div>
                     <div className="flex min-w-0 flex-1 flex-col gap-0.5">
                       <div className="flex min-w-0 items-center gap-2">
                         <p className="truncate text-p text-ds-fg">{name}</p>
-                        {!usedMediaIds.has(item.id) && <DsPill variant="highlight">Unused</DsPill>}
+                        {!isUsed(entry) && <DsPill variant="highlight">Unused</DsPill>}
                       </div>
-                      <p className="truncate text-p text-ds-fg-subtle">{formatFileSize(item.size)}</p>
+                      <p className="truncate text-p text-ds-fg-subtle">{formatFileSize(entrySize(entry))}</p>
                     </div>
                     <div className="flex shrink-0 items-center gap-1">
                       <DsDropdown>
@@ -1233,29 +1321,43 @@ export default function MediaLibraryPage() {
                           <DsButton size="small" variant="text" iconLeft={MoreVertical} aria-label={`Options for ${name}`} />
                         </DsDropdownTrigger>
                         <DsDropdownContent>
-                          <DsDropdownItem iconLeft={Pencil} onSelect={() => setSelectedMediaId(item.id)}>
-                            Edit
+                          <DsDropdownItem iconLeft={Pencil} onSelect={open}>
+                            {doc ? "Open" : "Edit"}
                           </DsDropdownItem>
+                          {item && kind !== "file" && (
+                            <DsDropdownItem
+                              iconLeft={Plus}
+                              onSelect={() => router.push(`/admin/posts/new?media=${id}`)}
+                            >
+                              Create post
+                            </DsDropdownItem>
+                          )}
+                          {item && (
+                            <>
+                              <DsDropdownItem iconLeft={Copy} onSelect={() => copyToClipboard(item.url)}>
+                                Copy URL
+                              </DsDropdownItem>
+                              <DsDropdownItem
+                                iconLeft={ExternalLink}
+                                onSelect={() => window.open(item.url, "_blank", "noopener,noreferrer")}
+                              >
+                                Open in new tab
+                              </DsDropdownItem>
+                            </>
+                          )}
+                          {doc && (
+                            <DsDropdownItem iconLeft={Download} onSelect={() => downloadDoc(doc)}>
+                              Download
+                            </DsDropdownItem>
+                          )}
                           <DsDropdownItem
-                            iconLeft={Plus}
-                            onSelect={() => router.push(`/admin/posts/new?media=${item.id}`)}
+                            iconLeft={RefreshCw}
+                            onSelect={() => (doc ? handleReplaceDocument(doc) : handleReplaceFromMenu(id))}
                           >
-                            Create post
-                          </DsDropdownItem>
-                          <DsDropdownItem iconLeft={Copy} onSelect={() => copyToClipboard(item.url)}>
-                            Copy URL
-                          </DsDropdownItem>
-                          <DsDropdownItem
-                            iconLeft={ExternalLink}
-                            onSelect={() => window.open(item.url, "_blank", "noopener,noreferrer")}
-                          >
-                            Open in new tab
-                          </DsDropdownItem>
-                          <DsDropdownItem iconLeft={RefreshCw} onSelect={() => handleReplaceFromMenu(item.id)}>
                             Replace file
                           </DsDropdownItem>
                           <DsDropdownSeparator />
-                          <DsDropdownItem tone="danger" iconLeft={Trash2} onSelect={() => handleDelete(item.id)}>
+                          <DsDropdownItem tone="danger" iconLeft={Trash2} onSelect={remove}>
                             Delete
                           </DsDropdownItem>
                         </DsDropdownContent>
@@ -1315,13 +1417,8 @@ export default function MediaLibraryPage() {
       />
 
       {/* Hidden file inputs: single replace, and the two batch replace modes */}
-      <input
-        ref={replaceInputRef}
-        type="file"
-        accept="image/*,video/*"
-        onChange={handleReplaceFileChange}
-        className="hidden"
-      />
+      <input ref={replaceInputRef} type="file" onChange={handleReplaceFileChange} className="hidden" />
+      <input ref={replaceDocInputRef} type="file" accept={DOC_ACCEPT} onChange={handleReplaceDocFileChange} className="hidden" />
       <input
         ref={batchFolderInputRef}
         type="file"

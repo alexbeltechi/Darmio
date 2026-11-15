@@ -12,7 +12,7 @@ import { AgentSettings } from "@/components/admin/settings/agent-settings";
 /**
  * The current project's settings, one section per thing a project can vary,
  * in the order you'd set them up: the site, its library, the accounts it
- * works with, the agent's brain and rules. Your own account is at
+ * works with, and the context the agent reads first. Your own account is at
  * /admin/account, for the whole install. Design, the project's Parabola
  * theme, follows the site, then its examples (an example site to remove,
  * shown while there is one to remove or add). Each section has an anchor

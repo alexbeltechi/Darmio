@@ -8,7 +8,7 @@ const MAX_SHARE = 0.4;
 const MAX_HEIGHT = 150;
 
 /**
- * A row of the `list` layout: the post's picture on the left and its text,
+ * A row of the `list` layout: the post's text, and its picture on the right,
  * centred on each other. The picture keeps its own shape and is at least as
  * tall as the text beside it (measured, since the text wraps to more or fewer
  * lines on different screens), so a landscape picture grows wider to match
@@ -53,6 +53,9 @@ export function PostListRow({
 
   return (
     <article ref={rowRef} className="flex items-center gap-ds-20 sm:gap-ds-32">
+      <div ref={textRef} className="flex min-w-0 flex-1 flex-col gap-ds-8">
+        {children}
+      </div>
       {picture && (
         <div
           className="relative shrink-0 overflow-hidden [--list-picture:6rem] sm:[--list-picture:9rem]"
@@ -61,9 +64,6 @@ export function PostListRow({
           {picture}
         </div>
       )}
-      <div ref={textRef} className="flex min-w-0 flex-1 flex-col gap-ds-8">
-        {children}
-      </div>
     </article>
   );
 }

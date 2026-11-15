@@ -19,6 +19,7 @@ import {
 import { AdminMenuButton } from "@/components/admin/layout";
 import { DOC_ACCEPT, mdBytes, mdName, shortDate, sizeLabel, type DocWithUsage } from "@/lib/cms/docs";
 import { cn } from "@/lib/utils";
+import { uploadDocument } from "./upload-document";
 
 /** Fired after a doc is saved or deleted, so the list refreshes. */
 export const DOCS_CHANGED = "cms:docs-changed";
@@ -30,10 +31,11 @@ const openDocId = (pathname: string) => pathname.match(/^\/admin\/library\/docum
 
 /** The Library's type filter, shared with the media grid: documents are one more type. */
 export const LIBRARY_TYPES = [
-  { value: "all", label: "All media items" },
+  { value: "all", label: "All files" },
   { value: "images", label: "Images" },
   { value: "video", label: "Video" },
   { value: "documents", label: "Documents" },
+  { value: "files", label: "Other files" },
 ];
 
 /** "By your agent · 4 Oct · 3 KB": who made it first, so agent-made files stand out. */
@@ -43,11 +45,12 @@ function detailLine(doc: DocWithUsage) {
     .join(" · ");
 }
 
-/** "Services", "Services, About +2" or "Not attached". */
+/** "Services", "Context, About +2" or "Not attached": a file in Context counts as used there. */
 function usageLine(doc: DocWithUsage) {
-  if (doc.usedBy.length === 0) return doc.kind === "guide" ? "Site-wide" : "Not attached";
-  const names = doc.usedBy.slice(0, 2).map((u) => u.title);
-  const more = doc.usedBy.length - names.length;
+  const all = [...(doc.kind === "guide" ? ["Context"] : []), ...doc.usedBy.map((u) => u.title)];
+  if (all.length === 0) return "Not attached";
+  const names = all.slice(0, 2);
+  const more = all.length - names.length;
   return names.join(", ") + (more > 0 ? ` +${more}` : "");
 }
 
@@ -99,10 +102,11 @@ export function DocumentsWorkspace({ children }: { children: React.ReactNode }) 
 
   const upload = async (file: File) => {
     setUploading(true);
-    const form = new FormData();
-    form.append("file", file);
-    await create({ body: form });
+    const { doc, error } = await uploadDocument(file);
     setUploading(false);
+    if (!doc) return dsToast("Couldn't add the doc", { description: error });
+    await reload();
+    router.push(`${DOCUMENTS_PATH}/${doc.id}`);
   };
 
   const q = query.trim().toLowerCase();

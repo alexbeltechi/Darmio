@@ -1,18 +1,24 @@
 import { NextResponse } from "next/server";
 import { listCategories } from "@/lib/db/categories";
+import { listDocs, mdName } from "@/lib/db/docs";
 import { getCurrentProject } from "@/lib/db/mongodb";
 
 // GET /api/admin/agent - Everything an agent needs to work with this CMS, in
 // one short Markdown document: the rules, the endpoints, the post Markdown
 // format and the live category ids. Read this first instead of the code.
 export async function GET() {
-  const [categories, project] = await Promise.all([listCategories(), getCurrentProject()]);
+  const [categories, project, docs] = await Promise.all([listCategories(), getCurrentProject(), listDocs()]);
+  // Context (Settings › Context): a linked folder or page and the Library's documents of kind "guide".
+  const brainFiles = docs.filter((d) => d.kind === "guide").map((d) => `- ${mdName(d)}: GET /docs/${d.id}?format=md`);
+  const brainLines = [...(project?.brain ? [`- Linked folder or page: ${project.brain}`] : []), ...brainFiles];
   const projectLines = project
     ? `
 ## This project
-${project.name} (\`${project.slug}\`). Every request works on one project: send \`x-darmio-project: <slug>\` for another; GET /projects lists them.${project.brain ? `
-Its brain: ${project.brain}. Read it before you write anything for this project.` : ""}
-`
+${project.name} (\`${project.slug}\`). Every request works on one project: send \`x-darmio-project: <slug>\` for another; GET /projects lists them.
+${brainLines.length ? `
+## Context: read these before you write anything for this project
+${brainLines.join("\n")}
+` : ""}`
     : "";
   const guide = `# Darmio: agent guide
 ${projectLines}
@@ -57,7 +63,7 @@ The home page is the page with slug home. Write the page's words; the format doe
 - POST /publish {"slugs":[...],"collection":"pages"}    Make a page live (only when the owner asks)
 
 ## Docs
-Markdown that guides the work: a brief (strategy for one post or page), a source (raw material), a guide (site-wide rules). the owner sees every doc in admin › Agent, so store nothing anywhere else. Before working on a post or page, read the docs it lists.
+Markdown that guides the work: a brief (strategy for one post or page), a source (raw material), a guide (in Context: read before every job). The owner sees every doc in the Library, so store nothing anywhere else. Before working on a post or page, read the docs it lists.
 - GET  /docs                                            All docs, with where each is used (usedBy)
 - GET  /docs/{id}?format=md                             One doc's Markdown
 - POST /docs {"title","kind":"brief|source|guide","body","stage"?,"links"?}   Create (or multipart: file=.md, title, kind)
@@ -84,7 +90,7 @@ A theme file (\`name.theme.json\`) changes how the whole site looks; the guide t
 ## Media
 - GET  /media?fields=summary&q=word&limit=50            Compact list; q searches names, title, caption, tags and keywords. fields: id,name,url,mime,width,height,size,alt,caption,title,description,tags,keywords,createdAt,fingerprint,sha256,sourcePath
        q also finds an image by the file it was uploaded from ("DSCF6400").
-- POST /media (multipart: file, alt, caption, title, tags, keywords, keywordsBy, origin=agent, agent=claude)   Upload
+- POST /media (multipart: file, alt, caption, title, tags, keywords, keywordsBy, origin=agent, agent=claude)   Upload any file: an image is optimized, a video gets a poster, anything else (a PDF, a zip) is stored as it is. Text to read or edit (.md, .txt, .html, .csv, .json) goes to POST /docs
 - PATCH /media/{id} {"alt","caption","title","tags","keywords","keywordsBy"}    Edit a file's details
 - tags are the owner's words (typed, or confirmed by them); keywords say what's in the picture, written by the agent that looked at it (keywordsBy "/post" or "/curate"), comma-separated on upload.
 - POST /media/{id}/replace (multipart: file)            Swap the file everywhere it's used (the old file is deleted); keeps its title, alt, caption, tags and keywords unless sent

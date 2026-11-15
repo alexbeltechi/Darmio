@@ -1,12 +1,9 @@
 "use client";
 
-import { mediaMatches } from "@/lib/cms/media-search";
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import {
   X,
-  Image as ImageIcon,
-  Film,
   Loader2,
   Upload,
   AlertCircle,
@@ -14,7 +11,24 @@ import {
   RotateCcw,
 } from "lucide-react";
 import type { MediaItem } from "@/lib/cms/types";
-import { DsButton, DsCheckbox, DsPill, DsSearch, DsTopBar } from "@beltechi/parabola";
+import type { DocWithUsage } from "@/lib/cms/docs";
+import {
+  LIBRARY_KINDS,
+  entryId,
+  entryKind,
+  entryMatches,
+  entryName,
+  entrySize,
+  entryAddedAt,
+  fileLibraryKind,
+  kindsAccept,
+  kindsInWords,
+  type LibraryEntry,
+  type LibraryKind,
+} from "@/lib/cms/library";
+import { DsButton, DsCheckbox, DsEmptyState, DsPill, DsSearch, DsSelect, DsTopBar } from "@beltechi/parabola";
+import { uploadDocument } from "@/components/admin/docs/upload-document";
+import { LibraryThumb } from "@/components/admin/library/library-thumb";
 import { cn } from "@/lib/utils";
 import {
   compressImages,
@@ -24,15 +38,24 @@ import {
   isCompressibleImage,
   type CompressionProgress,
 } from "@/lib/image-compression";
-import { thumbnailUrl } from "@/lib/cms/media-url";
+
+const KIND_LABELS: Record<LibraryKind, string> = { image: "Images", video: "Video", document: "Documents", file: "Other files" };
 
 interface MediaPickerProps {
   isOpen: boolean;
   onClose: () => void;
+  /** The uploaded files picked (pictures, video, other files), in the order picked. */
   onSelect: (items: MediaItem[]) => void;
+  /** The documents picked, where the pop-up shows them (`kinds` includes "document"). */
+  onSelectDocuments?: (docs: DocWithUsage[]) => void;
   multiple?: boolean;
-  accept?: string[]; // e.g., ["image/*", "video/*"]
+  /** What this spot takes: a gallery `["image"]`, a rule `["document"]`. Without it, the whole Library. */
+  kinds?: readonly LibraryKind[];
   maxSelect?: number;
+  /** Ids picked when it opens (the file a spot holds now). */
+  selected?: string[];
+  /** The primary button, when "Select" or "Add 2 files" isn't what happens. */
+  confirmLabel?: string;
 }
 
 interface UploadProgress {
@@ -45,15 +68,25 @@ interface UploadProgress {
   file?: File; // Keep reference for retry
 }
 
+/**
+ * The library pop-up: choose from everything in the Library, or upload into
+ * it from here. It shows the kinds of file the spot it was opened from takes.
+ */
 export function MediaPicker({
   isOpen,
   onClose,
   onSelect,
+  onSelectDocuments,
   multiple = true,
-  accept,
+  kinds = LIBRARY_KINDS,
   maxSelect,
+  selected,
+  confirmLabel,
 }: MediaPickerProps) {
   const [media, setMedia] = useState<MediaItem[]>([]);
+  const [docs, setDocs] = useState<DocWithUsage[]>([]);
+  const [kindFilter, setKindFilter] = useState<LibraryKind | "all">("all");
+  const showsDocuments = kinds.includes("document");
   const [usedMediaIds, setUsedMediaIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -74,45 +107,51 @@ export function MediaPicker({
   const fetchMedia = useCallback(async () => {
     setLoading(true);
     try {
-      const [mediaRes, usedRes] = await Promise.all([
+      const [mediaRes, usedRes, docsRes] = await Promise.all([
         fetch("/api/admin/media?limit=1000"),
         fetch("/api/admin/media/used"),
+        showsDocuments ? fetch("/api/admin/docs") : null,
       ]);
       const mediaData = await mediaRes.json();
       const usedData = await usedRes.json();
       setMedia(mediaData.data || []);
       setUsedMediaIds(new Set(usedData.usedMediaIds || []));
+      setDocs(docsRes ? (await docsRes.json()).data || [] : []);
     } catch (error) {
       console.error("Failed to fetch media:", error);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [showsDocuments]);
 
+  // `selected` is read when the pop-up opens, not followed while it's open.
+  const selectedOnOpen = useRef(selected);
+  selectedOnOpen.current = selected;
   useEffect(() => {
     if (isOpen) {
       fetchMedia();
-      setSelectedIds([]);
+      setSelectedIds(selectedOnOpen.current ?? []);
       setSearchQuery("");
+      setKindFilter("all");
       setUploadProgress(new Map());
       setUploadError(null);
     }
   }, [isOpen, fetchMedia]);
 
   const handleUpload = async (files: FileList | File[]) => {
-    const fileArray = Array.from(files);
-    if (fileArray.length === 0) return;
+    const allFiles = Array.from(files);
+    if (allFiles.length === 0) return;
 
     setUploadError(null);
 
-    const validationError = validateFilesForUpload(fileArray);
+    const validationError = validateFilesForUpload(allFiles, kinds);
     if (validationError) {
       setUploadError(validationError);
       return;
     }
 
     const initialProgress = new Map<string, UploadProgress>();
-    fileArray.forEach((file) => {
+    allFiles.forEach((file) => {
       initialProgress.set(file.name, {
         fileName: file.name,
         status: isCompressibleImage(file) ? "compressing" : "uploading",
@@ -123,6 +162,22 @@ export function MediaPicker({
     setUploadProgress(initialProgress);
 
     const uploadedIds: string[] = [];
+
+    // Text files become documents; everything else is stored as the file it is.
+    const fileArray = allFiles.filter((file) => fileLibraryKind(file) !== "document");
+    for (const file of allFiles.filter((f) => fileLibraryKind(f) === "document")) {
+      const { doc, error } = await uploadDocument(file, "source");
+      if (doc) uploadedIds.push(doc.id);
+      setUploadProgress((prev) =>
+        new Map(prev).set(file.name, {
+          fileName: file.name,
+          status: error ? "error" : "done",
+          progress: error ? 0 : 100,
+          originalSize: file.size,
+          error,
+        })
+      );
+    }
 
     try {
       const compressionResults = await compressImages(
@@ -276,34 +331,26 @@ export function MediaPicker({
     setDragActive(false);
 
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      const validFiles = Array.from(e.dataTransfer.files).filter(
-        (file) => file.type.startsWith("image/") || file.type.startsWith("video/")
-      );
-      if (validFiles.length > 0) {
-        handleUpload(validFiles);
-      }
+      handleUpload(e.dataTransfer.files);
     }
   };
 
-  // Filter media based on accept types and search
-  const filteredMedia = useMemo(() => {
-    return media.filter((item) => {
-      if (!mediaMatches(item, searchQuery)) return false;
+  // Everything the spot takes, uploaded files and documents together, newest first.
+  const entries = useMemo<LibraryEntry[]>(
+    () =>
+      [...media.map((item) => ({ kind: "media" as const, item })), ...docs.map((doc) => ({ kind: "doc" as const, doc }))]
+        .filter((entry) => kinds.includes(entryKind(entry)))
+        .sort((a, b) => entryAddedAt(b) - entryAddedAt(a)),
+    [media, docs, kinds]
+  );
 
-      if (accept && accept.length > 0) {
-        const matches = accept.some((type) => {
-          if (type.endsWith("/*")) {
-            const prefix = type.replace("/*", "/");
-            return item.mime.startsWith(prefix);
-          }
-          return item.mime === type;
-        });
-        if (!matches) return false;
-      }
+  const filteredEntries = useMemo(
+    () => entries.filter((entry) => entryMatches(entry, searchQuery) && (kindFilter === "all" || entryKind(entry) === kindFilter)),
+    [entries, searchQuery, kindFilter]
+  );
 
-      return true;
-    });
-  }, [media, searchQuery, accept]);
+  const isUsed = (entry: LibraryEntry) =>
+    entry.kind === "doc" ? entry.doc.usedBy.length > 0 || entry.doc.kind === "guide" : usedMediaIds.has(entry.item.id);
 
   const toggleSelect = (id: string) => {
     if (!multiple) {
@@ -330,10 +377,13 @@ export function MediaPicker({
   const handleConfirm = () => {
     // Return items in the order they were selected
     const mediaMap = new Map(media.map((m) => [m.id, m]));
+    const docMap = new Map(docs.map((d) => [d.id, d]));
     const selectedItems = selectedIds
       .map((id) => mediaMap.get(id))
       .filter((item): item is MediaItem => item !== undefined);
+    const selectedDocs = selectedIds.map((id) => docMap.get(id)).filter((doc): doc is DocWithUsage => doc !== undefined);
     onSelect(selectedItems);
+    if (selectedDocs.length > 0) onSelectDocuments?.(selectedDocs);
     onClose();
   };
 
@@ -493,7 +543,18 @@ export function MediaPicker({
               </Dialog.Close>
             </div>
 
-            <DsSearch aria-label="Search media" value={searchQuery} onValueChange={setSearchQuery} className="w-full" />
+            <div className="flex items-center gap-2">
+              <DsSearch aria-label="Search the library" value={searchQuery} onValueChange={setSearchQuery} className="min-w-0 flex-1" />
+              {kinds.length > 1 && (
+                <DsSelect
+                  aria-label="Type"
+                  options={[{ value: "all", label: "All files" }, ...kinds.map((k) => ({ value: k, label: KIND_LABELS[k] }))]}
+                  value={kindFilter}
+                  onValueChange={(value) => setKindFilter(value as LibraryKind | "all")}
+                  className="w-[170px] shrink-0"
+                />
+              )}
+            </div>
 
             {uploadError && (
               <div className="flex items-start gap-3 rounded-ds-lg bg-ds-error/10 p-3">
@@ -567,35 +628,33 @@ export function MediaPicker({
               <div className="pointer-events-none absolute inset-x-5 inset-y-0 z-10 flex flex-col items-center justify-center gap-1 rounded-ds-lg border-2 border-dashed border-ds-fg-subtle bg-ds-bg/80 text-center">
                 <Upload aria-hidden className="mb-1 size-6" />
                 <p className="text-p">Drop files to upload</p>
-                <p className="text-small text-ds-fg-muted">Images are optimized for the web automatically.</p>
+                <p className="text-small text-ds-fg-muted">
+                  {kinds.length === LIBRARY_KINDS.length ? "Any file. Images are optimized for the web." : `This takes ${kindsInWords(kinds)}.`}
+                </p>
               </div>
             )}
 
             {loading ? (
               <div className="flex justify-center py-20">
-                <Loader2 aria-label="Loading media" className="size-6 animate-spin text-ds-fg-subtle" />
+                <Loader2 aria-label="Loading the library" className="size-6 animate-spin text-ds-fg-subtle" />
               </div>
-            ) : filteredMedia.length === 0 ? (
-              <div className="flex flex-col items-center gap-1 py-16 text-center">
-                <p className="text-p text-ds-fg-muted">
-                  {media.length === 0 ? "No media uploaded yet" : "No media matches your search"}
-                </p>
-                {media.length === 0 && (
-                  <p className="text-small text-ds-fg-subtle">Upload files or drag and drop them here.</p>
-                )}
-              </div>
+            ) : filteredEntries.length === 0 ? (
+              <DsEmptyState>
+                {entries.length === 0 ? "Nothing here yet. Upload files, or drop them here." : "Nothing matches"}
+              </DsEmptyState>
             ) : (
               <div className="grid grid-cols-2 gap-x-4 gap-y-6 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-                {filteredMedia.map((item) => {
-                  const isSelected = selectedIds.includes(item.id);
+                {filteredEntries.map((entry) => {
+                  const id = entryId(entry);
+                  const isSelected = selectedIds.includes(id);
                   const isDisabled = Boolean(multiple && maxSelect && selectedIds.length >= maxSelect && !isSelected);
-                  const name = item.title || item.originalName || item.filename;
-                  const isImage = item.mime.startsWith("image/");
+                  const name = entryName(entry);
 
                   return (
                     <div
-                      key={item.id}
-                      onClick={() => !isDisabled && toggleSelect(item.id)}
+                      key={id}
+                      data-kind={entryKind(entry)}
+                      onClick={() => !isDisabled && toggleSelect(id)}
                       className={cn(
                         "group flex min-w-0 flex-col gap-3",
                         isDisabled ? "cursor-not-allowed opacity-40" : "cursor-pointer"
@@ -610,24 +669,7 @@ export function MediaPicker({
                             : "outline-transparent group-hover:outline-ds-fg/20"
                         )}
                       >
-                        {isImage || item.poster?.url ? (
-                          <img
-                            src={isImage ? thumbnailUrl(item) : item.poster!.url}
-                            alt={item.alt || ""}
-                            className="size-full object-cover"
-                          />
-                        ) : (
-                          <span className="flex size-full items-center justify-center">
-                            <Film aria-hidden className="size-8 text-ds-fg-subtle" />
-                          </span>
-                        )}
-                        <span className="absolute top-2 left-2">
-                          {isImage ? (
-                            <ImageIcon aria-hidden className="size-4 text-white drop-shadow-md" />
-                          ) : (
-                            <Film aria-hidden className="size-4 text-white drop-shadow-md" />
-                          )}
-                        </span>
+                        <LibraryThumb entry={entry} />
                       </div>
 
                       <div className="flex items-center gap-3">
@@ -636,16 +678,16 @@ export function MediaPicker({
                           <DsCheckbox
                             checked={isSelected}
                             disabled={isDisabled}
-                            onCheckedChange={() => toggleSelect(item.id)}
+                            onCheckedChange={() => toggleSelect(id)}
                             aria-label={`Select ${name}`}
                           />
                         </div>
                         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
                           <div className="flex min-w-0 items-center gap-2">
                             <p className="truncate text-p text-ds-fg">{name}</p>
-                            {!usedMediaIds.has(item.id) && <DsPill variant="highlight">Unused</DsPill>}
+                            {!isUsed(entry) && <DsPill variant="highlight">Unused</DsPill>}
                           </div>
-                          <p className="truncate text-p text-ds-fg-subtle">{formatFileSize(item.size)}</p>
+                          <p className="truncate text-p text-ds-fg-subtle">{formatFileSize(entrySize(entry))}</p>
                         </div>
                       </div>
                     </div>
@@ -663,7 +705,7 @@ export function MediaPicker({
               ref={fileInputRef}
               type="file"
               multiple
-              accept="image/*,video/*"
+              accept={kindsAccept(kinds)}
               onChange={(e) => {
                 if (e.target.files && e.target.files.length > 0) {
                   handleUpload(e.target.files);
@@ -680,7 +722,7 @@ export function MediaPicker({
               <DsButton>Cancel</DsButton>
             </Dialog.Close>
             <DsButton variant="primary" onClick={handleConfirm} disabled={count === 0}>
-              {multiple ? `Add ${count} file${count !== 1 ? "s" : ""}` : "Select"}
+              {confirmLabel ?? (multiple ? `Add ${count} file${count !== 1 ? "s" : ""}` : "Select")}
             </DsButton>
           </div>
         </Dialog.Content>

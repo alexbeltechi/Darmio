@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getActor } from "@/lib/agent/actor";
-import { DOC_ACCEPT, isDocFilename } from "@/lib/cms/docs";
+import { DOC_ACCEPT, DOC_MAX_BYTES, isDocFilename } from "@/lib/cms/docs";
 import { logActivity } from "@/lib/db/activity";
 import {
   cleanDocLinks,
@@ -13,9 +13,6 @@ import {
   type DocLink,
   type DocStage,
 } from "@/lib/db/docs";
-
-/** Text is small; anything bigger is probably the wrong file. */
-const MAX_BYTES = 512 * 1024;
 
 // GET /api/admin/docs - Every doc, newest first, with where each is used.
 export async function GET() {
@@ -40,7 +37,7 @@ export async function POST(request: Request) {
       if (!isDocFilename(file.name)) {
         return NextResponse.json({ error: `Documents are text files: ${DOC_ACCEPT.replaceAll(",", " ")}` }, { status: 400 });
       }
-      if (file.size > MAX_BYTES) return NextResponse.json({ error: "That file is over 512 KB" }, { status: 400 });
+      if (file.size > DOC_MAX_BYTES) return NextResponse.json({ error: "That file is over 512 KB" }, { status: 400 });
       body = await file.text();
       filename = file.name;
       title = String(form.get("title") || "") || titleFromFilename(file.name);
@@ -53,7 +50,7 @@ export async function POST(request: Request) {
       if (isDocKind(json.kind)) kind = json.kind;
       if (isDocStage(json.stage)) stage = json.stage;
       links = cleanDocLinks(json.links) ?? undefined;
-      if (Buffer.byteLength(body) > MAX_BYTES)
+      if (Buffer.byteLength(body) > DOC_MAX_BYTES)
         return NextResponse.json({ error: "That doc is over 512 KB" }, { status: 400 });
     }
   } catch {

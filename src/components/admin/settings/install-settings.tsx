@@ -69,6 +69,7 @@ export function InstallSettings() {
     <>
       <SettingsSection
         id="hosting"
+        ai={[{ prompt: "Check the hosting of <site>: that it deploys from my GitHub copy, and connect my own domain when I give you one." }]}
         title="Hosting"
         description={<SettingsLink href="https://vercel.com/dashboard">Vercel</SettingsLink>}
         note={
@@ -105,6 +106,7 @@ export function InstallSettings() {
 
       <SettingsSection
         id="database"
+        ai={[{ prompt: "Check the database of <site>: is it working, how much of the free plan it uses, and what to do before it fills up. If I ask, move it to another MongoDB database without losing anything." }]}
         title="Database"
         description={
           usage &&
@@ -145,6 +147,7 @@ export function InstallSettings() {
 
       <SettingsSection
         id="storage"
+        ai={[{ prompt: "Check the image storage of <site>: how much of the free plan it uses, and what to do before it fills up." }]}
         title="Storage"
         description={<SettingsLink href="https://vercel.com/dashboard/stores">Vercel Blob</SettingsLink>}
         note={

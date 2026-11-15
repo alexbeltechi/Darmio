@@ -118,6 +118,7 @@ export function DesignSettings() {
   return (
     <SettingsSection
       id="design"
+      ai={[{ prompt: "Change the look of <site>: set its Parabola theme (colours, fonts, corners) from what I describe, and show me before you publish it." }]}
       title="Design"
       description={
         <>

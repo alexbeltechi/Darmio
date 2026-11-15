@@ -99,6 +99,7 @@ function AccountCard({ account, onChange }: { account: Account | null; onChange:
   return (
     <SettingsSection
       id="account"
+      ai={[{ prompt: "Change the email I sign in with on <site>." }]}
       title="Account"
       description={account ? `Signed in as ${account.email}, ${account.role}.` : "Your name and the email you sign in with."}
     >
@@ -167,6 +168,7 @@ function PasswordCard() {
   return (
     <SettingsSection
       id="password"
+      ai={[{ prompt: "Give me a password reset link for <site>." }]}
       title="Password"
       description="The one you sign in with"
       note="Forgotten it? Sign out and use “Forgot your password?” on the sign-in page."

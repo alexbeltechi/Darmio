@@ -2,6 +2,7 @@ import { DS_FONTS, DsThemeStyle } from "@beltechi/parabola";
 import { Footer } from "@/components/site/footer";
 import { ScrollToTop } from "@/components/site/scroll-to-top";
 import { SiteNav } from "@/components/site/site-nav";
+import { orderMenu } from "@/lib/cms/menu-order";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { DEFAULT_SETTINGS, getSiteSettings, sitePublishedTheme } from "@/lib/db/settings";
 import { listCategories } from "@/lib/db/categories";
@@ -16,17 +17,17 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
     listSitePages().catch(() => []),
   ]);
   const { siteName } = settings;
-  // The nav grows with the site: each top-level category marked for it
-  //, then each top-level page marked for it, lit for
-  // the pages under it too.
-  const sections = [
+  // The nav grows with the site: each top-level category marked for it,
+  // then each page marked for it, lit for the pages under it too, in the
+  // order set in admin › Pages.
+  const sections = orderMenu([
     ...categoryGroups(categories)
       .filter((g) => g.nav)
       .map(({ slug, label, members }) => ({ slug, label, members })),
     ...pages
       .filter((p) => p.settings.nav)
       .map((p) => ({ slug: p.slug, label: p.title, members: [p.slug, ...childPages(pages, p.slug).map((c) => c.slug)] })),
-  ];
+  ], settings.menuOrder);
 
   return (
     <ThemeProvider

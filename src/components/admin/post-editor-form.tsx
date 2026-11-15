@@ -45,6 +45,8 @@ import {
 import { UnsavedChangesModal } from "@/components/admin/unsaved-changes-modal";
 import { announceSaved, publishPosts, useOnPublished } from "@/components/admin/publish/events";
 import { MediaPicker } from "@/components/admin/media-picker";
+import { CustomPageField } from "@/components/admin/posts/custom-page-field";
+import { customPageOf, type CustomPageSetting } from "@/lib/cms/custom-pages";
 import { MediaDetailModal } from "@/components/admin/media-detail-modal";
 import { useEditorSelection } from "@/components/admin/remove-items-dialog";
 import { ContentBlockEditor, isBlockEmpty } from "@/components/admin/content-block-editor";
@@ -92,6 +94,8 @@ export function PostEditorForm({
   const [categories, setCategories] = useState<string[]>([]);
   const [tags, setTags] = useState("");
   const [description, setDescription] = useState("");
+  // The post's custom page, if it has one: shown in the details, saved by its own switch.
+  const [customPage, setCustomPage] = useState<CustomPageSetting | null>(null);
   const [docs, setDocs] = useState<string[]>([]);
   const [publishDate, setPublishDate] = useState<string | null>(null);
   const [sourceLabel, setSourceLabel] = useState("");
@@ -289,6 +293,7 @@ export function PostEditorForm({
         setCategories(catsVal);
         setTags(tagsVal);
         setDescription(descriptionVal);
+        setCustomPage(customPageOf(working));
         setDocs(docsVal);
         setPublishDate(dateVal);
         setBlocks(blocksVal);
@@ -985,6 +990,10 @@ export function PostEditorForm({
           <DsField label="Description" description="Optional. Shown under the post in feeds; blank uses the start of the text.">
             <DsTextarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Leave blank" />
           </DsField>
+
+          {(currentSlug || slug) && (
+            <CustomPageField slug={(currentSlug || slug) as string} value={customPage} onChange={setCustomPage} />
+          )}
 
           <DsField label="Documents" description="Anything that gives Claude context for this post: notes, copy, a brief, HTML. All of them live in Agent." className="w-full">
             <DocsField value={docs} onChange={setDocs} />

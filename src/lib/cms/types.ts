@@ -293,7 +293,7 @@ export interface NewsletterBlock {
   source?: string;
 }
 
-export type Block =
+export type Block = (
   | TextBlock
   | ImageBlock
   | GalleryBlock
@@ -305,7 +305,11 @@ export type Block =
   | EmbedBlock
   | CalloutBlock
   | ListBlock
-  | NewsletterBlock;
+  | NewsletterBlock
+) & {
+  /** A short name a custom page asks for this block by ("intro", "photos"); see lib/cms/custom-pages.ts. */
+  name?: string;
+};
 
 // ============================================
 // Media Types

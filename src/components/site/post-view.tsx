@@ -13,6 +13,8 @@ import { PostPageWrapper } from "@/components/site/post-page-wrapper";
 import { NavHighlight } from "@/components/site/site-nav";
 import { feedCategory, getPostGroups, getPreviewCandidateIds } from "@/components/site/post-grid-shared";
 import { categoryGroups } from "@/lib/cms/category-groups";
+import { customPageOf } from "@/lib/cms/custom-pages";
+import { POST_PAGES } from "@/extensions/post-pages";
 import type { Block, Entry, MediaItem } from "@/lib/cms/types";
 import type { Category } from "@/lib/db/categories";
 
@@ -40,18 +42,26 @@ function blockMediaIds(blocks: Block[]): string[] {
  * traditional article. Each gallery opens its own full-screen viewer that
  * cycles only that gallery's media. Shared by the public page and the
  * admin preview, which passes the post with its unpublished changes.
+ *
+ * A post with a custom page (lib/cms/custom-pages.ts) is drawn by that page
+ * in place of the header and the stacked blocks; the frame around it (the
+ * menu, what's under the article) stays the site's. Switched off, or with
+ * its page missing from this site's code, the post gets the standard layout.
  */
 export async function PostView({
   post,
   allCategories,
   settings,
   preview = false,
+  page,
 }: {
   post: Entry;
   allCategories: Category[];
   settings: SiteSettings;
   /** The admin preview: shows placeholders for images still to come. */
   preview?: boolean;
+  /** The admin preview can ask for either, whatever the post's switch says. */
+  page?: "standard" | "custom";
 }) {
 
   const categoryIds = (post.data.categories as string[]) || [];
@@ -70,21 +80,42 @@ export async function PostView({
   const categoryMap = new Map(allCategories.map((c) => [c.id, c]));
   const mainCategory = getPostGroups(post, categoryMap)[0];
 
+  const custom = customPageOf(post.data);
+  const wantsCustom = page ? page === "custom" : !custom?.off;
+  const loadCustom = custom && wantsCustom ? POST_PAGES[custom.key] : undefined;
+  const CustomPage = loadCustom ? (await loadCustom()).default : null;
+
   return (
     <PostPageWrapper>
       <NavHighlight slug={mainCategory?.slug ?? null} />
       <main className="min-h-screen bg-ds-bg">
-        <article className="px-ds-20">
-          <PostHeader
-            title={post.data.title as string}
-            categories={postCategories}
-            dateLabel={dateLabel}
-          />
+        {CustomPage ? (
+          <article>
+            <CustomPage
+              post={post}
+              title={post.data.title as string}
+              dateLabel={dateLabel}
+              blocks={blocks}
+              media={mediaItems}
+              preview={preview}
+            />
+            <div className="px-ds-20">
+              <SourceLine post={post} settings={settings.sourceLine} />
+            </div>
+          </article>
+        ) : (
+          <article className="px-ds-20">
+            <PostHeader
+              title={post.data.title as string}
+              categories={postCategories}
+              dateLabel={dateLabel}
+            />
 
-          <ArticleContent blocks={blocks} mediaItems={mediaItems} preview={preview} />
+            <ArticleContent blocks={blocks} mediaItems={mediaItems} preview={preview} />
 
-          <SourceLine post={post} settings={settings.sourceLine} />
-        </article>
+            <SourceLine post={post} settings={settings.sourceLine} />
+          </article>
+        )}
 
         <Suspense fallback={null}>
           <MoreToExplore

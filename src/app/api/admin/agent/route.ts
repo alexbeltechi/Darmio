@@ -126,6 +126,21 @@ The quote.
 - In a gallery the image text is only a label; edit a file's caption with PATCH /media/{id}.
 - A placeholder line makes an empty gallery with a note: shown in the editor and preview, never on the live site.
 - Front matter: only title, categories, tags and date are written; slug and status are read-only.
+- \`<!-- block:ID name=intro -->\` (or \`<!-- block name=intro -->\` on a new block) names a block, for a custom page to ask for it by.
+
+## Custom pages
+A post is drawn by the standard layout unless the owner asks for a page of its own. Work up this ladder, and stop at the first rung that does it:
+1. The standard layout and its options (a gallery's layout, columns and width; quotes; video).
+2. A new option, when every site would want it: say so to the owner rather than building a one-off.
+3. A custom page: only when the owner asks, or what they want can't be met another way.
+
+The rule for a custom page: **everything a reader reads or sees as content stays in the post** (words, pictures, video, captions, links). The page only arranges and decorates it. So:
+- Write the content into the post first, as usual, and name the blocks the page will place.
+- The page is a file in the site's code, \`src/extensions/post-pages/<key>.tsx\`, listed in \`src/extensions/post-pages.ts\`. It's given the post's blocks and Library files and asks for parts by name (\`part\`, \`blockMedia\`, \`unplaced\` in \`src/lib/cms/custom-pages.ts\`). It never holds its own copy of a word or a file.
+- Draw what it doesn't place with \`StandardBlocks\`, so nothing is lost. Pictures open the site's own viewer (\`LightboxGroup\`, \`LightboxButton\`); buttons and links are Parabola's; body text stays the site's; colours and spacing come from the theme's tokens (\`src/components/site/custom\`).
+- Then point the post at it: PATCH /collections/posts/entries/{slug} {"data":{"customPage":{"key":"<key>"}}}. \`"off":true\` beside the key shows the standard layout and keeps the page.
+- Check it both ways before you say it's done: /post/{slug}/preview?page=custom and ?page=standard. With the page off the post must still read, complete.
+- Afterwards, tell the owner which pieces turned out useful for any post: those are candidates for rung 2.
 
 ## Categories (id: label)
 ${categories.map((c) => `- ${c.id}: ${c.label}`).join("\n")}

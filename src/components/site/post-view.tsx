@@ -44,7 +44,8 @@ function blockMediaIds(blocks: Block[]): string[] {
  * admin preview, which passes the post with its unpublished changes.
  *
  * A post with a custom page (lib/cms/custom-pages.ts) is drawn by that page
- * in place of the header and the stacked blocks; the frame around it (the
+ * in place of the header, the stacked blocks and the source line (the page
+ * has the post's source and places it itself); the frame around it (the
  * menu, what's under the article) stays the site's. Switched off, or with
  * its page missing from this site's code, the post gets the standard layout.
  */
@@ -99,9 +100,6 @@ export async function PostView({
               media={mediaItems}
               preview={preview}
             />
-            <div className="px-ds-20">
-              <SourceLine post={post} settings={settings.sourceLine} />
-            </div>
           </article>
         ) : (
           <article className="px-ds-20">

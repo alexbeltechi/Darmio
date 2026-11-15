@@ -43,6 +43,10 @@ changes in the running app with read-only actions (see `CLAUDE.md`).
 | Media and users | Through `src/lib/cms/media.ts` and `users.ts`: they also handle files, renditions and password hashes. Everything else calls `src/lib/db` directly | |
 | Uploading images from disk | `scripts/ingest/push.ts` (the `/post` skill): every image gets the maker's confirmed tags, a title, alt and keywords from looking at it, and the run is logged in the folder's `_activity.md` | |
 | Logging another action on a folder's post (publish, delete, replace) | `scripts/ingest/activity.ts add` | |
+| What kind of file something is (image, video, document, other file) | `fileLibraryKind` / `mediaLibraryKind` from `@/lib/cms/library`: the Library takes any file, a text file (up to 512 KB) becomes a document, everything else is stored as it is | |
+| Choosing a file from the Library | `MediaPicker` (the library pop-up) with `kinds` for what the spot takes (`["image"]`, `["document"]`); documents come back through `onSelectDocuments`. Never a second list of the Library's files | |
+| Uploading a text file as a document | `uploadDocument` from `@/components/admin/docs/upload-document` | |
+| A Library tile's square (picture, poster, or an icon with the file type) | `LibraryThumb` | |
 | Searching media | `mediaMatches` from `@/lib/cms/media-search` (library, picker and `GET /media?q=`) | |
 | Spacing (gaps, margins, section padding) | Parabola's spacings, named by size (`/parabola/spacing/scale`): 4, 8, 16, 20, 40, 80, 160 as `gap-ds-20`, `px-ds-20`, `pt-ds-160`, `space-y-ds-40`… Layouts that do arithmetic use `DS_SPACES` / `DS_GUTTER_PX`. New code uses these, not raw `gap-5` | `check:parabola` keeps CSS and TS in step |
 | Field widths and form layout | Parabola's standard field width (`--ds-field-width`): leave fields their default size and lay a form out with `DS_FIELDS_CLASS` (one field under the other, never side by side). `w-full` only for a field that fills its row, `ds-fields-fill` on a container one field wide. No per-screen `max-w-[…]` on fields | |

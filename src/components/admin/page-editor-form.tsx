@@ -910,7 +910,7 @@ export function PageEditorForm({ slug, preset: presetId, onClose }: { slug?: str
           setGalleryReplaceIndex(null);
         }}
         multiple={galleryReplaceIndex === null}
-        accept={["image/*"]}
+        kinds={["image"]}
       />
 
       <input ref={replaceInputRef} type="file" accept="image/*,video/*" className="hidden" onChange={handleReplaceFile} />

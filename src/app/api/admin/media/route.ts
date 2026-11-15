@@ -35,7 +35,7 @@ export async function GET(request: Request) {
   });
 }
 
-// POST /api/admin/media - Upload new media with automatic optimization
+// POST /api/admin/media - Upload a file. Images are optimized; video gets a poster; any other file (a PDF, a zip) is stored as it is.
 export async function POST(request: Request) {
   try {
     const formData = await request.formData();
@@ -84,7 +84,8 @@ export async function POST(request: Request) {
     // - Generates variants (display, large, medium, thumb)
     // - Preserves original
     // - Extracts dimensions
-    const result = await uploadMedia(buffer, file.name, file.type, meta);
+    // Any file can live in the Library; one the browser couldn't name a type for is kept as plain bytes.
+    const result = await uploadMedia(buffer, file.name, file.type || "application/octet-stream", meta);
 
     if (result.error) {
       return NextResponse.json({ error: result.error }, { status: 400 });

@@ -10,6 +10,7 @@
  */
 
 import imageCompression from "browser-image-compression";
+import { fileLibraryKind, kindsInWords, type LibraryKind } from "@/lib/cms/library";
 
 // Portfolio-quality settings for photographers/designers
 export const COMPRESSION_SETTINGS = {
@@ -210,10 +211,11 @@ export async function compressImages(
 }
 
 /**
- * Validate files before upload
+ * Validate files before upload: the Library takes any file, a spot that takes
+ * only some kinds (a gallery: images) passes them as `kinds`.
  * Returns error message if validation fails, null if OK
  */
-export function validateFilesForUpload(files: File[]): string | null {
+export function validateFilesForUpload(files: File[], kinds?: readonly LibraryKind[]): string | null {
   for (const file of files) {
     // Check for files that are too large even after potential compression
     if (file.size > 50 * 1024 * 1024) {
@@ -221,26 +223,14 @@ export function validateFilesForUpload(files: File[]): string | null {
       return `"${file.name}" is too large (${formatFileSize(file.size)}). Maximum file size is 50MB.`;
     }
 
-    const supportedTypes = [
-      "image/jpeg",
-      "image/jpg",
-      "image/png",
-      "image/webp",
-      "image/gif",
-      "image/heic",
-      "image/heif",
-      "video/mp4",
-      "video/webm",
-      "video/quicktime",
-    ];
-
-    if (!supportedTypes.includes(file.type.toLowerCase())) {
-      return `"${file.name}" has an unsupported file type (${file.type || "unknown"}).`;
+    const kind = fileLibraryKind(file);
+    if (kinds && !kinds.includes(kind)) {
+      return `"${file.name}" can't go here: this takes ${kindsInWords(kinds)}.`;
     }
 
-    // Warn about large videos (can't compress these client-side)
-    if (file.type.startsWith("video/") && exceedsVercelLimit(file)) {
-      return `"${file.name}" is too large (${formatFileSize(file.size)}). Videos must be under ${SIZE_LIMITS.VERCEL_LIMIT_MB}MB.`;
+    // Only images are made smaller before they're sent; the rest must fit one request.
+    if ((kind === "video" || kind === "file") && exceedsVercelLimit(file)) {
+      return `"${file.name}" is too large (${formatFileSize(file.size)}). ${kind === "video" ? "Videos" : "Files"} must be under ${SIZE_LIMITS.VERCEL_LIMIT_MB}MB.`;
     }
   }
 

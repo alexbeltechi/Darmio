@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Download, ExternalLink, File, FileText, Link2, MoreVertical, Plus, Replace, Trash2, X } from "lucide-react";
+import { Brain, Download, ExternalLink, File, FileText, Link2, MoreVertical, Plus, Replace, Trash2, X } from "lucide-react";
 import {
   DsButton,
   DsDropdown,
@@ -18,6 +18,7 @@ import {
 } from "@beltechi/parabola";
 import {
   DOC_ACCEPT,
+  DOC_MAX_BYTES,
   cleanDocLinks,
   isDocFilename,
   mdName,
@@ -109,7 +110,7 @@ export function DocEditor({
   /** Swap the Markdown for a file's contents; it's saved with Save, like any other edit. */
   const replaceWith = async (file: File) => {
     if (!isDocFilename(file.name)) return dsToast("Documents are text files", { description: DOC_ACCEPT.replaceAll(",", " ") });
-    if (file.size > 512 * 1024) return dsToast("That file is over 512 KB");
+    if (file.size > DOC_MAX_BYTES) return dsToast("That file is over 512 KB");
     setBody(await file.text());
     setFilename(file.name);
   };
@@ -214,10 +215,23 @@ export function DocEditor({
           </DsField>
 
           <DsField label="Used by" className="w-full">
+            {/* A file in Context is read before every job, so it's listed there first. */}
+            {kind === "guide" && (
+              <DsListRow
+                hover={false}
+                className="px-0"
+                href="/admin/settings#agent"
+                thumbnailIcon={Brain}
+                title="Context"
+                meta="Your agent reads it before every job"
+              />
+            )}
             {doc.usedBy.length === 0 ? (
+              kind === "guide" ? null : (
               <p className="text-p text-ds-fg-subtle">
                 Not attached to anything.
               </p>
+              )
             ) : (
               <ul className="flex flex-col">
                 {doc.usedBy.map((u) => (

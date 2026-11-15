@@ -1180,7 +1180,7 @@ export function PostEditorForm({
           setGalleryReplaceIndex(null);
         }}
         multiple={galleryReplaceIndex === null}
-        accept={["image/*"]}
+        kinds={["image"]}
       />
 
       {/* Preview Image Picker */}
@@ -1196,7 +1196,7 @@ export function PostEditorForm({
           setShowPreviewImagePicker(false);
         }}
         multiple={false}
-        accept={["image/*"]}
+        kinds={["image"]}
       />
 
       <input

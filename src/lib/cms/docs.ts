@@ -41,6 +41,8 @@ export type DocWithUsage = Doc & { usedBy: DocUsage[] };
 /** The files a document can be: anything Claude can read as text. */
 export const DOC_EXTENSIONS = ["md", "markdown", "txt", "html", "htm", "csv", "json"] as const;
 export const DOC_ACCEPT = DOC_EXTENSIONS.map((e) => `.${e}`).join(",");
+/** Text is small; anything bigger is kept in the Library as a plain file, not a document. */
+export const DOC_MAX_BYTES = 512 * 1024;
 export const isDocFilename = (name: string) => new RegExp(`\\.(${DOC_EXTENSIONS.join("|")})$`, "i").test(name);
 
 /** The name a document shows under: its uploaded file name, or its title as a file ("work-with-me.md"). */

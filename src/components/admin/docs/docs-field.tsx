@@ -1,33 +1,36 @@
 "use client";
 
 import * as React from "react";
-import { FilePlus, MoreVertical, Paperclip, PanelRightOpen, Plus, Upload, X } from "lucide-react";
+import { FilePlus, FolderOpen, MoreVertical, PanelRightOpen, Plus, Upload, X } from "lucide-react";
 import {
   DS_COLUMNS_CLASS,
   DsButton,
   DsDropdown,
   DsDropdownContent,
   DsDropdownItem,
-  DsDropdownSeparator,
   DsDropdownTrigger,
   DsSidePanel,
   dsToast,
 } from "@beltechi/parabola";
 import { DOC_ACCEPT, mdBytes, mdName, shortDate, sizeLabel, type DocWithUsage } from "@/lib/cms/docs";
+import { MediaPicker } from "@/components/admin/media-picker";
 import { DocEditor } from "./doc-editor";
 import { FileCard } from "./file-card";
+import { uploadDocument } from "./upload-document";
 
 /**
  * The Documents field of a post or page: the text files attached to it (the
  * notes it was made from: Markdown, HTML, plain text…), as categories are: by
- * id, from one shared library (admin › Agent). Upload a file, start a blank
- * one, or attach one that exists; open one to read or edit it in a side panel. Detaching leaves it in
- * the library. Put it inside a DsField for the label.
+ * id, from the Library. Upload a file, start a blank one, or choose from the
+ * Library (its pop-up, showing documents); open one to read or edit it in a
+ * side panel. Detaching leaves it in the Library. Put it inside a DsField for
+ * the label.
  */
 export function DocsField({ value, onChange }: { value: string[]; onChange: (ids: string[]) => void }) {
   const [library, setLibrary] = React.useState<DocWithUsage[]>([]);
   const [openId, setOpenId] = React.useState<string | null>(null);
   const [uploading, setUploading] = React.useState(false);
+  const [choosing, setChoosing] = React.useState(false);
   const fileRef = React.useRef<HTMLInputElement>(null);
 
   const reload = React.useCallback(async () => {
@@ -45,28 +48,25 @@ export function DocsField({ value, onChange }: { value: string[]; onChange: (ids
 
   const byId = new Map(library.map((d) => [d.id, d]));
   const attached = value.map((id) => byId.get(id)).filter((d): d is DocWithUsage => Boolean(d));
-  const others = library.filter((d) => !value.includes(d.id));
   const open = openId ? byId.get(openId) : undefined;
 
-  const attach = (doc: DocWithUsage) => {
-    setLibrary((prev) => (prev.some((d) => d.id === doc.id) ? prev : [doc, ...prev]));
-    onChange([...value, doc.id]);
+  const attachAll = (docs: DocWithUsage[]) => {
+    const added = docs.filter((doc) => !value.includes(doc.id));
+    setLibrary((prev) => [...added.filter((doc) => !prev.some((d) => d.id === doc.id)), ...prev]);
+    onChange([...value, ...added.map((doc) => doc.id)]);
   };
+  const attach = (doc: DocWithUsage) => attachAll([doc]);
 
   const upload = async (files: File[]) => {
     setUploading(true);
     try {
+      const uploaded: DocWithUsage[] = [];
       for (const file of files) {
-        const form = new FormData();
-        form.append("file", file);
-        const res = await fetch("/api/admin/docs", { method: "POST", body: form });
-        const json = await res.json();
-        if (!res.ok) {
-          dsToast(`Couldn't upload ${file.name}`, { description: json.error });
-          continue;
-        }
-        attach(json.data);
+        const { doc, error } = await uploadDocument(file);
+        if (doc) uploaded.push(doc);
+        else dsToast(`Couldn't upload ${file.name}`, { description: error });
       }
+      attachAll(uploaded);
     } finally {
       setUploading(false);
     }
@@ -140,23 +140,20 @@ export function DocsField({ value, onChange }: { value: string[]; onChange: (ids
             <DsDropdownItem iconLeft={FilePlus} onSelect={createBlank}>
               New document
             </DsDropdownItem>
-            {others.length > 0 && (
-              <>
-                <DsDropdownSeparator />
-                {others.map((doc) => (
-                  <DsDropdownItem
-                    key={doc.id}
-                    iconLeft={Paperclip}
-                    onSelect={() => attach(doc)}
-                  >
-                    {mdName(doc)}
-                  </DsDropdownItem>
-                ))}
-              </>
-            )}
+            <DsDropdownItem iconLeft={FolderOpen} onSelect={() => setChoosing(true)}>
+              Choose from library
+            </DsDropdownItem>
           </DsDropdownContent>
         </DsDropdown>
       </div>
+
+      <MediaPicker
+        isOpen={choosing}
+        onClose={() => setChoosing(false)}
+        kinds={["document"]}
+        onSelect={() => {}}
+        onSelectDocuments={attachAll}
+      />
 
       <DsSidePanel open={Boolean(open)} onOpenChange={(o) => !o && setOpenId(null)} label="Document">
         {open && (

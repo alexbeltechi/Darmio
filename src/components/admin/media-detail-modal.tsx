@@ -28,6 +28,8 @@ import {
 } from "@beltechi/parabola";
 import { formatFileSize } from "@/lib/image-compression";
 import { cn } from "@/lib/utils";
+import { LibraryThumb } from "@/components/admin/library/library-thumb";
+import { mediaLibraryKind } from "@/lib/cms/library";
 import { storedBytes } from "@/lib/cms/stored-bytes";
 import type { MediaItem } from "@/lib/cms/types";
 
@@ -246,6 +248,16 @@ export function MediaDetailModal({
                       alt={item.alt || item.originalName}
                       className="max-h-full max-w-full object-contain"
                     />
+                  ) : mediaLibraryKind(item) === "file" ? (
+                    // Any other file (a PDF, a deck, a zip): what it is, and a way to open it.
+                    <div className="flex flex-col items-center gap-ds-16">
+                      <span className="flex size-40 rounded-ds-md bg-ds-surface">
+                        <LibraryThumb entry={{ kind: "media", item }} />
+                      </span>
+                      <DsButton iconRight={ExternalLink} href={item.url} target="_blank" rel="noopener noreferrer">
+                        Open file
+                      </DsButton>
+                    </div>
                   ) : (
                     <video
                       src={item.url}
@@ -317,15 +329,17 @@ export function MediaDetailModal({
                 <DsDivider />
 
                 <div className="flex flex-col gap-4">
-                  <DsField label="Alternative text" description="Leave empty if the image is purely decorative.">
-                    <DsTextarea
-                      value={editAlt}
-                      onChange={(e) => setEditAlt(e.target.value)}
-                      placeholder="Describe this image for screen readers"
-                    />
-                  </DsField>
+                  {mediaLibraryKind(item) !== "file" && (
+                    <DsField label="Alternative text" description="Leave empty if the image is purely decorative.">
+                      <DsTextarea
+                        value={editAlt}
+                        onChange={(e) => setEditAlt(e.target.value)}
+                        placeholder="Describe this image for screen readers"
+                      />
+                    </DsField>
+                  )}
                   <DsField label="Title">
-                    <DsInput value={editTitle} onChange={(e) => setEditTitle(e.target.value)} placeholder="Image title" />
+                    <DsInput value={editTitle} onChange={(e) => setEditTitle(e.target.value)} placeholder="Title" />
                   </DsField>
                   <DsField label="Caption">
                     <DsTextarea

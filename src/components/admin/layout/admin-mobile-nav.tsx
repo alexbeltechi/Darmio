@@ -52,13 +52,15 @@ function useNavCounts(enabled: boolean) {
       json("/api/admin/collections/pages/entries?limit=1"),
       json("/api/admin/categories"),
       json("/api/admin/media?limit=1"),
-    ]).then(([posts, pages, categories, media]) => {
+      json("/api/admin/docs"),
+    ]).then(([posts, pages, categories, media, docs]) => {
       if (cancelled) return;
       setCounts({
         posts: posts?.total ?? posts?.data?.length,
         pages: pages?.total ?? pages?.data?.length,
         categories: categories?.data?.length,
-        library: media?.total,
+        // Everything the Library holds: uploaded files and documents.
+        library: media?.total === undefined ? undefined : media.total + (docs?.data?.length ?? 0),
       });
     });
     return () => {

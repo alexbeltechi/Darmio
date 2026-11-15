@@ -20,3 +20,5 @@ Waiting for Codex. (Updated with the verdict once the review is in.)
 
 **If you merge:** <what happens, in one line>
 **If you close:** <what is lost, usually "nothing; the work stays on the branch">
+
+- [ ] I agree to the contributor agreement in `CONTRIBUTING.md`.

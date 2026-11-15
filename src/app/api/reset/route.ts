@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { handleDatabaseError, isDatabaseError } from "@/lib/api/error-handler";
-import { getUserById, updateUser } from "@/lib/cms/users";
+import { getUserByEmail, getUserById, updateUser } from "@/lib/cms/users";
+import { emailProblem } from "@/lib/cms/email";
 import { PASSWORD_MIN } from "@/lib/cms/password";
 import { resetTokenUser, spendResetToken } from "@/lib/db/password-resets";
 import { clearMisses } from "@/lib/db/login-attempts";
@@ -19,17 +20,32 @@ export async function GET(request: NextRequest) {
   }
 }
 
-/** Set a new password with a reset link: `{ token, password }`. The link works once. */
+/**
+ * Set a new password with a reset link: `{ token, email, password }`. The
+ * email is the one you'll sign in with, typed by you (the link already opens
+ * the account, so it can set both; for an account made with a stand-in
+ * email, this is where its owner gives their own). The link works once, and
+ * isn't spent on a request that's refused.
+ */
 export async function POST(request: NextRequest) {
   try {
-    const { token, password } = await request.json();
+    const { token, password, email } = await request.json();
     if (typeof password !== "string" || password.length < PASSWORD_MIN) {
       return NextResponse.json({ error: `The new password needs at least ${PASSWORD_MIN} characters` }, { status: 400 });
     }
-    const userId = await spendResetToken(typeof token === "string" ? token : "");
+    const newEmail = typeof email === "string" ? email.trim().toLowerCase() : "";
+    const problem = newEmail ? emailProblem(newEmail) : "Type the email you'll sign in with";
+    if (problem) return NextResponse.json({ error: problem }, { status: 400 });
+
+    const linkUser = await resetTokenUser(typeof token === "string" ? token : "");
+    if (!linkUser) return NextResponse.json({ error: EXPIRED }, { status: 400 });
+    const taken = await getUserByEmail(newEmail);
+    if (taken && taken.id !== linkUser) return NextResponse.json({ error: "Another account signs in with that email" }, { status: 400 });
+
+    const userId = await spendResetToken(token);
     if (!userId) return NextResponse.json({ error: EXPIRED }, { status: 400 });
 
-    const result = await updateUser(userId, { password });
+    const result = await updateUser(userId, { password, email: newEmail });
     if (result.error || !result.user) return NextResponse.json({ error: result.error ?? "Couldn't set the password" }, { status: 400 });
     // A locked-out owner is let back in straight away.
     await clearMisses(result.user.email);

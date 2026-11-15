@@ -987,15 +987,15 @@ export function PostEditorForm({
             />
           </DsField>
 
-          <DsField label="Description" description="Optional. Shown under the post in feeds; blank uses the start of the text.">
-            <DsTextarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Leave blank" />
+          <DsField label="Description">
+            <DsTextarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Add a description" />
           </DsField>
 
           {(currentSlug || slug) && (
             <CustomPageField slug={(currentSlug || slug) as string} value={customPage} onChange={setCustomPage} />
           )}
 
-          <DsField label="Documents" description="Anything that gives Claude context for this post: notes, copy, a brief, HTML. All of them live in Agent." className="w-full">
+          <DsField label="Documents" className="w-full">
             <DocsField value={docs} onChange={setDocs} />
           </DsField>
 

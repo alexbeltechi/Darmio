@@ -1,19 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowUpRight } from "lucide-react";
-import { DsButton, DsField, DsSwitch, dsToast } from "@beltechi/parabola";
-import { AiInstructions } from "@/components/admin/settings/settings-section";
+import { DsSwitch, dsToast } from "@beltechi/parabola";
 import type { CustomPageSetting } from "@/lib/cms/custom-pages";
 
 /**
- * A post's page, in its details: the standard layout, or a custom page of
- * its own (lib/cms/custom-pages.ts). It reports what's there rather than
- * offering a switch that does nothing: with no custom page it says
- * "Standard layout" and how to ask an AI for one; with one, a switch turns
- * it off and on (the page is kept either way), and two links open the post
- * each way to compare. The switch saves on its own and applies to the live
- * post straight away: it changes how the post is shown, not what it says.
+ * "Custom styling" in a post's details: whether the post is drawn by a
+ * custom page of its own (lib/cms/custom-pages.ts). The toggle sits in the
+ * title and only appears when there is a custom page to turn on or off; off
+ * shows the standard layout and keeps the custom page. It saves on its own,
+ * straight to the live post: it changes how the post looks, not what it says.
  */
 export function CustomPageField({
   slug,
@@ -36,22 +32,6 @@ export function CustomPageField({
       .catch(() => setKnown([]));
   }, [value]);
 
-  if (!value) {
-    return (
-      <DsField label="Page" className="w-full">
-        <p className="text-p text-ds-fg-muted">Standard layout.</p>
-        <AiInstructions
-          prompts={[
-            {
-              label: "For a page of its own, made for this post",
-              prompt: `Build a custom page for the post "${slug}" on <site>. Read the agent guide's "Custom pages" first: all the content stays in the post, the page only arranges it. The look I want: `,
-            },
-          ]}
-        />
-      </DsField>
-    );
-  }
-
   async function setOn(on: boolean) {
     if (!value) return;
     const next: CustomPageSetting = on ? { key: value.key } : { key: value.key, off: true };
@@ -64,44 +44,29 @@ export function CustomPageField({
       });
       if (!res.ok) throw new Error((await res.json()).error);
       onChange(next);
-      dsToast(on ? "Custom page on" : "Standard layout on", { description: on ? undefined : "The custom page is kept." });
     } catch (error) {
-      dsToast.error("Couldn't change the page", { description: error instanceof Error ? error.message : undefined });
+      dsToast.error("Couldn't change it", { description: error instanceof Error ? error.message : undefined });
     } finally {
       setSaving(false);
     }
   }
 
-  if (known && !known.includes(value.key)) {
-    return (
-      <DsField label="Page" className="w-full">
-        <p className="text-p text-ds-fg-muted">
-          Standard layout. This post asks for a custom page called “{value.key}”, and this site’s code doesn’t have it.
-        </p>
-      </DsField>
-    );
-  }
+  // A custom page the site's code doesn't have can't be shown, so there's nothing to switch.
+  const exists = Boolean(value) && known !== null && known.includes(value!.key);
+  const on = exists && !value!.off;
 
-  const on = !value.off;
   return (
-    <DsField label="Page" className="w-full">
-      <label className="flex items-center gap-ds-8 text-p text-ds-fg">
-        <DsSwitch checked={on} disabled={saving || known === null} onCheckedChange={setOn} />
-        Custom page
-      </label>
-      <p className="text-p text-ds-fg-muted">
-        {on
-          ? "This post has a page of its own. Off shows the standard layout; the custom page is kept."
-          : "Showing the standard layout. The custom page is kept: turn it on to bring it back."}
-      </p>
-      <div className="flex flex-wrap gap-ds-8">
-        <DsButton size="small" href={`/post/${slug}/preview?page=custom`} target="_blank" iconRight={ArrowUpRight}>
-          See custom
-        </DsButton>
-        <DsButton size="small" href={`/post/${slug}/preview?page=standard`} target="_blank" iconRight={ArrowUpRight}>
-          See standard
-        </DsButton>
+    // Laid out as a field: its label in the label's place, with the toggle beside it.
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center gap-ds-8">
+        <span id="custom-styling" className="text-p text-ds-fg-muted">
+          Custom styling
+        </span>
+        {exists && <DsSwitch aria-labelledby="custom-styling" checked={on} disabled={saving} onCheckedChange={setOn} />}
       </div>
-    </DsField>
+      <p className="text-p text-ds-fg">
+        {on ? "This post has custom styling." : "This post doesn't have custom styling."}
+      </p>
+    </div>
   );
 }

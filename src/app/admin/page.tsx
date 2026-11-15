@@ -114,8 +114,9 @@ function HomeProjects() {
 
   return (
     <div className="flex min-h-dvh flex-col">
-      <DsTopBar className="mb-5">
-        <div className="flex flex-wrap items-center gap-2 px-5 py-3">
+      <DsTopBar className="mb-5 pb-0">
+        {/* On a phone the search wraps to its own row, 12px under the title, as on Posts. */}
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-3 px-5 py-3">
           <h1 className="min-w-0 flex-1 truncate text-p text-ds-fg">Projects</h1>
           {/* Phones put the search on its own row below. */}
           <DsSearch

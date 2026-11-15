@@ -20,7 +20,7 @@ export default function SettingsPage() {
   return (
     <div className="flex min-h-dvh flex-col">
       {/* Pinned header, solid with a rule under it, like every admin page and /parabola (DsTopBar). */}
-      <DsTopBar className="mb-5">
+      <DsTopBar className="mb-5 pb-0">
         <div className="flex items-center gap-2 px-5 py-3">
           <h1 className="min-w-0 flex-1 truncate text-p text-ds-fg">Settings</h1>
           <AdminMenuButton />

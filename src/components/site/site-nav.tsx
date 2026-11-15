@@ -1,10 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
-import { DsButton, DsMenu, DsThemeToggle } from "@beltechi/parabola";
+import { DsButton, DsMenu, DsThemeToggle, DsTopBar } from "@beltechi/parabola";
 
 /** A section in the nav: a top-level category and the slugs that light it. */
 export type NavSection = { slug: string; label: string; members: string[] };
@@ -41,57 +41,6 @@ function activeSlugForPath(pathname: string, sections: NavSection[]): string {
   return sections.find((c) => c.members.includes(segment))?.slug ?? "";
 }
 
-// Distance above the logo's bottom edge over which it fades out as the page
-// content scrolls up to meet it.
-const LOGO_FADE_RANGE = 40;
-
-// Where the page content starts: a `data-content-start` marker.
-function contentStartTop(): number | null {
-  const marker = document.querySelector<HTMLElement>("[data-content-start]");
-  if (marker) return marker.getBoundingClientRect().top;
-  // Pages without a marker: fall back to plain scroll distance.
-  return null;
-}
-
-function currentScrollTop(): number {
-  return window.scrollY;
-}
-
-function useLogoOpacity(
-  logoRef: React.RefObject<HTMLAnchorElement | null>,
-  pathname: string
-): number {
-  const [opacity, setOpacity] = useState(1);
-
-  useEffect(() => {
-    let raf = 0;
-    const update = () => {
-      raf = 0;
-      const logoBottom = logoRef.current?.getBoundingClientRect().bottom ?? 44;
-      const contentTop = contentStartTop();
-      const distance =
-        contentTop === null ? LOGO_FADE_RANGE * 2 - currentScrollTop() : contentTop - logoBottom;
-      setOpacity(Math.min(1, Math.max(0, distance / LOGO_FADE_RANGE)));
-    };
-    const onScroll = () => {
-      if (!raf) raf = requestAnimationFrame(update);
-    };
-
-    // The new page's content may mount after the route change; re-measure once it has.
-    update();
-    raf = requestAnimationFrame(update);
-    document.addEventListener("scroll", onScroll, { capture: true, passive: true });
-    window.addEventListener("resize", onScroll);
-    return () => {
-      document.removeEventListener("scroll", onScroll, { capture: true });
-      window.removeEventListener("resize", onScroll);
-      if (raf) cancelAnimationFrame(raf);
-    };
-  }, [logoRef, pathname]);
-
-  return opacity;
-}
-
 const LOGO_CLASS = "text-h3 text-ds-fg";
 
 /** The desktop nav's ghost links: muted, the page colour on hover, no current highlight. */
@@ -105,11 +54,11 @@ const NAV_LINK_CLASS = "bg-transparent text-ds-fg-muted hover:bg-ds-surface/40 h
  * name on the left in H3, a little bigger than the links, the way home; on
  * the right the sections as ghost `DsButton`s 4px apart (muted text, a light
  * surface on hover, the current page not highlighted), then the theme
- * switch, a ghost icon that flips to the other theme. It's as wide as the
- * reading column and fixed to the top over a fade, so the page scrolls under
- * it. Below `sm` it's the site's name top-left (fading out as the page
- * content scrolls up to it) and an "Explore" button top-right that opens the
- * Parabola `DsMenu`, which also holds the theme switch.
+ * switch, a ghost icon that flips to the other theme. Below `sm` the same
+ * bar holds the name and an "Explore" button that opens the Parabola
+ * `DsMenu`, which also holds the theme switch. At every width it's as wide as
+ * the reading column and fixed to the top on Parabola's blur bar (`DsTopBar`,
+ * as in the admin), so the page scrolls softly under it.
  */
 export function SiteNav({
   siteName,
@@ -126,8 +75,6 @@ export function SiteNav({
   const NAV_ITEMS = sections.map((c) => ({ slug: c.slug, label: c.label, href: `/${c.slug}` }));
   const [mobileOpen, setMobileOpen] = useState(false);
   const closeMobile = useCallback(() => setMobileOpen(false), []);
-  const logoRef = useRef<HTMLAnchorElement>(null);
-  const logoOpacity = useLogoOpacity(logoRef, pathname);
 
   // A link to the section you're already on won't trigger a navigation (or
   // its scroll reset), so scroll back to top by hand instead. Judged by the
@@ -161,46 +108,31 @@ export function SiteNav({
 
   return (
     <>
-      {/* Sits above the page content; the page fades out beneath it. The bar is
-          as wide as the reading column, so the name and links line up with the text. */}
-      <header className="fixed inset-x-0 top-0 z-(--ds-z-nav) hidden ds-nav-fade px-5 py-5 sm:block">
+      {/* One bar at every width, over the page, which blurs softly beneath it. Its sides on a
+          phone put Explore where the menu's Close button sits. */}
+      <DsTopBar surface="blur" className="fixed inset-x-0 z-(--ds-z-nav) pt-[14px] pr-[14px] pb-5 pl-5 sm:p-5">
         <div className="mx-auto flex w-full max-w-[600px] items-center justify-between gap-4">
           <Link href="/" onClick={handleClick("home")} className={`min-w-0 truncate ${LOGO_CLASS}`}>
             {siteName}
           </Link>
-          <nav className="flex shrink-0 items-center gap-1">
+          <nav className="hidden shrink-0 items-center gap-1 sm:flex">
             {/* The page you're on isn't highlighted (only aria-current marks it): every link is
                 muted, with the ghost's light surface on hover. */}
             {NAV_ITEMS.map((item) => navButton(item, NAV_LINK_CLASS, undefined, "text"))}
             {/* On mobile the theme switch lives in the menu. */}
             <DsThemeToggle variant="text" className={NAV_LINK_CLASS} />
           </nav>
+          <DsButton
+            onClick={() => setMobileOpen(true)}
+            aria-expanded={mobileOpen}
+            aria-haspopup="dialog"
+            iconLeft={Menu}
+            className="shrink-0 sm:hidden"
+          >
+            Explore
+          </DsButton>
         </div>
-      </header>
-
-      <Link
-        ref={logoRef}
-        href="/"
-        onClick={handleClick("home")}
-        aria-hidden={logoOpacity === 0}
-        tabIndex={logoOpacity === 0 ? -1 : undefined}
-        className={`fixed top-5 left-5 z-(--ds-z-nav) sm:hidden ${LOGO_CLASS} ${
-          logoOpacity === 0 ? "pointer-events-none" : ""
-        }`}
-        style={{ opacity: logoOpacity }}
-      >
-        {siteName}
-      </Link>
-
-      <DsButton
-        onClick={() => setMobileOpen(true)}
-        aria-expanded={mobileOpen}
-        aria-haspopup="dialog"
-        iconLeft={Menu}
-        className="fixed top-[14px] right-[14px] z-(--ds-z-nav) sm:hidden"
-      >
-        Explore
-      </DsButton>
+      </DsTopBar>
 
       <DsMenu open={mobileOpen} onClose={closeMobile} className="sm:hidden">
         <Link href="/" onClick={handleClick("home")} className={`absolute top-5 left-5 ${LOGO_CLASS}`}>

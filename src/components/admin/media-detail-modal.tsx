@@ -24,6 +24,7 @@ import {
   DsTextarea,
   DsTooltip,
   dsToast,
+  DsTopBar,
 } from "@beltechi/parabola";
 import { formatFileSize } from "@/lib/image-compression";
 import { cn } from "@/lib/utils";
@@ -196,7 +197,7 @@ export function MediaDetailModal({
         >
           {/* Header: pinned over the content, which fades out beneath it (`ds-nav-fade`,
               as on the list pages); clicks pass through the gradient's empty space. */}
-          <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-center gap-2 p-5 pb-10 ds-nav-fade [&>*]:pointer-events-auto">
+          <DsTopBar surface="blur" className="flex-row top-0 absolute inset-x-0 items-center gap-2 p-5 pb-10">
             <Dialog.Title className="min-w-0 flex-1 truncate text-h3">
               {item?.title || item?.originalName || "Media details"}
             </Dialog.Title>
@@ -223,7 +224,7 @@ export function MediaDetailModal({
             <Dialog.Close asChild>
               <DsButton iconLeft={X} aria-label="Close" />
             </Dialog.Close>
-          </div>
+          </DsTopBar>
 
           {/* Content */}
           {loading ? (

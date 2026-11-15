@@ -39,7 +39,7 @@ export function PageSection({
 export function PageColumn({ children }: { children: React.ReactNode }) {
   return (
     <main className="flex w-full flex-1 flex-col px-5 pt-24 pb-ds-80 sm:pt-36">
-      <div data-content-start="" className="mx-auto flex w-full max-w-[600px] flex-col gap-ds-40">
+      <div className="mx-auto flex w-full max-w-[600px] flex-col gap-ds-40">
         {children}
       </div>
     </main>

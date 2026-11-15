@@ -37,6 +37,7 @@ import {
   DS_FIELDS_CLASS,
   cn,
   dsToast,
+  DsTopBar,
 } from "@beltechi/parabola";
 import { useEditorSelection } from "@/components/admin/remove-items-dialog";
 import { ContentBlockEditor, isBlockEmpty } from "@/components/admin/content-block-editor";
@@ -573,7 +574,7 @@ export function PageEditorForm({ slug, preset: presetId, onClose }: { slug?: str
         {/* Top bar, as in the post editor: floats over the content, which fades
             out beneath it (`ds-nav-fade`); clicks pass through all but its controls. */}
         <div className="sticky top-0 z-20 h-0">
-          <div className="pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between gap-2 ds-nav-fade px-5 pt-5 pb-10 [&>*]:pointer-events-auto">
+          <DsTopBar surface="blur" className="flex-row top-0 absolute inset-x-0 items-center justify-between gap-2 px-5 pt-5 pb-10">
             <div className="flex min-w-0 items-center gap-3">
               <DsButton iconLeft={X} aria-label="Close" onClick={handleClose} />
               <div className="hidden min-w-0 items-center gap-2 md:flex">
@@ -650,7 +651,7 @@ export function PageEditorForm({ slug, preset: presetId, onClose }: { slug?: str
                 </DsDropdown>
               )}
             </div>
-          </div>
+          </DsTopBar>
         </div>
 
         {/* Clears the floating bar. */}

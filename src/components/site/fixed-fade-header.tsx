@@ -37,9 +37,7 @@ interface FixedFadeHeaderProps {
  * (a direct page load) or an ancestor scrolls internally (the frosted modal
  * overlay, whose backdrop-filter makes it the containing block for `fixed`
  * descendants) - only the element the scroll listener attaches to changes.
- *
- * A `data-content-start` marker sits where the next section begins; the
- * mobile logo in SiteNav reads it to fade out as content approaches it too.
+
  */
 export function FixedFadeHeader({ children, className = "" }: FixedFadeHeaderProps) {
   const fixedRef = useRef<HTMLDivElement>(null);
@@ -111,7 +109,6 @@ export function FixedFadeHeader({ children, className = "" }: FixedFadeHeaderPro
           {children}
         </div>
       </div>
-      <div data-content-start="" className="absolute inset-x-0 bottom-0" />
     </div>
   );
 }

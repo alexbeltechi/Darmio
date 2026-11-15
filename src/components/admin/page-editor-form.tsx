@@ -965,7 +965,8 @@ function LinksEditor({ links, onChange }: { links: PageLink[]; onChange: (links:
   return (
     <div className="flex flex-col gap-2">
       {links.map((link, index) => (
-        <div key={index} className={cn(DS_FIELDS_CLASS, "items-center")}>
+        // One link per line, its parts side by side: a row of a list, not a form.
+        <div key={index} className="flex flex-wrap items-center gap-ds-20">
           <DsInput aria-label="Label" value={link.label} onChange={(e) => update(index, { label: e.target.value })} placeholder="YouTube" />
           <DsInput aria-label="URL" value={link.url} onChange={(e) => update(index, { url: e.target.value })} placeholder="https://…" />
           <DsInput aria-label="Note" value={link.note ?? ""} onChange={(e) => update(index, { note: e.target.value })} placeholder="@you" />

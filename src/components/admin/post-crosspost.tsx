@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { DS_COLUMNS_CLASS, DsButton, DsDialog, DsDialogActions, DsDialogCancel, DsField, DsInput, DsSelect, DsSwitch, dsToast } from "@beltechi/parabola";
+import { DsButton, DsDialog, DsDialogActions, DsDialogCancel, DsField, DsInput, DsSelect, DsSwitch, dsToast } from "@beltechi/parabola";
 import { LinkedInIcon, XIcon } from "@/components/site/social-icons";
 import {
   DEFAULT_SOURCE_LABELS,
@@ -178,7 +178,7 @@ export function CrosspostFields({
 
   return (
     <DsField label="Share" className="w-full">
-      <div className={DS_COLUMNS_CLASS}>
+      <div className="flex flex-col items-start gap-ds-16">
         {PLATFORMS.map((platform) => {
           const Icon = PLATFORM_ICONS[platform];
           const name = PLATFORM_META[platform].name;

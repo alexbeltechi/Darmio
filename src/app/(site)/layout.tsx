@@ -8,8 +8,17 @@ import { DEFAULT_SETTINGS, getSiteSettings, sitePublishedTheme } from "@/lib/db/
 import { listCategories } from "@/lib/db/categories";
 import { categoryGroups } from "@/lib/cms/category-groups";
 import { childPages, listSitePages } from "@/lib/db/site-pages";
+import { InstallProblemNotice } from "@/components/admin/install-problem";
+import { installProblem } from "@/lib/cms/install-problems";
 
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
+  // No database yet (a fresh install, or a deployment before one is connected):
+  // nothing on the site can load, and only the owner is here, so say what's
+  // missing straight away, the same screen the sign-in and setup pages show.
+  if (!process.env.MONGODB_URI) {
+    return <InstallProblemNotice problem={installProblem("DB_NOT_CONFIGURED")!} />;
+  }
+
   const [settings, categories, pages] = await Promise.all([
     // Without its database the page below fails into error.tsx; the frame around it still renders.
     getSiteSettings().catch(() => DEFAULT_SETTINGS),

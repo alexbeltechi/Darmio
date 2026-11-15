@@ -18,7 +18,7 @@ function entryDate(entry: Entry): number {
 export default async function HomePage() {
   // No database (a fresh install, or a preview built before one is connected):
   // render per request, so the build doesn't prerender a page that can't read
-  // anything and the visit shows the setup screen instead.
+  // anything; the site's layout shows the no-database screen instead.
   if (!process.env.MONGODB_URI) await connection();
 
   // If a published "home" builder page exists (a Home-format page, or one

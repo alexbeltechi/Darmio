@@ -1,15 +1,20 @@
 # Seed: Ilo Odena
 
 The example site a fresh install can start as, shaped like a creator's
-personal site: writing, a home page, about, work with me. Every post
+personal site: writing, a home page, about, collaborate. Every post
 and page is marked as an example (`metadata.example`).
+
+A fresh install offers it on the setup screen ("Start with"), and
+Settings › Examples adds it later or removes it in one step: every example
+goes, except what the maker changed or still uses (their post in Writing,
+their page under About). On a computer, the same load is:
 
 ```sh
 npm run seed -- ilo
 ```
 
 It loads into the database in `.env.local` and skips anything already
-there. Posts and pages are in the CMS's own agent format
+there. `site.json`'s `label` and `about` are what the setup screen shows. Posts and pages are in the CMS's own agent format
 (`src/lib/agent/markdown.ts`); an image is written `![alt](file:name.jpg)`
 and a video `::video media=file:name.mp4`, and each becomes an upload from
 `media/`. Pages are made in file-name
@@ -30,35 +35,32 @@ explains how.
 ## Voice
 
 - Quiet, exact, sensory. Short sentences. Concrete nouns over adjectives.
-- Never says "the future", "year 3000", "Renaissance", "multi-sensory" or
-  "AI". The reader should think "who is this?", not be told.
-- Home, About and the press kit are in the third person; her writing, My story and Work with me in the first.
-- Y3K appears plainly in About, the press kit and Follow. Never as an ad.
+- About says it once, plainly: she's a maker from the year 3000. Nowhere
+  else says "the future", "Renaissance", "multi-sensory" or "AI".
+- Home and About are in the third person; her writing and Collaborate in the first.
+- Never "services": what she does with other people is Collaborate.
+- Y3K appears plainly in About and Follow. Never as an ad.
 
 ## What's in here
 
 | File | Becomes |
 | --- | --- |
-| `site.json` | The site's name; Writing (stacked like a blog, in the nav) with Listening, Making and Habits inside it |
-| `media/` | Her portrait, the black-sand shore, the lake and an 8-second loop of her, from Y3K |
-| `pages/01-home.md` | Home: the portrait, three short paragraphs; the format adds Writing, About, Follow and the newsletter |
-| `pages/02-about.md` | About (in the nav): short, two images |
-| `pages/03…05` | My story, Press kit, FAQ, under About |
-| `pages/06-work-with-me.md` | Work with me (in the nav): four ways |
-| `pages/07-follow.md` | Follow: YouTube, Newsletter, Instagram, X, Y3K Club |
-| `posts/*.md` | Six essays in Writing, 2025–2026; three with a picture or the loop |
+| `site.json` | The site's name; Writing (stacked like a blog, in the nav) with Listening and Making inside it |
+| `media/` | Her portrait, the black-sand shore and the lake, from Y3K; an 8-second loop of her, not on the site yet |
+| `pages/01-home.md` | Home: the portrait, two short paragraphs; the format adds Writing, Follow and the newsletter |
+| `pages/02-about.md` | About (in the nav): a few lines, one image |
+| `pages/03-collaborate.md` | Collaborate (in the nav): 1:1, In a group, Ceremonies. No email |
+| `pages/04-follow.md` | Follow: YouTube, Newsletter, Instagram, X, Y3K Club |
+| `posts/*.md` | Seven short posts in Writing, 2025–2026: three with a picture, four text only, mixed. Placeholders, meant to be replaced |
 
 ## Made up for the seed
 
 Beyond the Y3K story (Hollow, the lake, the glasses, cohort 02), these are
 invented, and yours to change:
 
-- She grew up in the wetlands; her grandmother kept bees and gave her the
-  glasses; she worked a fruit stall at nineteen.
-- She keeps about one moment a week, and never faces.
-- Two Hollows a year on commission, listening walks, four-session "small
-  version" mentoring, talks and essays (Work with me).
-- The handles (@iloodena, @ilo.odena) and the address ilo@example.com
-  (`example.com` is reserved for examples, so it reaches nobody).
-- Three new essays: "Four in the morning", "Answering slowly", "What I
-  bring to the lake".
+- She keeps about one moment a week.
+- Collaborate: a season one to one, a slow morning in a group, and
+  ceremonies (a stone cut for a place, and a morning there).
+- The handles (@iloodena, @ilo.odena). She has no email: there's none in
+  her year, so Collaborate ends "You know where to find me."
+- The posts, all placeholders.

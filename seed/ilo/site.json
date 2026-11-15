@@ -1,5 +1,7 @@
 {
   "siteName": "Ilo Odena",
+  "label": "Ilo's site",
+  "about": "A maker's site to learn from: seven posts, a home page, About and Collaborate, with her photos.",
   "categories": [
     {
       "slug": "writing",
@@ -9,7 +11,6 @@
       "description": "Essays on making things slowly and finishing them anyway."
     },
     { "slug": "listening", "label": "Listening", "parent": "writing" },
-    { "slug": "making", "label": "Making", "parent": "writing" },
-    { "slug": "habits", "label": "Habits", "parent": "writing" }
+    { "slug": "making", "label": "Making", "parent": "writing" }
   ]
 }

@@ -17,8 +17,8 @@ import { readFileSync } from "node:fs";
 
 const ALLOWED = [
   /Copyright \(c\) \d{4} Alex Beltechi/,
-  /github\.com\/alexbeltechi\/(darmio|techistack)(\.git)?/g,
-  /alexbeltechi\/darmio\b/g,
+  /github\.com\/alexbeltechi\/(darmio|techistack|parabola)(\.git)?/g,
+  /alexbeltechi\/(darmio|parabola)\b/g,
   /@beltechi\/parabola/g,
 ];
 

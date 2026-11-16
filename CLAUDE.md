@@ -45,6 +45,12 @@ UI is built on **Parabola**, its own package in this workspace
   their page.
 - Code prefix is `ds` (`DsButton`, `--ds-*`, `bg-ds-*`); "Parabola" is the brand.
 - After changing a token, run `npm run check:parabola`.
+- `packages/parabola` is this repo's own copy of Parabola, which has its own
+  repo; `parabola.json` says which version the copy came from. Change it here
+  like any other code. A newer Parabola comes in only when someone runs its
+  `update` (Parabola's README, "Taking a newer Parabola"), on a branch, as
+  its own pull request. A change every project should have goes to
+  Parabola's repo as a pull request too.
 
 ## Data
 

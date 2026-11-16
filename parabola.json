@@ -1,0 +1,16 @@
+{
+  "source": "https://github.com/alexbeltechi/parabola.git",
+  "version": "0.2.0",
+  "commit": "7660eda2974a435e79726d23785ecd65de8368a3",
+  "dir": "packages/parabola",
+  "files": "*",
+  "exclude": [
+    ".gitignore",
+    ".npmrc",
+    "bin/",
+    "cli/",
+    "package-lock.json",
+    "scripts/",
+    "test/"
+  ]
+}

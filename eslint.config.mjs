@@ -137,7 +137,7 @@ const eslintConfig = defineConfig([
     },
   },
   // Other sessions' worktrees are whole checkouts (with their own .next) and lint themselves.
-  globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts", ".backups/**", ".claude/worktrees/**", "packages/parabola/bin/**"]),
+  globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts", ".backups/**", ".claude/worktrees/**"]),
 ]);
 
 export default eslintConfig;

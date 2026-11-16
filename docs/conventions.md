@@ -30,6 +30,7 @@ changes in the running app with read-only actions (see `CLAUDE.md`).
 | --- | --- | --- |
 | UI | Parabola components and tokens (`packages/parabola/README.md`, imported as `@beltechi/parabola`) | lint: raw palette, shadcn colour names, raw Radix |
 | A primitive Parabola lacks | Add it to Parabola, on Radix if needed, then use it | lint: raw Radix outside Parabola |
+| A newer Parabola | `packages/parabola` is a copy; `parabola.json` records its version. Take a newer one with Parabola's `update`, on its own branch (Parabola's README, "Taking a newer Parabola"). Never paste files over the copy by hand | |
 | A post that needs a page of its own | A custom page in `src/extensions/post-pages/`, listed in `src/extensions/post-pages.ts` and named by the post's `customPage` (`src/lib/cms/custom-pages.ts`). All content stays in the post; the page arranges it, with the pieces in `src/components/site/custom`. Never a second copy of a word or a file, never a change to the standard layout for one post | |
 | An empty section (no posts, nothing chosen, nothing matches) | `DsEmptyState`: one line, an optional button, centred in the section. Never a title plus a sentence | |
 | A side note on a screen (another way to do it, a tip) | `DsInfoCard` | |

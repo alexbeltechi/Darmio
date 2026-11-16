@@ -3,7 +3,6 @@
 import * as React from "react";
 import {
   ChevronDown,
-  ChevronLeft,
   Dices,
   ChevronRight,
   ClipboardPaste,
@@ -33,7 +32,6 @@ import {
   Orbit,
   Pill,
   Shapes,
-  Shuffle,
   Square,
   SquareDashed,
   BarChart3,
@@ -44,7 +42,6 @@ import {
   MoreHorizontal,
   Repeat2,
   Upload,
-  Moon,
   Minus,
   MoreVertical,
   OctagonAlert,
@@ -55,7 +52,6 @@ import {
   Plus,
   Send,
   RotateCcw,
-  Sun,
   Terminal,
   Trash2,
   Type,
@@ -128,12 +124,10 @@ import {
 import {
   DS_BUTTON_LOOKS,
   DS_PALETTES,
-  DS_TASTES,
   DS_TYPE_STYLES,
   dsButtonLookAt,
   dsButtonLookStyle,
   dsPaletteDraw,
-  dsPickTaste,
   dsRandomTastes,
   dsShuffleTaste,
   dsTasteNames,
@@ -153,14 +147,12 @@ import {
   dsThemeColourTokens,
   dsThemeRadius,
   dsThemeWithFonts,
-  dsThemeWithMood,
   parseDsThemeConfig,
   type DsThemeConfig,
 } from "../theme";
 import { dsZip } from "../zip";
 import {
   InPanel,
-  InPanelFooter,
   PanelSection,
   RESTORE,
   useThemeEditor,
@@ -396,8 +388,174 @@ function SectionRestore({
   );
 }
 
-/** The theme dropdown's last option, which adds a theme rather than opening one. */
-const ADD_THEME = "__add-theme";
+/**
+ * A panel section's dice, beside its Restore: draws that part of the look
+ * again, at random, with Undo in the toast. The Theme section's draws the
+ * whole look.
+ */
+function SectionDice({
+  section,
+  theme,
+  setTheme,
+  draw,
+}: {
+  section: string;
+  theme: DsThemeConfig;
+  setTheme: (theme: DsThemeConfig) => void;
+  draw: (theme: DsThemeConfig) => DsThemeConfig;
+}) {
+  return (
+    <DsButton
+      size="small"
+      variant="text"
+      iconLeft={Dices}
+      aria-label={`Random ${section.toLowerCase()}`}
+      title="Random"
+      onClick={() => {
+        const before = theme;
+        setTheme(draw(theme));
+        dsToast(`${section} drawn`, {
+          action: { label: "Undo", onClick: () => setTheme(before) },
+        });
+      }}
+    />
+  );
+}
+
+/** One at random from a list. */
+const pickOne = <T,>(list: readonly T[]): T =>
+  list[Math.floor(Math.random() * list.length)];
+
+/**
+ * What each section's Restore puts back, and what its dice draws. Parabola's
+ * own values on the left, a random one of that section's looks on the right;
+ * the Theme section runs every restore, and its dice draws the whole look
+ * (`dsShuffleTaste`, which also moves the mood).
+ */
+const SECTION = {
+  colour: {
+    restore: (t: DsThemeConfig): DsThemeConfig => ({
+      ...t,
+      character: {
+        ...t.character,
+        scoped: { ...t.character.scoped, colour: "classic" },
+        hue: 40,
+        warmth: 0,
+        colour: 0,
+        brightness: 1,
+        contrast: 0,
+      },
+      colours: DS_DEFAULT_COLOURS,
+    }),
+    draw: (t: DsThemeConfig): DsThemeConfig => {
+      const palette = pickOne(DS_PALETTES);
+      const drawn = dsPaletteDraw(palette.id, t.character, t.character.mood);
+      return {
+        ...t,
+        character: {
+          ...t.character,
+          ...drawn.character,
+          scoped: { ...t.character.scoped, colour: palette.id },
+        },
+        colours: {
+          ...DS_DEFAULT_COLOURS,
+          accent: { light: drawn.button, dark: null },
+        },
+      };
+    },
+  },
+  type: {
+    restore: (t: DsThemeConfig): DsThemeConfig =>
+      parseDsThemeConfig({
+        ...t,
+        character: {
+          ...t.character,
+          scoped: { ...t.character.scoped, type: "classic" },
+          ink: 1,
+        },
+        families: DS_DEFAULT_THEME.families,
+        hiddenFonts: [],
+      }),
+    draw: (t: DsThemeConfig): DsThemeConfig => {
+      const style = pickOne(DS_TYPE_STYLES);
+      return dsThemeWithFonts(
+        {
+          ...t,
+          character: {
+            ...t.character,
+            scoped: { ...t.character.scoped, type: style.id },
+          },
+        },
+        dsTypeStyleFonts(style.id, t.character.mood),
+      );
+    },
+  },
+  buttons: {
+    restore: (t: DsThemeConfig): DsThemeConfig => ({
+      ...t,
+      character: {
+        ...t.character,
+        scoped: { ...t.character.scoped, buttons: "soft" },
+      },
+      radius: null,
+      pillRadius: null,
+      buttons: null,
+    }),
+    draw: (t: DsThemeConfig): DsThemeConfig => {
+      const look = pickOne(DS_BUTTON_LOOKS);
+      const dials = dsButtonLookAt(look.id, t.character.mood);
+      return {
+        ...t,
+        character: {
+          ...t.character,
+          roundness: dials?.roundness ?? dsMoodDials(t.character.mood).roundness,
+          depth: dials?.depth ?? DS_DEFAULT_CHARACTER.depth,
+          scoped: { ...t.character.scoped, buttons: look.id },
+        },
+        radius: null,
+        pillRadius: null,
+        buttons: dsButtonLookStyle(look.id),
+      };
+    },
+  },
+  fields: {
+    restore: (t: DsThemeConfig): DsThemeConfig => ({
+      ...t,
+      fields: DS_DEFAULT_FIELD_STYLE,
+    }),
+    // An outline or none; when there is one, one of the widths it offers, solid or faded.
+    draw: (t: DsThemeConfig): DsThemeConfig => ({
+      ...t,
+      fields: {
+        outline: Math.random() < 0.75,
+        outlineWidth: pickOne(DS_OUTLINE_WIDTHS),
+        outlineOpacity: pickOne([1, 1, 0.6, 0.35]),
+      },
+    }),
+  },
+} as const;
+
+/** The whole look again, at random: another style, mood and colours (taste.ts). */
+const drawLook = (t: DsThemeConfig): DsThemeConfig => {
+  const next = dsShuffleTaste(dsRandomTastes(t.character.tastes), t.character, "wide");
+  return dsThemeWithFonts(
+    {
+      ...t,
+      character: next.character,
+      colours: { ...DS_DEFAULT_COLOURS, accent: { light: next.button, dark: null } },
+      radius: null,
+      pillRadius: null,
+      buttons: next.buttonStyle,
+    },
+    next.fonts,
+  );
+};
+
+/** Light or dark, for the preview. */
+const MODES = [
+  { id: "light", label: "Light" },
+  { id: "dark", label: "Dark" },
+] as const;
 
 /** Where "Claude Design" in the design system's hint opens, with the text copied first. */
 const CLAUDE_URL = "https://claude.ai/new";
@@ -1273,18 +1431,25 @@ const TASTE_ICONS: Record<string, LucideIcon> = {
 
 /**
  * A row of pills that slides sideways (DsScrollRow), the light kind (text
- * buttons): no fill at rest, a soft one when picked, with an icon each.
+ * buttons): no fill at rest, a soft one when picked, with an icon each
+ * (`plain`: text only).
  */
 function PillRow({
   label,
   options,
   picked,
   onToggle,
+  plain,
+  after,
 }: {
   label: string;
   options: readonly { id: string; label: string }[];
   picked: readonly string[];
   onToggle: (id: string) => void;
+  /** Text only, no icons: the themes, and light or dark. */
+  plain?: boolean;
+  /** One more button after the options, e.g. New +. */
+  after?: React.ReactNode;
 }) {
   return (
     <DsScrollRow role="group" aria-label={label} className="-mx-2 px-2">
@@ -1293,207 +1458,15 @@ function PillRow({
           key={o.id}
           size="small"
           variant="text"
-          iconLeft={TASTE_ICONS[o.id]}
+          iconLeft={plain ? undefined : TASTE_ICONS[o.id]}
           pressed={picked.includes(o.id)}
           onClick={() => onToggle(o.id)}
         >
           {o.label}
         </DsButton>
       ))}
+      {after}
     </DsScrollRow>
-  );
-}
-
-/**
- * The takes: every draw is a take, kept in order with
- * the one showing. Back returns to the one before; forward replays an
- * undone one, or draws a new variation inside the style picked (its other
- * chips and colours, at the same mood); the dice picks another style and a
- * mood at random and draws wide. A draw starts the look over: colours, corners and buttons
- * given their own go back to Auto.
- */
-function useTakes(
-  theme: DsThemeConfig,
-  onTheme: (theme: DsThemeConfig) => void,
-) {
-  // The last look had with each pick of pills, tweaks and all (back to Approachable should be
-  // the Approachable he saw). Forward and the dice are for new ones; picking another theme forgets them (reset).
-  const seen = React.useRef(new Map<string, DsThemeConfig>());
-  const keyOf = (ids: string[]) => [...ids].sort().join();
-  const current = keyOf(theme.character.tastes);
-  React.useEffect(() => {
-    seen.current.set(current, theme);
-  }, [current, theme]);
-  const [takes, setTakes] = React.useState<{
-    list: DsThemeConfig[];
-    at: number;
-  }>({ list: [], at: -1 });
-  const drawn = (ids: string[], how: "first" | "vary" | "wide") => {
-    const next = dsShuffleTaste(ids, theme.character, how);
-    const colours = {
-      ...DS_DEFAULT_COLOURS,
-      accent: { light: next.button, dark: null },
-    };
-    return dsThemeWithFonts(
-      {
-        ...theme,
-        character: next.character,
-        colours,
-        radius: null,
-        pillRadius: null,
-        buttons: next.buttonStyle,
-      },
-      next.fonts,
-    );
-  };
-  const show = (next: DsThemeConfig) => {
-    setTakes(({ list, at }) => ({
-      list: [...list.slice(0, at + 1), next],
-      at: at + 1,
-    }));
-    onTheme(next);
-  };
-  const picked = theme.character.tastes;
-  // Another variation of the look locked in: the style picked (one at random with none).
-  const fresh = () =>
-    show(drawn(picked.length ? picked : dsRandomTastes(), "vary"));
-  return {
-    canBack: takes.at > 0,
-    dice: () => show(drawn(dsRandomTastes(picked), "wide")),
-    // Another version of the style picked, wherever the player is.
-    shuffle: () => fresh(),
-    // A style's own look the first time; the one last seen with it after that.
-    draw: (ids: string[]) =>
-      show(seen.current.get(keyOf(ids)) ?? drawn(ids, "first")),
-    reset: () => {
-      seen.current.clear();
-      setTakes({ list: [], at: -1 });
-    },
-    back: () => {
-      if (takes.at <= 0) return;
-      setTakes({ ...takes, at: takes.at - 1 });
-      onTheme(takes.list[takes.at - 1]);
-    },
-    forward: () => {
-      if (takes.at < takes.list.length - 1) {
-        setTakes({ ...takes, at: takes.at + 1 });
-        return onTheme(takes.list[takes.at + 1]);
-      }
-      fresh();
-    },
-  };
-}
-
-type Takes = ReturnType<typeof useTakes>;
-
-/**
- * The dice, at the Taste section's top right beside its Restore: starts over
- * with another style and mood. A look worth keeping is saved as a new theme,
- * at the panel's foot.
- */
-function DiceControl({ takes }: { takes: Takes }) {
-  return (
-    <DsButton
-      size="small"
-      variant="text"
-      iconLeft={Dices}
-      aria-label="Random look"
-      title="Random look"
-      onClick={takes.dice}
-    />
-  );
-}
-
-/**
- * Previous, shuffle and Next, under the mood, grey
- * buttons: Previous at the left with its chevron on the left, Next at the
- * right with its chevron on the right, stepping back and forth through the
- * versions seen; between them, filling the space, Shuffle, which draws
- * another version of the style picked (another Elegant, say). Not the dice, which
- * starts over with any style and mood.
- */
-function VariationControls({ takes }: { takes: Takes }) {
-  return (
-    <div className="flex items-center justify-between gap-ds-8">
-      <DsButton
-        size="small"
-        iconLeft={ChevronLeft}
-        disabled={!takes.canBack}
-        onClick={takes.back}
-      >
-        Previous
-      </DsButton>
-      <DsButton
-        size="small"
-        iconLeft={Shuffle}
-        className="flex-1"
-        title="Another version of this style"
-        onClick={takes.shuffle}
-      >
-        Shuffle
-      </DsButton>
-      <DsButton size="small" iconRight={ChevronRight} onClick={takes.forward}>
-        Next
-      </DsButton>
-    </div>
-  );
-}
-
-/** The Mood bar's track: a 1px line in the border colour, centred in the bar's height. */
-const MOOD_LINE =
-  "linear-gradient(to bottom, transparent calc(50% - 0.5px), var(--ds-border) calc(50% - 0.5px), var(--ds-border) calc(50% + 0.5px), transparent calc(50% + 0.5px))";
-
-/**
- * Taste (taste.ts; "aesthetics and personality"): the
- * Style rail, one pick at a time as tabs are (Classic, Minimal, Elegant,
- * Tech, Natural, Retro, Sport), which chooses a chip in Colour, Typography
- * and Buttons; then the Mood slider, the personality, Serious to Playful
- * (on to Wacky at its end), which changes the look you can see inside that style (its
- * fonts, its buttons, its colour, its voice). Parabola's own is Classic and
- * Balanced. Picking a style changes the look at once (a take); under the
- * mood, the shuffle draws another version of it and Previous and Next step
- * through the versions seen; the dice at the top right starts over. Restore, beside the dice, is Parabola's own again.
- */
-function TasteChoice({
-  theme,
-  onTheme,
-  takes,
-}: {
-  theme: DsThemeConfig;
-  onTheme: (theme: DsThemeConfig) => void;
-  takes: Takes;
-}) {
-  const character = theme.character;
-  const picked = character.tastes;
-  // One style at a time, as tabs are: picking the one picked does nothing.
-  const toggle = (id: string) => {
-    if (!picked.includes(id)) takes.draw(dsPickTaste(picked, id));
-  };
-  return (
-    <div className="flex flex-col gap-ds-16">
-      <div className="flex flex-col gap-ds-4">
-        <span className="text-small text-ds-fg-muted">Style</span>
-        <PillRow
-          label="Style"
-          options={DS_TASTES}
-          picked={picked}
-          onToggle={toggle}
-        />
-      </div>
-      {/* Mood as a slider again, its track a 1px line rather than a colour, Serious to Playful; no
-          labels under it, the word above says where it is. */}
-      <DsColourBar
-        label="Mood"
-        readout={dsMoodLabel(character.mood)}
-        value={character.mood}
-        onChange={(x) =>
-          onTheme(dsThemeWithMood(theme, Math.round(x * 100) / 100))
-        }
-        valueText={dsMoodLabel(character.mood)}
-        track={MOOD_LINE}
-      />
-      <VariationControls takes={takes} />
-    </div>
   );
 }
 
@@ -2089,12 +2062,12 @@ function ThemeNameDialog({
  * shadcn's create page. The page is a site's page
  * wearing the open theme (its nav, a post's opening, buttons, a list of
  * writing, one card on the surface); the panel on
- * the right holds the theme's main choices: which theme (the site's reads
- * "(default)"; Parabola itself never changes, a change to it opens a copy,
- * Custom, to create), light or dark for the preview, the five colours, the
+ * the right holds the theme's main choices: which theme, as a row of names
+ * (a change goes into the open one, Parabola included; Restore puts it
+ * back), light or dark for the preview, the five colours, the
  * Heading and Font families' fonts, the radius and the icon library. The
- * rest is on Typography. Save as new theme or Save theme sits at the panel's
- * foot while there's something to keep; a site picks its theme in
+ * rest is on Typography. Changes go straight into the open theme and are
+ * kept (in this browser, on Parabola's own site); a site picks its theme in
  * Settings › Design. Every spacing is a Parabola one.
  */
 export function ThemeSection() {
@@ -2103,19 +2076,16 @@ export function ThemeSection() {
     entry,
     theme,
     setTheme,
-    status,
-    createTheme,
-    saving,
     select,
     addTheme,
     renameTheme,
     removeTheme,
-    backToParabola,
+    restoreTheme,
     previewMode: mode,
     setPreviewMode,
   } = useThemeEditor();
   const [naming, setNaming] = React.useState<
-    "add" | "rename" | "create" | null
+    "add" | "rename" | null
   >(null);
   const [restoring, setRestoring] = React.useState(false);
 
@@ -2138,13 +2108,12 @@ export function ThemeSection() {
   const tilt = dsTasteTilt(theme.character.tastes, theme.character.mood);
   const voice = dsTasteVoice(theme.character.tastes, theme.character.mood);
   const copy = VOICE_COPY[voice.tone];
-  const takes = useTakes(theme, setTheme);
   const heading = theme.families.find((f) => f.id === DS_HEADING_FAMILY);
   const body =
     theme.families.find((f) => f.id === DS_BODY_FAMILY) ?? theme.families[0];
 
   return (
-    // The brand, not just the UI: the look in each place, at the CMS's reading width (600px),
+    // The brand, not just the UI: the look in each place, at a site's reading width (600px),
     // the site (Web), the top of a letter (Email), a story, a feed post and a post on X (Social), and the admin's own card
     // (App), with Ilo's own photos and words in the taste's voice; then what it says and how (Brand).
     <div className="flex w-full max-w-[600px] flex-col gap-ds-80">
@@ -2281,6 +2250,21 @@ export function ThemeSection() {
           title="Theme"
           actions={
             <div className="flex items-center gap-ds-4">
+              {/* The whole look again, at random; then this theme back to Parabola's. */}
+              <SectionDice
+                section="Theme"
+                theme={theme}
+                setTheme={setTheme}
+                draw={drawLook}
+              />
+              <DsButton
+                size="small"
+                variant="text"
+                iconLeft={RotateCcw}
+                aria-label="Restore Theme"
+                title="Restore"
+                onClick={() => setRestoring(true)}
+              />
               <DsDropdown>
                 <DsDropdownTrigger asChild>
                   <DsButton
@@ -2305,12 +2289,6 @@ export function ThemeSection() {
                     Duplicate
                   </DsDropdownItem>
                   <DsDropdownItem
-                    iconLeft={RotateCcw}
-                    onSelect={() => setRestoring(true)}
-                  >
-                    Restore
-                  </DsDropdownItem>
-                  <DsDropdownItem
                     tone="danger"
                     iconLeft={Trash2}
                     disabled={
@@ -2326,109 +2304,51 @@ export function ThemeSection() {
             </div>
           }
         >
-          <DsSelect
-            aria-label="Theme"
-            key={library.themes.map((t) => t.id).join()}
-            // Parabola, Parabola's own, is the default every theme starts from and restores to; Add theme is the last option.
-            options={[
-              ...library.themes.map((t) => ({
-                value: t.id,
-                label:
-                  t.id === DS_DEFAULT_THEME_ID ? `${t.name} (default)` : t.name,
-              })),
-              {
-                value: ADD_THEME,
-                label: "Add theme",
-                indicator: <Plus aria-hidden className="size-4" />,
-              },
-            ]}
-            value={entry.id}
-            onValueChange={(value) =>
-              value === ADD_THEME
-                ? setNaming("add")
-                : (takes.reset(), select(value))
+          {/* The themes, as text: Parabola first (its own, never changed), then any made from it.
+              A change goes into the open theme, Parabola included (Restore puts it back); New +, the last tab, adds a copy. */}
+          <PillRow
+            plain
+            label="Theme"
+            options={library.themes.map((t) => ({ id: t.id, label: t.name }))}
+            picked={[entry.id]}
+            onToggle={(id) => {
+              if (id === entry.id) return;
+              select(id);
+            }}
+            // The last tab: a new theme, a copy of the open one, named first.
+            after={
+              <DsButton size="small" variant="text" iconRight={Plus} onClick={() => setNaming("add")}>
+                New
+              </DsButton>
             }
           />
-          {/* The preview's mode, right under the theme; the UI's is the sidebar's toggle. */}
-          <div
-            className="flex items-center gap-ds-8"
-            role="group"
-            aria-label="Mode"
-          >
-            <DsButton
-              size="small"
-              iconLeft={Sun}
-              pressed={mode === "light"}
-              onClick={() => setPreviewMode("light")}
-            >
-              Light
-            </DsButton>
-            <DsButton
-              size="small"
-              iconLeft={Moon}
-              pressed={mode === "dark"}
-              onClick={() => setPreviewMode("dark")}
-            >
-              Dark
-            </DsButton>
-          </div>
-        </PanelSection>
-
-        {/* The taste feeder first: push the whole look somewhere, then tune it below. */}
-        <PanelSection
-          title="Taste"
-          actions={
-            <div className="flex items-center gap-ds-4">
-              <DiceControl takes={takes} />
-              <SectionRestore
-                section="Taste"
-                theme={theme}
-                setTheme={setTheme}
-                // Parabola's own again: its style, the mood at rest, its fonts, every value Auto.
-                restore={(t) => {
-                  takes.reset();
-                  return dsThemeWithFonts(
-                    {
-                      ...t,
-                      character: DS_DEFAULT_CHARACTER,
-                      colours: DS_DEFAULT_COLOURS,
-                      type: DS_DEFAULT_THEME.type,
-                      radius: null,
-                      pillRadius: null,
-                      buttons: null,
-                    },
-                    null,
-                  );
-                }}
-              />
-            </div>
-          }
-        >
-          <TasteChoice theme={theme} onTheme={setTheme} takes={takes} />
+          {/* The preview's mode, right under the themes, the same kind of row; the UI's is the sidebar's toggle. */}
+          <PillRow
+            plain
+            label="Mode"
+            options={MODES}
+            picked={[mode]}
+            onToggle={(id) => setPreviewMode(id as "light" | "dark")}
+          />
         </PanelSection>
 
         <PanelSection
           title="Colour"
           actions={
-            <SectionRestore
-              section="Colour"
-              theme={theme}
-              setTheme={setTheme}
-              // Parabola's palette: the dials back to its own, every colour Auto.
-              restore={(t) => ({
-                ...t,
-                character: {
-                  ...t.character,
-                  scoped: { ...t.character.scoped, colour: "classic" },
-                  hue: 40,
-                  warmth: 0,
-                  colour: 0,
-                  brightness: 1,
-                  contrast: 0,
-                },
-                colours: DS_DEFAULT_COLOURS,
-              })}
-            />
+            <div className="flex items-center gap-ds-4">
+              <SectionDice
+                section="Colour"
+                theme={theme}
+                setTheme={setTheme}
+                draw={SECTION.colour.draw}
+              />
+              <SectionRestore
+                section="Colour"
+                theme={theme}
+                setTheme={setTheme}
+                restore={SECTION.colour.restore}
+              />
+            </div>
           }
         >
           <ColourChoice theme={theme} mode={mode} onTheme={setTheme} />
@@ -2437,23 +2357,20 @@ export function ThemeSection() {
         <PanelSection
           title="Typography"
           actions={
-            <SectionRestore
-              section="Typography"
-              theme={theme}
-              setTheme={setTheme}
-              restore={(t) =>
-                parseDsThemeConfig({
-                  ...t,
-                  character: {
-                    ...t.character,
-                    scoped: { ...t.character.scoped, type: "classic" },
-                    ink: 1,
-                  },
-                  families: DS_DEFAULT_THEME.families,
-                  hiddenFonts: [],
-                })
-              }
-            />
+            <div className="flex items-center gap-ds-4">
+              <SectionDice
+                section="Typography"
+                theme={theme}
+                setTheme={setTheme}
+                draw={SECTION.type.draw}
+              />
+              <SectionRestore
+                section="Typography"
+                theme={theme}
+                setTheme={setTheme}
+                restore={SECTION.type.restore}
+              />
+            </div>
           }
         >
           <SectionRail
@@ -2503,22 +2420,20 @@ export function ThemeSection() {
         <PanelSection
           title="Buttons"
           actions={
-            <SectionRestore
-              section="Buttons"
-              theme={theme}
-              setTheme={setTheme}
-              // Back to the character's: its roundness and depth.
-              restore={(t) => ({
-                ...t,
-                character: {
-                  ...t.character,
-                  scoped: { ...t.character.scoped, buttons: "soft" },
-                },
-                radius: null,
-                pillRadius: null,
-                buttons: null,
-              })}
-            />
+            <div className="flex items-center gap-ds-4">
+              <SectionDice
+                section="Buttons"
+                theme={theme}
+                setTheme={setTheme}
+                draw={SECTION.buttons.draw}
+              />
+              <SectionRestore
+                section="Buttons"
+                theme={theme}
+                setTheme={setTheme}
+                restore={SECTION.buttons.restore}
+              />
+            </div>
           }
         >
           <SectionRail
@@ -2578,12 +2493,20 @@ export function ThemeSection() {
         <PanelSection
           title="Fields"
           actions={
-            <SectionRestore
-              section="Fields"
-              theme={theme}
-              setTheme={setTheme}
-              restore={(t) => ({ ...t, fields: DS_DEFAULT_FIELD_STYLE })}
-            />
+            <div className="flex items-center gap-ds-4">
+              <SectionDice
+                section="Fields"
+                theme={theme}
+                setTheme={setTheme}
+                draw={SECTION.fields.draw}
+              />
+              <SectionRestore
+                section="Fields"
+                theme={theme}
+                setTheme={setTheme}
+                restore={SECTION.fields.restore}
+              />
+            </div>
           }
         >
           <OutlineChoice
@@ -2598,6 +2521,7 @@ export function ThemeSection() {
           />
         </PanelSection>
 
+        {/* No dice here: Lucide is the only library that works (colours.ts), so a draw has nothing to pick. */}
         <PanelSection
           title="Icons"
           actions={
@@ -2625,33 +2549,6 @@ export function ThemeSection() {
         <ThemeShare theme={theme} name={entry.name} setTheme={setTheme} />
       </InPanel>
 
-      {/* At the panel's foot while Custom, the working copy, is open (a variation, say): save it as a theme of its own. */}
-      {status === "custom" && (
-        <InPanelFooter>
-          <DsButton
-            variant="primary"
-            className="w-full"
-            loading={saving}
-            onClick={() => setNaming("create")}
-          >
-            Save as new theme
-          </DsButton>
-        </InPanelFooter>
-      )}
-
-      {naming === "create" && (
-        <ThemeNameDialog
-          title="Save as a new theme"
-          description="Parabola stays as it is; this is a theme of its own, for a site to pick in Settings › Design."
-          initial={entry.name}
-          action="Save theme"
-          onClose={() => setNaming(null)}
-          onSave={async (name) => {
-            setNaming(null);
-            await createTheme(name);
-          }}
-        />
-      )}
       <DsConfirmDialog
         open={restoring}
         onOpenChange={setRestoring}
@@ -2660,7 +2557,7 @@ export function ThemeSection() {
         confirmLabel="Restore"
         onConfirm={() => {
           setRestoring(false);
-          const undoIt = backToParabola();
+          const undoIt = restoreTheme();
           dsToast(RESTORE.all.done, {
             action: { label: "Undo", onClick: undoIt },
           });
@@ -2670,7 +2567,7 @@ export function ThemeSection() {
       {naming === "add" && (
         <ThemeNameDialog
           title="Add a theme"
-          description={`A copy of ${entry.name}, to change as you like. Publish keeps it.`}
+          description={`A copy of ${entry.name}, to change as you like.`}
           initial=""
           action="Add theme"
           onClose={() => setNaming(null)}
@@ -2683,7 +2580,7 @@ export function ThemeSection() {
       {naming === "rename" && (
         <ThemeNameDialog
           title={`Rename ${entry.name}`}
-          description="What it's called here and in Settings › Design."
+          description="What it's called here and wherever a site picks it."
           initial={entry.name}
           action="Rename"
           onClose={() => setNaming(null)}

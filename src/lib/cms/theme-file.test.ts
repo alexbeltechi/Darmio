@@ -8,7 +8,7 @@ import { DS_DEFAULT_THEME, dsThemeCss, parseDsThemeConfig } from "../../../packa
 import { dsThemeFileName, dsThemeFileParse, dsThemeFileText } from "../../../packages/parabola/theme-file";
 
 const file = (theme: unknown, extra: Record<string, unknown> = {}) => ({
-  format: "darmio-theme",
+  format: "parabola-theme",
   version: 1,
   name: "Invented",
   theme,
@@ -25,6 +25,11 @@ describe("theme file", () => {
     assert.equal(result.theme.radius, "small");
     // What the file leaves out stays Parabola's.
     assert.equal(result.theme.type.p.size, DS_DEFAULT_THEME.type.p.size);
+  });
+
+  it("still loads a file in the old darmio-theme format", () => {
+    const result = dsThemeFileParse(JSON.stringify(file({}, { format: "darmio-theme" })));
+    assert.ok(result.ok, result.ok ? "" : result.errors.join("\n"));
   });
 
   it("round-trips: theme to file to theme", () => {

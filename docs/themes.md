@@ -20,7 +20,7 @@ keeps Parabola's own look so a theme can never make it hard to use.
 
 ```json
 {
-  "format": "darmio-theme",
+  "format": "parabola-theme",
   "version": 1,
   "name": "Warm paper",
   "description": "Optional. Up to 300 characters.",

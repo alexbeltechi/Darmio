@@ -79,7 +79,8 @@ export async function getVideoMetadata(videoBuffer: Buffer): Promise<VideoMetada
     await fs.writeFile(tempFile, videoBuffer);
     
     const ffmpegInstance = ffmpeg;
-    return new Promise((resolve, reject) => {
+    // Awaited, so the `finally` below deletes the temp file only after ffmpeg has read it.
+    return await new Promise((resolve, reject) => {
       ffmpegInstance.ffprobe(tempFile, (err, metadata) => {
         if (err) {
           reject(err);
@@ -153,7 +154,8 @@ export async function extractVideoThumbnail(
     const safeTimestamp = Math.min(timestamp, Math.max(0, metadata.duration - 0.1));
     
     const ffmpegInstance = ffmpeg;
-    return new Promise((resolve, reject) => {
+    // Awaited, so the `finally` below deletes the temp file only after ffmpeg has read it.
+    return await new Promise((resolve, reject) => {
       ffmpegInstance(inputFile)
         .seekInput(safeTimestamp)
         .frames(1)

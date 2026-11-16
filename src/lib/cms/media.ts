@@ -167,16 +167,44 @@ function getExtension(mime: string, originalExt: string): string {
   return mimeToExt[mime] || originalExt;
 }
 
+const MIME_BY_EXTENSION: Record<string, string> = {
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  png: "image/png",
+  webp: "image/webp",
+  gif: "image/gif",
+  avif: "image/avif",
+  heic: "image/heic",
+  mp4: "video/mp4",
+  m4v: "video/mp4",
+  mov: "video/quicktime",
+  webm: "video/webm",
+  pdf: "application/pdf",
+};
+
+/**
+ * The file's type, from its name when the upload didn't say. A command-line
+ * upload (curl, an agent) often sends none, or the catch-all
+ * "application/octet-stream", and a video stored under that gets no poster
+ * and shows as a broken thumbnail.
+ */
+export function uploadMime(given: string | undefined, name: string): string {
+  if (given && given !== "application/octet-stream") return given;
+  const ext = name.match(/\.([a-z0-9]+)$/i)?.[1]?.toLowerCase();
+  return (ext && MIME_BY_EXTENSION[ext]) || given || "application/octet-stream";
+}
+
 /**
  * Upload a new media file with image optimization
  */
 export async function uploadMedia(
   file: Buffer,
   originalName: string,
-  mime: string,
+  givenMime: string,
   meta: UploadMetadata = {}
 ): Promise<{ item?: MediaItem; error?: string; deduped?: boolean }> {
   await ensureLocalDirs();
+  const mime = uploadMime(givenMime, originalName);
 
   // Re-uploading identical bytes returns the existing item rather than a duplicate,
   // which is what makes an ingest run safe to repeat.

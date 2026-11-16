@@ -5,7 +5,9 @@
  * Run with `npm run check:leaks`; exits 1 on any hit.
  *
  * Allowed: the copyright line in LICENSE, the repo's own GitHub address, the
- * `@beltechi/parabola` package name, and Y3K inside Ilo's example site
+ * `@beltechi/parabola` package name, the owner's name and contact email in
+ * the legal pages (TRADEMARK.md, CONTRIBUTING.md, and the email in the
+ * README's licence note), and Y3K inside Ilo's example site
  * (`seed/`, `public/parabola/preview/`), which is her story. Only the core
  * is checked: an install (a maker's own copy, renamed in package.json) holds
  * their own name and notes, and passes.
@@ -18,6 +20,12 @@ const ALLOWED = [
   /github\.com\/alexbeltechi\/(darmio|techistack|parabola)(\.git)?/g,
   /alexbeltechi\/(darmio|parabola)\b/g,
   /@beltechi\/parabola/g,
+];
+
+/** The owner and contact the legal pages must name, allowed only in those files. */
+const LEGAL_OWNER: { files: RegExp; text: RegExp }[] = [
+  { files: /^(TRADEMARK|CONTRIBUTING)\.md$/, text: /Andrei Alexandru Beltechi|alexbeltechi@gmail\.com/g },
+  { files: /^README\.md$/, text: /alexbeltechi@gmail\.com/g },
 ];
 
 const CHECKS: { name: string; pattern: RegExp; except?: RegExp }[] = [
@@ -51,7 +59,8 @@ for (const file of files) {
     continue;
   }
   text.split("\n").forEach((line, i) => {
-    const cleaned = ALLOWED.reduce((rest, allowed) => rest.replace(allowed, ""), line);
+    const allowed = [...ALLOWED, ...LEGAL_OWNER.filter((legal) => legal.files.test(file)).map((legal) => legal.text)];
+    const cleaned = allowed.reduce((rest, pattern) => rest.replace(pattern, ""), line);
     for (const check of CHECKS) {
       if (check.except?.test(file)) continue;
       if (check.pattern.test(cleaned)) hits.push(`${file}:${i + 1}: ${check.name}`);

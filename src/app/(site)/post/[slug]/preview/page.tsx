@@ -18,7 +18,14 @@ export const metadata: Metadata = { robots: { index: false, follow: false } };
  * posts with their unpublished changes laid over the live version. Anyone not
  * signed in to the admin gets a 404, so unpublished work stays private.
  */
-export default async function PostPreviewPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function PostPreviewPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>;
+  /** `?page=standard` or `?page=custom`: one or the other, whatever the post's switch says, to compare them. */
+  searchParams: Promise<{ page?: string }>;
+}) {
   const session = await getServerSession(authOptions);
   if (!session) notFound();
 
@@ -31,5 +38,14 @@ export default async function PostPreviewPage({ params }: { params: Promise<{ sl
   if (!entry) notFound();
 
   const post = { ...entry, data: { ...entry.data, ...entry.pendingData } } as Entry;
-  return <PostView post={post} allCategories={allCategories} settings={settings} preview />;
+  const { page } = await searchParams;
+  return (
+    <PostView
+      post={post}
+      allCategories={allCategories}
+      settings={settings}
+      preview
+      page={page === "standard" || page === "custom" ? page : undefined}
+    />
+  );
 }

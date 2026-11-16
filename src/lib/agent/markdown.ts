@@ -50,7 +50,9 @@ import {
  *
  * `<!-- block:ID -->` marks where each block starts and keeps its identity
  * (the first 8 characters of its id are enough). Writing a post back, a
- * marked block keeps its id; unmarked ones are new. In a gallery the image
+ * marked block keeps its id; unmarked ones are new. A marker may name its
+ * block for a custom page (`<!-- block:ID name=intro -->`, or
+ * `<!-- block name=intro -->` on a new block; lib/cms/custom-pages.ts). In a gallery the image
  * text is only a label (the file's own caption is edited on the media item);
  * a `placeholder` line is the empty gallery's note.
  */
@@ -155,7 +157,7 @@ export function postToMarkdown(entry: Entry, mediaLabel?: (id: string) => string
           ...(data.description ? [`description: ${String(data.description).replace(/\s+/g, " ")}`] : []),
         ];
   const front = ["---", `title: ${String(data.title || "")}`, `slug: ${entry.slug}`, status, ...fields, "---"].join("\n");
-  const blocks = ((data.content as Block[]) || []).map((b) => `<!-- block:${shortId(b.id)} -->\n${blockToMarkdown(b, mediaLabel)}`);
+  const blocks = ((data.content as Block[]) || []).map((b) => `<!-- block:${shortId(b.id)}${b.name ? ` name=${b.name}` : ""} -->\n${blockToMarkdown(b, mediaLabel)}`);
   return `${front}\n\n${blocks.join("\n\n")}\n`;
 }
 
@@ -294,12 +296,14 @@ export function parseBlocks(body: string): ParsedBlock[] {
   const lines = body.replace(/\r\n/g, "\n").split("\n");
   const out: ParsedBlock[] = [];
   let ref: string | undefined;
+  let name: string | undefined;
   let text: string[] = [];
   let inFence = false;
 
   const push = (block: Block) => {
-    out.push({ ref, block });
+    out.push({ ref, block: name ? { ...block, name } : block });
     ref = undefined;
+    name = undefined;
   };
   const flushText = () => {
     const md = text.join("\n").trim();
@@ -317,10 +321,11 @@ export function parseBlocks(body: string): ParsedBlock[] {
       continue;
     }
 
-    const marker = line.match(/^\s*<!--\s*block:([\w-]+)\s*-->\s*$/);
-    if (marker) {
+    const marker = line.match(/^\s*<!--\s*block(?::([\w-]+))?(?:\s+name=([a-z0-9][a-z0-9-]*))?\s*-->\s*$/);
+    if (marker && (marker[1] || marker[2])) {
       flushText();
-      ref = marker[1].replace(/-/g, "");
+      ref = marker[1]?.replace(/-/g, "");
+      name = marker[2];
       continue;
     }
 

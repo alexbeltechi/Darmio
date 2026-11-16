@@ -136,6 +136,23 @@ npx tsx scripts/ingest/activity.ts add "<originals folder>" date <slug> --note 2
 
 If the user edited the post in the admin between your runs, re-running `push.ts` overwrites `content`, `title`, and `categories` from the plan. Pull the entry first and ask before clobbering their work. Once a post is published, a re-push keeps it published and stages the changes; for a reorder or a cull, prefer a staged PATCH of `data.content` (`{"stage": true, "data": {"content": [...]}}`) that keeps the user's text, and log it (`activity.ts add … regroup|update`).
 
+## A page of its own
+
+A post gets the standard layout unless the user asks for a custom page ("make
+this one look like this", with a reference). Read the agent guide's "Custom
+pages" (`GET /api/admin/agent`) before building one, and follow its ladder:
+the standard layout's options first, a custom page only when asked or when
+nothing else does it.
+
+The rule: everything a reader reads or sees stays in the post. Push the post
+as usual, name the blocks the page will place (`<!-- block name=photos -->`),
+then write the page in `src/extensions/post-pages/`, list it in
+`src/extensions/post-pages.ts`, and point the post at it. A reference shows a
+kind of layout to work toward, never artwork or words to copy. Check
+`/post/<slug>/preview?page=custom` and `?page=standard`: with the page off,
+the post must still read, complete. Then tell the user which pieces would be
+useful to any post.
+
 ## Deleting, and media left behind
 
 Deleting a post or culling frames never deletes media by itself. Media is removed only when the user says yes to a list of it, the same as in the admin's delete dialog.

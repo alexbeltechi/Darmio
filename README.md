@@ -18,7 +18,8 @@ your agent, or by hand in a simple admin. A headless CMS (posts, pages, a
 media and documents library, a content API) with an optional site built on
 the Parabola design system (`packages/parabola`).
 
-Not released yet: the pre-release is planned for 2026-11-25.
+Open source under MIT. Run it yourself: your own copy, on your own Vercel
+and database, with your own AI. What's in each version: `CHANGELOG.md`.
 
 ## Run it locally (developers)
 

@@ -4,8 +4,8 @@
 
 Darmio is a publishing platform for makers, built to be run by your AI. You
 write, publish and change your site by asking your agent, or by hand in a
-simple admin. Open source under MIT: you run it yourself, on your own Vercel
-and database, and nothing it needs runs on anyone else's server.
+simple admin. Open source under MIT: you run it yourself, in your own Vercel
+and MongoDB Atlas accounts.
 
 This is a pre-release. It works, and it will change. Where you get stuck,
 open an issue on GitHub.
@@ -37,7 +37,8 @@ way; it tells you which and why.
 - **Context for your agent.** Settings › Context is the list of what your
   agent reads first: your own documents, or a brain you keep elsewhere.
 - **Built for agents.** An agent API that lists everything an agent can do,
-  a content API for your own front end, and a newsletter sign-up.
+  a content API for your own front end, and a newsletter sign-up
+  (through Kit, with your own Kit account).
 - **Several sites, one admin.** Each project has its own database; switch
   between them from the menu.
 - **Parabola, the design system.** The site and the admin are built on it

@@ -16,11 +16,11 @@ interface ArticleContentProps {
 }
 
 // READING_WIDTH (lib/cms/justified-rows.ts), written out for Tailwind.
-const READING_COLUMN = "mx-auto w-full max-w-[600px]";
+const READING_COLUMN = "mx-auto w-full max-w-[700px]";
 
 /**
  * Renders a post's blocks, each fading in as it scrolls into view. Text-like
- * blocks sit in the 600px reading column (READING_WIDTH); galleries span the full container.
+ * blocks sit in the 700px reading column (READING_WIDTH); galleries span the full container.
  *
  * Spacing comes from Parabola: 40px (`space-y-ds-40`) between blocks (a text block,
  * a gallery, a quote), so a gallery and the text around it read as separate

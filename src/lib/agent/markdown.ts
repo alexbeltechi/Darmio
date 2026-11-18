@@ -23,6 +23,8 @@ import {
  *
  *   <!-- block:3f2a91c0 -->
  *   Plain Markdown is a text block: paragraphs, ## headings, lists, links.
+ *   A footnote goes where it belongs,^[like this] and the page numbers it
+ *   and lists the notes at the end (lib/cms/footnotes.ts).
  *
  *   <!-- block:7be04d12 -->
  *   :::gallery layout=auto width=auto

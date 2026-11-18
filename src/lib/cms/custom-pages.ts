@@ -14,6 +14,8 @@
  *   short `name` ("intro", "photos"), written `<!-- block:ID name=intro -->`
  *   in the post's Markdown. What a page doesn't place still shows, in the
  *   standard way, so nothing is ever lost (`unplaced`).
+ * - Deleting the post deletes the page's code with it, unless another post
+ *   uses the same page (`custom-page-files.ts`).
  *
  * Pure (no database, no components), so the site, the admin and the agent
  * API share it.

@@ -6,6 +6,7 @@ import { pageSlugError } from "@/lib/db/page-slugs";
 import { getActor } from "@/lib/agent/actor";
 import { deletePageBelongings, pageDeletionPlan } from "@/lib/db/page-cascade";
 import { deletePlannedMedia, mediaDeletionPlan } from "@/lib/cms/entry-media-cascade";
+import { removeCustomPageOf } from "@/lib/cms/custom-page-files";
 import { logActivity } from "@/lib/db/activity";
 
 // GET /api/admin/collections/[collection]/entries/[slug] - Get single entry (any status)
@@ -106,7 +107,8 @@ export async function PATCH(
 // A page takes its wireframes and the docs only it uses with it (see
 // lib/db/page-cascade.ts). Media goes only when asked: the body's
 // `deleteMedia` lists the ids to remove, and only those nothing else uses are
-// (lib/cms/entry-media-cascade.ts). `?dryRun=1` returns both plans (`media`:
+// (lib/cms/entry-media-cascade.ts). A post's custom page goes with it, code
+// and all, unless another post uses it (lib/cms/custom-page-files.ts). `?dryRun=1` returns both plans (`media`:
 // what could go, `keptMedia`: used elsewhere) without deleting.
 export async function DELETE(
   request: Request,
@@ -144,6 +146,7 @@ export async function DELETE(
   }
   if (entry && plan) await deletePageBelongings(entry, plan);
   const deletedMedia = mediaPlan ? await deletePlannedMedia(mediaPlan, confirmedMedia) : [];
+  const customPage = entry ? await removeCustomPageOf({ ...entry.data, ...entry.pendingData }) : null;
 
   // Revalidate public pages if the entry was published
   if (wasPublished) {
@@ -158,7 +161,7 @@ export async function DELETE(
     detail: belongingsLabel(plan?.wireframes.length ?? 0, plan?.docs.length ?? 0, deletedMedia.length),
   });
 
-  return NextResponse.json({ success: true, deleted: { ...plan, media: deletedMedia } });
+  return NextResponse.json({ success: true, deleted: { ...plan, media: deletedMedia, ...(customPage ? { customPage } : {}) } });
 }
 
 /** "with 2 wireframes, 1 doc, 23 media items", or undefined when nothing else went. */

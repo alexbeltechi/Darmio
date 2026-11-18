@@ -75,8 +75,10 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   const mediaIds = new Set(entries.flatMap(getPreviewCandidateIds));
   const mediaItems = await getMediaByIds(Array.from(mediaIds));
 
+  // A category inside another looks like the one it's in, unless it has a layout of its own.
+  const parent = category.parentId ? categories.find((c) => c.id === category.parentId) : undefined;
   const view = {
-    layout: category.layout ?? ("hero" as const),
+    layout: category.layout ?? parent?.layout ?? ("hero" as const),
     intro: { title: category.headline || category.label, description: category.description },
   };
 

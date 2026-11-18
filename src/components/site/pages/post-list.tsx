@@ -7,17 +7,18 @@ import type { ViewIntro } from "../site-views";
 import { PageColumn } from "./page-layout";
 import { PostListRow } from "./post-list-row";
 
-const DAY = new Intl.DateTimeFormat("en", { month: "short", day: "numeric", year: "numeric" });
+const DAY = new Intl.DateTimeFormat("en", { month: "short", day: "numeric" });
+const MONTH = new Intl.DateTimeFormat("en", { month: "long", year: "numeric" });
 
 /**
- * A category's posts stacked like a blog, newest first, left-aligned in the
- * reading column (the `list` category layout): the
- * title, its line and how many posts, then the posts as rows, each with a
- * rule under it: each its title in the size of a home page's lists and, under
- * it in small text, its own categories (each a link to its page) and the
- * date; its picture, when it has one, is a small one on the right in its own
- * shape (post-list-row.tsx; a video plays muted, on a loop). No description:
- * rows with and without pictures stay the same height in one stream.
+ * A category's posts stacked like an archive, newest first, left-aligned in
+ * the reading column (the `list` category layout): the title, its line and
+ * how many posts, then the posts as rows, each with a rule under it: its
+ * title and, under it in small capitals, the day and its own categories
+ * (each a link to its page); its picture, when it has one, on the right, whole
+ * and in its own shape, no frame (post-list-row.tsx; a video plays muted, on
+ * a loop). No description. A month's posts sit under its name ("December
+ * 2025"); the newest month, at the top, needs none.
  */
 export function PostList({
   intro,
@@ -30,6 +31,15 @@ export function PostList({
   mediaMap: Map<string, MediaItem>;
   categoryMap: Map<string, Category>;
 }) {
+  // Posts arrive newest first, so a month's posts are already together.
+  const months: { label: string; posts: Entry[] }[] = [];
+  for (const post of posts) {
+    const label = MONTH.format(entryDate(post));
+    const last = months[months.length - 1];
+    if (last?.label === label) last.posts.push(post);
+    else months.push({ label, posts: [post] });
+  }
+
   return (
     <PageColumn>
       <header className="flex flex-col gap-ds-8">
@@ -39,16 +49,23 @@ export function PostList({
           {posts.length} {posts.length === 1 ? "post" : "posts"}
         </p>
       </header>
-      <div className="flex flex-col divide-y divide-ds-border border-b border-ds-border">
-        {posts.map((post) => (
-          <PostListEntry
-            key={post.id}
-            post={post}
-            media={getPostMediaItems(post, mediaMap)[0]}
-            categories={((post.data.categories as string[]) || [])
-              .map((id) => categoryMap.get(id))
-              .filter((c): c is Category => Boolean(c))}
-          />
+      <div className="flex flex-col">
+        {months.map((month, i) => (
+          <section key={month.label} aria-label={month.label} className="flex flex-col">
+            {i > 0 && (
+              <h2 className="pt-ds-20 text-small tracking-wide text-ds-fg-subtle uppercase">{month.label}</h2>
+            )}
+            {month.posts.map((post) => (
+              <PostListEntry
+                key={post.id}
+                post={post}
+                media={getPostMediaItems(post, mediaMap)[0]}
+                categories={((post.data.categories as string[]) || [])
+                  .map((id) => categoryMap.get(id))
+                  .filter((c): c is Category => Boolean(c))}
+              />
+            ))}
+          </section>
         ))}
       </div>
     </PageColumn>
@@ -70,37 +87,32 @@ function PostListEntry({ post, media, categories }: { post: Entry; media?: Media
           muted
           loop
           playsInline
-          className="size-full object-cover"
+          className="size-full object-contain"
         />
       ) : (
-        <MediaImage item={media} alt={media.alt || title} fill sizes="160px" className="object-cover" />
+        <MediaImage item={media} alt={media.alt || title} fill sizes="240px" className="object-contain" />
       )}
     </Link>
   );
 
   return (
     <PostListRow picture={picture} aspect={media?.width && media.height ? media.width / media.height : 3 / 2}>
-      <h2 className="text-prose text-ds-fg">
-        <Link
-          href={href}
-          className="underline decoration-ds-border underline-offset-4 transition-colors hover:decoration-ds-fg"
-        >
+      <h3 className="text-h3 text-ds-fg">
+        <Link href={href} className="underline-offset-4 hover:underline">
           {title}
         </Link>
-      </h2>
-      <div className="flex items-baseline gap-ds-16 text-small text-ds-fg-subtle">
-        <span className="min-w-0 truncate">
-          {categories.map((category, i) => (
-            <span key={category.id}>
-              {i > 0 && ", "}
-              <Link href={`/${category.slug}`} className="hover:text-ds-fg">
-                {category.label}
-              </Link>
-            </span>
-          ))}
-        </span>
-        <span className="shrink-0 tabular-nums">{DAY.format(entryDate(post))}</span>
-      </div>
+      </h3>
+      <p className="text-small tracking-wide text-ds-fg-subtle uppercase">
+        <span className="tabular-nums">{DAY.format(entryDate(post))}</span>
+        {categories.map((category) => (
+          <span key={category.id}>
+            {" · "}
+            <Link href={`/${category.slug}`} className="hover:text-ds-fg">
+              {category.label}
+            </Link>
+          </span>
+        ))}
+      </p>
     </PostListRow>
   );
 }

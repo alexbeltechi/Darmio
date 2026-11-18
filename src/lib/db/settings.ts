@@ -52,6 +52,12 @@ export interface SiteSettings {
    * its own order (lib/cms/menu-order.ts). Set by dragging in admin › Pages.
    */
   menuOrder: string[];
+  /**
+   * Custom pages whose post was deleted on a deployed site, which can't
+   * change its own code: their keys, until the site next runs from its
+   * folder and removes the code (lib/cms/custom-page-files.ts).
+   */
+  customPagesToRemove: string[];
   updatedAt: string;
 }
 
@@ -64,6 +70,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   themes: DS_DEFAULT_LIBRARY,
   publishedTheme: null,
   menuOrder: [],
+  customPagesToRemove: [],
   updatedAt: new Date(0).toISOString(),
 };
 
@@ -154,6 +161,8 @@ export async function getSiteSettings(): Promise<SiteSettings> {
     themes: parseDsThemeLibrary(doc.themes, doc.theme),
     publishedTheme: parsePublishedTheme(doc.publishedTheme),
     menuOrder: tryParse(parseMenuOrder, doc.menuOrder, DEFAULT_SETTINGS.menuOrder),
+    // The same shape: a list of slugs, each once.
+    customPagesToRemove: tryParse(parseMenuOrder, doc.customPagesToRemove, DEFAULT_SETTINGS.customPagesToRemove),
     updatedAt: (doc.updatedAt as string) || DEFAULT_SETTINGS.updatedAt,
   };
 }
@@ -208,6 +217,10 @@ export async function updateSiteSettings(
 
   if (updates.menuOrder !== undefined) {
     set.menuOrder = parseMenuOrder(updates.menuOrder);
+  }
+
+  if (updates.customPagesToRemove !== undefined) {
+    set.customPagesToRemove = parseMenuOrder(updates.customPagesToRemove);
   }
 
   if (updates.activeTheme !== undefined) {

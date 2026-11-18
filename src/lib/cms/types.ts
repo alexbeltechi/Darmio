@@ -203,7 +203,7 @@ export interface GalleryBlock {
   gap?: number;
   /**
    * `auto` (the default, also when unset): inline for up to three images, the
-   * page's whole width for more. `large` / `normal`: inline, up to 820px.
+   * page's whole width for more. `large` / `normal`: inline, the reading column (700px).
    * `full`: the page's whole width. See `galleryIsFull` in justified-rows.ts.
    */
   width?: (typeof GALLERY_WIDTHS)[number];

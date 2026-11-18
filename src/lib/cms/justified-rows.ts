@@ -60,8 +60,14 @@ const MAX_ROW_PX = 820;
  * How tall a row may get, in pixels: as tall as the gallery is wide, so a
  * square image fills the width; taller on a phone so
  * a portrait isn't left as a thumbnail; never more than MAX_ROW_PX.
+ *
+ * Not for one image a row in the reading column (an inline gallery that
+ * stacks, up to MAX_ROW_PX wide): there a picture always fills the width,
+ * a portrait as tall as its shape makes it, as on Substack. Only its own
+ * pixels limit it.
  */
-function rowCap(containerWidth: number): number {
+function rowCap(containerWidth: number, columns: number): number {
+  if (columns === 1 && containerWidth <= MAX_ROW_PX) return Infinity;
   const ratio = containerWidth < 640 ? 1.5 : 1;
   return Math.min(ratio * containerWidth, MAX_ROW_PX);
 }
@@ -100,7 +106,7 @@ export function justifiedRows(
   for (let i = 0; i < aspects.length; i += columns) rows.push(aspects.slice(i, i + columns).map((_, j) => i + j));
 
   return rows.map((items) => {
-    const cap = Math.min(native(items), rowCap(width));
+    const cap = Math.min(native(items), rowCap(width, columns));
     const full = fit(items);
     return full <= cap
       ? { items, mode: "fill" as const, height: full / width }
@@ -118,10 +124,10 @@ export const READING_WIDTH = 700;
 
 /**
  * The widest an inline gallery with images side by side runs (Auto from four
- * images, grid, masonry, `large`): the tallest a row may be, so rows of three
- * stay big enough to see. Was 1024px.
+ * images, grid, masonry, `large`): the reading column, so every inline block
+ * lines up with the text. Was 820px.
  */
-export const INLINE_GALLERY_MAX = MAX_ROW_PX;
+export const INLINE_GALLERY_MAX = READING_WIDTH;
 
 /**
  * Whether a gallery shows one image a row: the Stacked layout, or Auto with

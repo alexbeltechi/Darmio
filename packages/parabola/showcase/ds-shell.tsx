@@ -15,6 +15,7 @@ import { DsTopBar } from "../primitives/top-bar";
 import { DS_THEME_SCOPE } from "../theme";
 import { DsModeScope } from "../provider";
 import { DS_GROUPS, DS_TIERS, dsHref, type DsGroup } from "./registry";
+import { ThemeExport } from "./theme-export";
 import { PanelFooterSlotContext, PanelSlotContext, ThemeEditorProvider, ThemeHeaderActions, useThemeEditor } from "./theme-editor";
 
 /** Sidebar contents: search, then each tier's label and its collapsible groups. */
@@ -120,9 +121,11 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
  * canvas holding the current page. Below `md` the sidebar moves into the
  * hamburger menu.
  */
-/** Top left of the sidebar: a menu to Parabola's home or back to the website. */
-function ShellMenu() {
+/** Top left of the sidebar: a menu to Parabola's home or back to the website; just Home when there's no website. */
+function ShellMenu({ backHref }: { backHref: string | null }) {
   const router = useRouter();
+  // With no website to go back to there's one place to go: a plain Home button, not a menu of one.
+  if (!backHref) return <DsButton size="small" variant="text" iconLeft={House} aria-label="Home" href="/parabola" />;
   return (
     <DsDropdown>
       <DsDropdownTrigger asChild>
@@ -132,7 +135,7 @@ function ShellMenu() {
         <DsDropdownItem iconLeft={House} onSelect={() => router.push("/parabola")}>
           Home
         </DsDropdownItem>
-        <DsDropdownItem iconLeft={ArrowLeft} onSelect={() => router.push("/")}>
+        <DsDropdownItem iconLeft={ArrowLeft} onSelect={() => router.push(backHref)}>
           Back to website
         </DsDropdownItem>
       </DsDropdownContent>
@@ -140,7 +143,14 @@ function ShellMenu() {
   );
 }
 
-export function DsShell({ children }: { children: React.ReactNode }) {
+export function DsShell({
+  children,
+  backHref = "/",
+}: {
+  children: React.ReactNode;
+  /** Where "Back to website" goes; null leaves it out (Parabola's own site, where the showcase is the website). */
+  backHref?: string | null;
+}) {
   const [menuOpen, setMenuOpen] = React.useState(false);
   const closeMenu = React.useCallback(() => setMenuOpen(false), []);
 
@@ -157,21 +167,21 @@ export function DsShell({ children }: { children: React.ReactNode }) {
     <ThemeEditorProvider>
       <aside className="fixed inset-y-0 left-0 hidden w-[240px] flex-col gap-4 overflow-y-auto border-r border-ds-border bg-ds-surface-subtle p-5 md:flex">
         <div className="flex items-center justify-between">
-          <ShellMenu />
+          <ShellMenu backHref={backHref} />
           <DsThemeToggle size="small" />
         </div>
         <SidebarNav />
       </aside>
 
       <div className="md:hidden">
-        <DsNavBar menuOpen={menuOpen} onMenuToggle={() => setMenuOpen((o) => !o)} />
+        <DsNavBar backHref={backHref ?? "/parabola"} menuOpen={menuOpen} onMenuToggle={() => setMenuOpen((o) => !o)} />
         <DsMenu
           open={menuOpen}
           onClose={closeMenu}
           className="items-stretch justify-start overflow-y-auto px-5 pt-[76px] pb-10"
         >
           {/* The menu is modal, so it carries its own copy of the bar for closing it. */}
-          <DsNavBar menuOpen onMenuToggle={closeMenu} />
+          <DsNavBar backHref={backHref ?? "/parabola"} menuOpen onMenuToggle={closeMenu} />
           <SidebarNav onNavigate={closeMenu} />
         </DsMenu>
       </div>
@@ -211,7 +221,7 @@ export function DsCanvas({
 }) {
   const [slot, setSlot] = React.useState<HTMLElement | null>(null);
   const [footer, setFooter] = React.useState<HTMLElement | null>(null);
-  const { previewMode, setPreviewMode } = useThemeEditor();
+  const { pickedMode, setPreviewMode } = useThemeEditor();
   // Collapse all, then Expand all: every accordion on the page (the panel's sections) at once.
   const [allOpen, setAllOpen] = React.useState(true);
   const [version, setVersion] = React.useState(0);
@@ -230,7 +240,7 @@ export function DsCanvas({
             the title and the theme's actions. Below md it sits right under the fixed
             nav bar (76px, its colour reaching up behind the bar), with no padding of
             its own above. */}
-        <DsTopBar surface="solid" className="top-[76px] self-start before:absolute before:inset-x-0 before:bottom-full before:h-[76px] before:bg-ds-bg md:top-0 md:before:hidden lg:col-span-full lg:row-start-1">
+        <DsTopBar surface="solid" className="border-b border-ds-border top-[76px] self-start before:absolute before:inset-x-0 before:bottom-full before:h-[76px] before:bg-ds-bg md:top-0 md:before:hidden lg:col-span-full lg:row-start-1">
           <div className="flex flex-wrap items-center justify-between gap-ds-16 px-5 py-3">
             <div className="flex min-w-0 flex-col">
               <p className="text-small text-ds-fg-subtle">{group}</p>
@@ -238,6 +248,7 @@ export function DsCanvas({
             </div>
             {/* Collapse all / Expand all first, then the theme's Undo, Redo, Save, Publish and ⋮ menu, wherever you are. */}
             <ThemeHeaderActions
+              trailing={<ThemeExport />}
               leading={
                 <DsButton
                   size="small"
@@ -257,7 +268,9 @@ export function DsCanvas({
         {/* The page wears the open theme (theme-editor), light or dark as the panel says; everything
             around it stays Parabola's own, in the UI's mode. */}
         <div
-          data-ds-mode={previewMode}
+          // Only once a mode is picked: until then the canvas follows the page's own
+          // .dark class, set before the first paint, so it never flashes light.
+          data-ds-mode={pickedMode ?? undefined}
           className={`${DS_THEME_SCOPE} flex min-w-0 items-center-safe justify-center bg-ds-bg px-6 py-12 lg:col-start-1 lg:row-start-2 lg:min-h-0 lg:overflow-y-auto`}>
           <DsModeScope onThemeChange={setPreviewMode}>{children}</DsModeScope>
         </div>

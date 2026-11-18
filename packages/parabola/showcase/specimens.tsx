@@ -58,6 +58,8 @@ import { DsPlaceholder } from "../components/placeholder";
 import { DsEmptyState } from "../components/empty-state";
 import { DsInfoCard } from "../components/info-card";
 import { DsLinkList } from "../components/link-list";
+import { DsPromptBox } from "../components/prompt-box";
+import { DsSubscribe } from "../components/subscribe";
 import { DsColourPicker } from "../components/colour-picker";
 import { DsCopyField } from "../primitives/copy-field";
 import { DsProgress } from "../primitives/progress";
@@ -452,7 +454,7 @@ export function Radio() {
 const LONG_PROMPT = Array.from(
   { length: 6 },
   (_, i) =>
-    `${i + 1}. Set up Darmio for me. Follow SETUP.md in the Darmio folder: it says what to ask me and what to do, step by step, and what each step is for.`
+    `${i + 1}. Set up Parabola for me. Follow the README in the Parabola package: it says what to install, what to import and where, step by step, and what each step is for.`
 ).join("\n");
 
 export function TextareaField() {
@@ -1140,7 +1142,7 @@ export function Progress() {
         value={8}
         title="Storage"
         meta="82 MB of 1 GB free"
-        description="214 media items, counted by the CMS."
+        description="214 media items, counted by the app."
       />
       <DsProgress
         max={1024}
@@ -1200,7 +1202,7 @@ export function InfoCard() {
   return (
     <div className="flex w-full max-w-md flex-col gap-4">
       <DsInfoCard title="Set up with AI">
-        <DsCopyField className="w-full" value="Set up Darmio for me. Follow SETUP.md in the Darmio folder." />
+        <DsCopyField className="w-full" value="Set up Parabola for me. Follow the README in the Parabola package." />
       </DsInfoCard>
       <DsInfoCard title="Not live yet">
         <p>Changes to a published post wait until you publish them.</p>
@@ -1222,7 +1224,7 @@ export function CopyField() {
             wrap={o.wrap}
             collapsible={o.showMore}
             mono={o.mono}
-            value={long ? LONG_PROMPT : "Set up Darmio for me. Follow SETUP.md in the Darmio folder: it says what to ask me and what to do."}
+            value={long ? LONG_PROMPT : "Set up Parabola for me. Follow the README in the Parabola package: it says what to install and what to import."}
           />
         </DsField>
       }
@@ -1233,6 +1235,55 @@ export function CopyField() {
           onChange={(next) => setO({ ...next, ...(next.showMore && !o.showMore ? { wrap: false } : {}), ...(next.wrap && !o.wrap ? { showMore: false } : {}) })}
         />
       }
+    />
+  );
+}
+
+/** Components › Input › Prompt box: a chat prompt that grows into two rows, with files, a microphone and a note. */
+export function PromptBox() {
+  const [o, setO] = useState({ files: true, voice: true, note: true, enterSends: false, busy: false });
+  const [listening, setListening] = useState(false);
+  return (
+    <Specimen
+      wide
+      preview={
+        <DsPromptBox
+          files={o.files}
+          onVoice={o.voice ? () => setListening((l) => !l) : undefined}
+          listening={listening}
+          enterSends={o.enterSends}
+          busy={o.busy}
+          onStop={() => setO({ ...o, busy: false })}
+          note={o.note ? "AI can make mistakes. Check important info." : undefined}
+        />
+      }
+      controls={
+        <Controls
+          options={o}
+          labels={{ files: "Add files (+)", voice: "Microphone", note: "Note under", enterSends: "Enter sends", busy: "Waiting for reply" }}
+          onChange={setO}
+        />
+      }
+    />
+  );
+}
+
+/** Components › Input › Subscribe: an email field and one button, then a thank-you line. */
+export function Subscribe() {
+  const [o, setO] = useState({ error: false });
+  return (
+    <Specimen
+      preview={
+        <DsSubscribe
+          key={String(o.error)}
+          error={o.error ? "that address looks mistyped" : undefined}
+          onSubscribe={async () => {
+            await new Promise((r) => setTimeout(r, 700));
+            if (o.error) throw new Error("that address looks mistyped");
+          }}
+        />
+      }
+      controls={<Controls options={o} labels={{ error: "Show the error" }} onChange={setO} />}
     />
   );
 }

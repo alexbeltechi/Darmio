@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { DsButton, DsMenu, DsThemeToggle, DsTopBar, type DsNavSurface } from "@beltechi/parabola";
 
-/** A section in the nav: a top-level category and the slugs that light it. */
+/** A section in the nav: a top-level category or page, and the slugs inside it. */
 export type NavSection = { slug: string; label: string; members: string[] };
 
 // Pages whose URL doesn't name a category (a post) can light a pill anyway.
@@ -32,13 +32,16 @@ export function NavHighlight({ slug }: { slug: string | null }) {
   return null;
 }
 
-/** The nav pill lit for a given path: home, a section, or a category inside
- * one (e.g. /portrait lights up Photography). */
+/**
+ * The nav item lit for a given path: home, or a section's own page. A
+ * category inside a section (/making, inside Writing) lights nothing: it's
+ * a page of its own, not the section's.
+ */
 function activeSlugForPath(pathname: string, sections: NavSection[]): string {
   if (pathname === "/") return "home";
 
   const segment = pathname.split("/")[1] ?? "";
-  return sections.find((c) => c.members.includes(segment))?.slug ?? "";
+  return sections.find((c) => c.slug === segment)?.slug ?? "";
 }
 
 const LOGO_CLASS = "text-h3 text-ds-fg";

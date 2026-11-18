@@ -5,12 +5,15 @@
   "dir": "packages/parabola",
   "files": "*",
   "exclude": [
+    ".github/",
     ".gitignore",
     ".npmrc",
+    "CHANGELOG.md",
     "bin/",
     "cli/",
     "package-lock.json",
     "scripts/",
+    "site/",
     "test/"
   ]
 }

@@ -159,7 +159,8 @@ function SourceLine({ post, settings }: { post: Entry; settings: SourceLineSetti
 
 /**
  * Other posts: those sharing a sub-category first, then the rest of the
- * post's top-level group (never another group), newest first within each. An extra
+ * post's top-level group (never another group), newest first within each, six
+ * at most, under a heading on the left. An extra
  * under the post: if it can't load (say the database drops for a moment), the
  * post still shows without it.
  */
@@ -185,7 +186,7 @@ async function moreToExplore({
   categoryIds: string[];
   allCategories: CategoryRef[];
 }) {
-  const MAX_RELATED_POSTS = 12;
+  const MAX_RELATED_POSTS = 6;
 
   const others = (await getPublishedEntries("posts"))
     .filter((p) => p.id !== postId)
@@ -212,7 +213,10 @@ async function moreToExplore({
   const displayPosts = [
     ...others.filter(sharesSub),
     ...others.filter((p) => !sharesSub(p) && inGroup(p)),
-  ].slice(0, MAX_RELATED_POSTS);
+  ]
+    // The grid shows pictures: a post without one has no card, so it doesn't take one of the six places.
+    .filter((p) => getPreviewCandidateIds(p).length > 0)
+    .slice(0, MAX_RELATED_POSTS);
 
   if (displayPosts.length === 0) return null;
 
@@ -243,29 +247,22 @@ async function moreToExplore({
   return (
     // As wide as an inline gallery (INLINE_GALLERY_MAX, 820px), inside the page's margins.
     <section className="px-ds-20 pt-ds-160 pb-ds-40">
-      {/* The title column is as wide as its longest line, so a long category name never runs into the grid. */}
-      <div
-        className="mx-auto grid w-full gap-ds-80 lg:grid-cols-[auto_minmax(0,1fr)]"
-        style={{ maxWidth: INLINE_GALLERY_MAX }}
-      >
-        {/* Centred above the grid on a phone; beside it from lg, staying put under the fixed nav as the grid scrolls past. */}
-        <div className="flex flex-col items-center gap-ds-20 text-center lg:sticky lg:top-28 lg:items-start lg:self-start lg:text-left">
-          <h2 className="text-h2 text-ds-fg sm:text-h1 lg:text-display">
-            <span className="block">More</span>
+      <div className="mx-auto flex w-full flex-col gap-ds-40" style={{ maxWidth: INLINE_GALLERY_MAX }}>
+        {/* One line over the grid: the heading on the left, the way to the rest on the right. */}
+        <div className="flex flex-wrap items-center justify-between gap-ds-16">
+          <h2 className="text-h2 text-ds-fg sm:text-h1">
+            More{" "}
             {named ? (
-              <Link
-                href={`/${named.slug}`}
-                className="block text-ds-fg-subtle transition-opacity hover:opacity-70"
-              >
+              <Link href={`/${named.slug}`} className="text-ds-fg-subtle transition-opacity hover:opacity-70">
                 {named.label}
               </Link>
             ) : (
-              <span className="block text-ds-fg-subtle">posts</span>
+              <span className="text-ds-fg-subtle">posts</span>
             )}
           </h2>
           <DsButton href={parent ? `/${parent.slug}` : "/"}>{parent ? `See all ${parent.label}` : "See all"}</DsButton>
         </div>
-        {/* Two columns plus dense's one: three beside the title, two on a phone. */}
+        {/* Two columns plus dense's one: three across, two on a phone. */}
         <PostGrid
           posts={displayPosts}
           mediaMap={mediaMap}
@@ -273,6 +270,7 @@ async function moreToExplore({
           layout="masonry"
           targetColumns={2}
           padded={false}
+          align="start"
           dense
         />
       </div>

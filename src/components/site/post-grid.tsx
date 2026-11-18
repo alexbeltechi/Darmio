@@ -18,6 +18,8 @@ interface PostGridProps {
   dense?: boolean;
   /** Masonry only: column count at desktop width. */
   targetColumns?: number;
+  /** Masonry only: where the columns sit when there are fewer than fit. */
+  align?: "center" | "start";
 }
 
 /**
@@ -32,6 +34,7 @@ export function PostGrid({
   padded = true,
   dense = false,
   targetColumns,
+  align,
 }: PostGridProps) {
   const categoryMap = new Map(categories.map((c) => [c.id, c]));
 
@@ -53,6 +56,7 @@ export function PostGrid({
       padded={padded}
       dense={dense}
       targetColumns={targetColumns}
+      align={align}
     />
   );
 }

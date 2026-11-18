@@ -1,7 +1,15 @@
 # Parabola
 
-The design system for the site and the admin, as a package: `@beltechi/parabola`.
-Showcase: `/parabola`.
+Parabola is a style, not a design system in the traditional sense, although
+it contains components. **Fixed below, free above:** the basics are those of a
+design system (tokens, buttons, fields, a spacing scale), and they leave room
+for visual expression, so any model can experiment on top of them and a
+site still reads as one thing from page to page.
+
+The default theme is the fallback, so everything is consistent; from there a
+page can expand. Not every page is made from scratch.
+
+As a package it's `@beltechi/parabola`. Showcase: `/parabola`.
 
 ## What belongs here
 
@@ -22,10 +30,11 @@ identical, promote it to a component then, not before.
 
 ## Installing
 
-Parabola is an npm package, `@beltechi/parabola`, published by version from
-`packages/parabola` in the Darmio workspace. Install it and pin a
-version; never copy the folder. Nothing checks for a newer version at run
-time: upgrading is a `package.json` change.
+Parabola is an npm package, `@beltechi/parabola`, released from this repo
+(see [Releasing a version](#releasing-a-version)). Install it and pin a
+version; never copy the folder by hand (to copy pieces into a project, use
+`add`, below). Nothing checks for a newer version at run time: upgrading is
+a `package.json` change.
 
 ```sh
 npm install @beltechi/parabola
@@ -44,6 +53,9 @@ ones you don't have). Then, in the app:
    @source "../node_modules/@beltechi/parabola";
    ```
 
+   The `@source` path is relative to the CSS file: from `src/app/globals.css`
+   it's `"../../node_modules/@beltechi/parabola"`.
+
 2. Wrap the app in `DsProvider`, where it plugs in its framework:
 
    ```tsx
@@ -58,22 +70,19 @@ ones you don't have). Then, in the app:
    `next.config.ts`. A build step (compiled JS and `.d.ts`) comes when a
    non-Next consumer needs one.
 
-In this workspace the CMS depends on the package as `"*"`, so `npm install`
-always links `packages/parabola` into `node_modules`, whatever its version,
-and edits show up live. The CMS never fetches Parabola from npm: each CMS
-release carries the Parabola in its repo.
+`site/` in this repo is a complete, minimal example: it's the app behind
+[parabolasystem.com](https://parabolasystem.com).
 
 ## Self-contained
 
-The package depends on nothing in the app and on no framework. ESLint
-enforces it: no `@/…` imports inside `packages/parabola`.
+The package depends on nothing in an app and on no framework: no `@/…`
+imports, nothing from the app that uses it.
 
-- `tokens.css`: tokens, the dark variant and the `ds-*` utilities. The app
-  imports it once, after Tailwind (see `src/app/globals.css`).
-- `cn.ts`: the class-name helper, taught Parabola's custom classes. The app's
-  `@/lib/utils` re-exports it.
-- `provider.tsx`: `DsProvider` (above). This app sets it up in
-  `src/components/providers/theme-provider.tsx`.
+- `tokens.css`: tokens, the dark variant and the `ds-*` utilities. An app
+  imports it once, after Tailwind (see `site/app/globals.css`).
+- `cn.ts`: the class-name helper, taught Parabola's custom classes.
+- `provider.tsx`: `DsProvider` (above). `site/app/providers.tsx` sets it up
+  for Next.
 
 ### Add-ons
 
@@ -98,7 +107,8 @@ component contract asks for one). It is not part of the design system: never
 import it from app code (ESLint stops you) and nothing in the core imports
 it. It is the one place that touches a framework (`next/navigation`, for the
 shell's current path), so `next` is an optional peer, needed only when the
-showcase is mounted. The CMS mounts it from `src/app/parabola`.
+showcase is mounted. Parabola's own site mounts it from `site/app/parabola`
+(and so does Darmio, from `src/app/parabola`).
 
 ## Naming
 
@@ -125,9 +135,10 @@ A theme is data (`theme.ts`), much as shadcn's create page sets a style:
   resolve a theme; `dsCharacterColourOptions` is what the colour
   derivations take from it. An agent sets a look by moving dials. The
   panel opens with **Taste** (`taste.ts`), aesthetics and personality:
-  the **Style** rail, one pick at a time as tabs are (`DS_TASTES`:
-  Classic, Minimal, Elegant, Tech, Natural, Retro, Sport;
-  `dsPickTaste`, `dsShuffleTaste`, `dsRandomTastes`), which chooses one chip on each section's rail
+  a style (`DS_TASTES`: Classic, Minimal, Elegant, Tech, Natural, Retro,
+  Sport; `dsPickTaste`, `dsShuffleTaste`, `dsRandomTastes`; the panel no
+  longer lists them to pick from, the dice and Shuffle draw from them, and
+  the themes at the panel's top are the looks to choose between), which chooses one chip on each section's rail
   (`character.scoped`): a palette in Colour (`DS_PALETTES`,
   `dsPaletteDraw`), a kind of type in Typography (`DS_TYPE_STYLES`,
   `dsTypeStyleFonts`) and a kind of button in Buttons (`DS_BUTTON_LOOKS`,
@@ -194,6 +205,10 @@ A theme is data (`theme.ts`), much as shadcn's create page sets a style:
   (`pillRadius`, `--ds-radius-chip`, `rounded-ds-chip`). Fields have their
   own outline (`fields`: on, 2px, solid by default; `--ds-field-border-width`;
   an invalid field's red outline, `DS_FIELD_INVALID_CLASS`, is always 2px).
+- **Navigation** (`nav-style.ts`, `theme.nav.surface`): what's behind the
+  site's pinned nav, one of three (`DS_NAV_SURFACES`): None, Blur (the nav
+  fade, the default) or Solid (the page colour alone, hiding what scrolls
+  under it). A site passes it to its `DsTopBar` as `surface`.
 - **Radius** (`radius.ts`): None, Small (2px), Medium, Large (the default) or a
   custom number of pixels (the cards' and pills' corner, the rest scaled),
   for every corner (`rounded-ds-sm` … `rounded-ds-lg`) and the pill
@@ -221,16 +236,23 @@ with `scope` (`DS_THEME_SCOPE`, as /parabola's canvas does):
 <DsThemeStyle theme={…} scope={DS_THEME_SCOPE} />                              {/* only <div className="ds-theme"> */}
 ```
 
-An app that hosts Parabola's fonts (the CMS does, with next/font) sets
+An app that hosts Parabola's fonts (the site does, with next/font) sets
 `--ds-font-<id>` to its family names; each stack tries it first. Pass the
 library and a saver to `DsProvider` (`themeLibrary`, `onThemeLibraryChange`)
 and `/parabola` publishes too.
 
 ## Sharing a theme
 
-**Share**, at the foot of the theme panel, hands the open theme over as a
-**brand kit** (`brand-kit.ts`), one source with three ways out. Nothing goes
-anywhere on its own; the maker puts it where they work.
+**Export**, top right of every `/parabola` page, hands the open theme over
+as a **brand kit** (`brand-kit.ts`), one source with several ways out.
+Nothing goes anywhere on its own; the maker puts it where they work.
+
+- **The style in words** (`kit.style`), first in the dialog with one button
+  to copy it: the look in a sentence, the colours, fonts, sizes and shapes,
+  and how to use them, to paste at the end of any prompt ("make a website,
+  in this style"). It says what holds and what's open, Parabola's "fixed
+  below, free above", and ends "Created with parabolasystem.com". The
+  guide below says the same.
 
 - **Brand kit**: a zip (`zip.ts`, no dependency) with `README.md` (the brand
   guide), `tokens.json`, `tokens.css` and `parabola-theme.json`.
@@ -318,9 +340,14 @@ they update.
 
 Change things here, add an entry to `CHANGELOG.md` in plain words (say which
 files a project is likely to have edited), raise `version` in
-`package.json`, `npm run bundle`, `npm test`, commit, and tag it `v<version>`.
-`update` takes the newest tag. Nothing happens in any project until it runs
-`update`.
+`package.json`, `npm run bundle`, `npm test`, `npm run check`, commit, and
+tag it `v<version>`. `update` takes the newest tag. Nothing happens in any
+project until it runs `update`.
+
+Publishing a GitHub release for the tag puts that version on npm
+(`.github/workflows/publish.yml`; it needs the repo's `NPM_TOKEN` secret).
+parabolasystem.com rebuilds from `main` on every push, so the site always
+shows the latest Parabola.
 
 ## Using it
 
@@ -391,7 +418,7 @@ Blocks follow the component contract, plus:
 - **A token**: add it to `:root` (and `.dark` if it differs by theme) in
   `tokens.css`, map it in `@theme inline` if it needs a Tailwind utility, and
   list it in `showcase/colour-roles.ts` (or `accents.ts` for an accent).
-  Run `npm run check:parabola`: it fails if the showcase or accent list and
+  Run `npm run check`: it fails if the showcase or accent list and
   `tokens.css` disagree, or if a themed token isn't shown.
 - **A primitive or component**: a file in its tier's folder, a named export in
   `index.ts`, a specimen and a registry entry under its tier. Follow the

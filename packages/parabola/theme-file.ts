@@ -3,12 +3,13 @@ import { DS_ACCENT_COLOURS, DS_BASE_COLOURS, DS_ICON_LIBRARIES, DS_SHIFT_MAX, ds
 import { DS_CHARACTER_DIALS, DS_DEFAULT_CHARACTER } from "./character";
 import { DS_CUSTOM_FONT_ID_RE, DS_FONTS, DS_FONT_LABEL_RE, DS_GOOGLE_FONT_RE, dsGoogleWeightsValid } from "./fonts";
 import { DS_OUTLINE_MAX } from "./button-style";
+import { DS_NAV_SURFACES } from "./nav-style";
 import { DS_RADII, DS_RADIUS_MAX } from "./radius";
 import { DS_TEXT_STYLES, parseDsThemeConfig, type DsThemeConfig } from "./theme";
 
 /**
  * The theme file: `<name>.theme.json`, a theme a maker or their agent writes
- * by hand, drops into Settings > Design and removes again, without touching
+ * by hand, drops into the app (Darmio: Settings > Design) and removes again, without touching
  * code. `theme` holds the same choices Parabola's builder sets
  * (`DsThemeConfig`); the file adds a name and a version, and this contract says
  * exactly which keys are allowed, so a mistake is named instead of ignored.
@@ -16,7 +17,9 @@ import { DS_TEXT_STYLES, parseDsThemeConfig, type DsThemeConfig } from "./theme"
  * Anything left out keeps Parabola's default. Anything not listed in
  * `DS_THEME_FILE_CONTRACT` is rejected, with the allowed values in the message.
  */
-export const DS_THEME_FILE_FORMAT = "darmio-theme";
+export const DS_THEME_FILE_FORMAT = "parabola-theme";
+/** Older theme files, written when Parabola shipped inside Darmio; still read. */
+export const DS_THEME_FILE_LEGACY_FORMATS: readonly string[] = ["darmio-theme"];
 export const DS_THEME_FILE_VERSION = 1;
 export const DS_THEME_FILE_SUFFIX = ".theme.json";
 /** A file bigger than this is not a theme. */
@@ -29,6 +32,7 @@ const STYLE_KEYS = ["label", "family", "weight", "size", "lineHeight"] as const;
 const CUSTOM_FONT_KEYS = ["id", "label", "google"] as const;
 const BUTTON_KEYS = ["fill", "contrast", "outline", "outlineWidth", "outlineOpacity", "shadow", "shadowAngle"] as const;
 const FIELD_KEYS = ["outline", "outlineWidth", "outlineOpacity"] as const;
+const NAV_KEYS = ["surface"] as const;
 const CHARACTER_KEYS = ["tastes", "scoped", "mood", ...DS_CHARACTER_DIALS.map((d) => d.id)] as const;
 const THEME_KEYS = [
   "character",
@@ -41,6 +45,7 @@ const THEME_KEYS = [
   "pillRadius",
   "buttons",
   "fields",
+  "nav",
   "icons",
 ] as const;
 const FILE_KEYS = ["format", "version", "name", "description", "theme"] as const;
@@ -58,6 +63,8 @@ export const DS_THEME_FILE_CONTRACT = {
   character: CHARACTER_KEYS,
   buttons: BUTTON_KEYS,
   fields: FIELD_KEYS,
+  nav: NAV_KEYS,
+  navSurfaces: DS_NAV_SURFACES.map((s) => s.id),
   radii: DS_RADII.map((r) => r.id),
   radiusMaxPx: DS_RADIUS_MAX,
   fonts: DS_FONTS.map((f) => f.id),
@@ -237,6 +244,17 @@ function checkTheme(theme: Obj, errors: string[]) {
     }
   }
 
+  if (theme.nav !== undefined) {
+    if (!isObj(theme.nav)) errors.push("theme.nav: must be an object");
+    else {
+      unknownKeys(theme.nav, NAV_KEYS, "theme.nav", errors);
+      const surface = theme.nav.surface;
+      if (surface !== undefined && !DS_THEME_FILE_CONTRACT.navSurfaces.some((s) => s === surface)) {
+        errors.push(`theme.nav.surface: must be one of ${list(DS_THEME_FILE_CONTRACT.navSurfaces)}`);
+      }
+    }
+  }
+
   if (theme.icons !== undefined && !DS_THEME_FILE_CONTRACT.icons.some((i) => i === theme.icons)) {
     errors.push(`theme.icons: must be one of ${list(DS_THEME_FILE_CONTRACT.icons)}`);
   }
@@ -283,7 +301,7 @@ export function dsThemeFileParse(input: unknown): DsThemeFileResult {
 
   const errors: string[] = [];
   unknownKeys(value, FILE_KEYS, "file", errors);
-  if (value.format !== DS_THEME_FILE_FORMAT) errors.push(`format: must be "${DS_THEME_FILE_FORMAT}"`);
+  if (value.format !== DS_THEME_FILE_FORMAT && !DS_THEME_FILE_LEGACY_FORMATS.includes(value.format as string)) errors.push(`format: must be "${DS_THEME_FILE_FORMAT}"`);
   if (value.version !== DS_THEME_FILE_VERSION) errors.push(`version: must be ${DS_THEME_FILE_VERSION}`);
   if (typeof value.name !== "string" || !value.name.trim() || value.name.length > 60) errors.push("name: a name of 1 to 60 characters");
   if (value.description !== undefined && (typeof value.description !== "string" || value.description.length > 300)) {

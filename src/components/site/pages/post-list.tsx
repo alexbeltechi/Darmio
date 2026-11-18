@@ -2,7 +2,7 @@ import Link from "next/link";
 import { MediaImage } from "@/components/shared/media-image";
 import { entryDate } from "@/lib/cms/read-time";
 import type { Entry, MediaItem } from "@/lib/cms/types";
-import { getPostMediaItems, getPreviewText, type Category } from "../post-grid-shared";
+import { getPostMediaItems, type Category } from "../post-grid-shared";
 import type { ViewIntro } from "../site-views";
 import { PageColumn } from "./page-layout";
 import { PostListRow } from "./post-list-row";
@@ -12,13 +12,12 @@ const DAY = new Intl.DateTimeFormat("en", { month: "short", day: "numeric", year
 /**
  * A category's posts stacked like a blog, newest first, left-aligned in the
  * reading column (the `list` category layout): the
- * title, its line and how many posts, then each post as its title in the
- * size of a home page's lists, the start of its text, and its own
- * categories (each a link to its page) with the date after them in small
- * text, the three lines evenly apart; its picture, when it has one, sits on
- * the left, centred on the text, in its own shape, at least as tall as the
- * text and at most 150px (post-list-row.tsx; a video plays muted, on a
- * loop). Posts with and without pictures sit in the same stream.
+ * title, its line and how many posts, then the posts as rows, each with a
+ * rule under it: each its title in the size of a home page's lists and, under
+ * it in small text, its own categories (each a link to its page) and the
+ * date; its picture, when it has one, is a small one on the right in its own
+ * shape (post-list-row.tsx; a video plays muted, on a loop). No description:
+ * rows with and without pictures stay the same height in one stream.
  */
 export function PostList({
   intro,
@@ -40,7 +39,7 @@ export function PostList({
           {posts.length} {posts.length === 1 ? "post" : "posts"}
         </p>
       </header>
-      <div className="flex flex-col gap-ds-40 pt-ds-16">
+      <div className="flex flex-col divide-y divide-ds-border border-b border-ds-border">
         {posts.map((post) => (
           <PostListEntry
             key={post.id}
@@ -59,7 +58,6 @@ export function PostList({
 function PostListEntry({ post, media, categories }: { post: Entry; media?: MediaItem; categories: Category[] }) {
   const href = `/post/${post.slug}`;
   const title = (post.data.title as string) || post.slug;
-  const text = getPreviewText(post);
   const isVideo = media?.mime.startsWith("video/");
 
   const picture = media && (
@@ -75,7 +73,7 @@ function PostListEntry({ post, media, categories }: { post: Entry; media?: Media
           className="size-full object-cover"
         />
       ) : (
-        <MediaImage item={media} alt={media.alt || title} fill sizes="(max-width: 640px) 160px, 280px" className="object-cover" />
+        <MediaImage item={media} alt={media.alt || title} fill sizes="160px" className="object-cover" />
       )}
     </Link>
   );
@@ -90,7 +88,6 @@ function PostListEntry({ post, media, categories }: { post: Entry; media?: Media
           {title}
         </Link>
       </h2>
-      {text && <p className="text-p text-ds-fg-muted">{text}</p>}
       <div className="flex items-baseline gap-ds-16 text-small text-ds-fg-subtle">
         <span className="min-w-0 truncate">
           {categories.map((category, i) => (

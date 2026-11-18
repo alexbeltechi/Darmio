@@ -109,12 +109,12 @@ export function justifiedRows(
 }
 
 /**
- * The reading width: the text column of posts and pages (`max-w-[600px]` in
+ * The reading width: the text column of posts and pages (`max-w-[700px]` in
  * their markup), and the width of a gallery that stacks its images one a row,
  * so a picture lines up with the text and a square fills it
- * (was 661px).
+ * (was 600px).
  */
-export const READING_WIDTH = 600;
+export const READING_WIDTH = 700;
 
 /**
  * The widest an inline gallery with images side by side runs (Auto from four

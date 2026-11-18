@@ -1,7 +1,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { DsButton } from "@beltechi/parabola";
-import { INLINE_GALLERY_MAX } from "@/lib/cms/justified-rows";
 import { getPublishedEntries } from "@/lib/db/entries";
 import { getMediaByIds } from "@/lib/cms/media";
 import type { SiteSettings } from "@/lib/db/settings";
@@ -139,7 +138,7 @@ function SourceLine({ post, settings }: { post: Entry; settings: SourceLineSetti
   if (!label) return null;
 
   return (
-    <p className="mx-auto mt-ds-40 w-full max-w-[600px] text-p text-ds-fg-muted">
+    <p className="mx-auto mt-ds-40 w-full max-w-[700px] text-p text-ds-fg-muted">
       {settings.prefix && <>{settings.prefix} </>}
       {url ? (
         <a
@@ -160,7 +159,7 @@ function SourceLine({ post, settings }: { post: Entry; settings: SourceLineSetti
 /**
  * Other posts: those sharing a sub-category first, then the rest of the
  * post's top-level group (never another group), newest first within each, six
- * at most, under a heading on the left. An extra
+ * at most, under their heading and its button, in the article's column. An extra
  * under the post: if it can't load (say the database drops for a moment), the
  * post still shows without it.
  */
@@ -245,19 +244,22 @@ async function moreToExplore({
   const named = primaryCategory ?? parent;
 
   return (
-    // As wide as an inline gallery (INLINE_GALLERY_MAX, 820px), inside the page's margins.
+    // The article's own column (READING_WIDTH), so it lines up with the text above.
     <section className="px-ds-20 pt-ds-160 pb-ds-40">
-      <div className="mx-auto flex w-full flex-col gap-ds-40" style={{ maxWidth: INLINE_GALLERY_MAX }}>
-        {/* One line over the grid: the heading on the left, the way to the rest on the right. */}
-        <div className="flex flex-wrap items-center justify-between gap-ds-16">
-          <h2 className="text-h2 text-ds-fg sm:text-h1">
-            More{" "}
+      <div className="mx-auto flex w-full max-w-[700px] flex-col gap-ds-40">
+        {/* The heading, then the way to the rest under it, both from the left. */}
+        <div className="flex flex-col items-start gap-ds-20">
+          <h2 className="text-h2 text-ds-fg sm:text-h1 lg:text-display">
+            <span className="block">More</span>
             {named ? (
-              <Link href={`/${named.slug}`} className="text-ds-fg-subtle transition-opacity hover:opacity-70">
+              <Link
+                href={`/${named.slug}`}
+                className="block text-ds-fg-subtle transition-opacity hover:opacity-70"
+              >
                 {named.label}
               </Link>
             ) : (
-              <span className="text-ds-fg-subtle">posts</span>
+              <span className="block text-ds-fg-subtle">posts</span>
             )}
           </h2>
           <DsButton href={parent ? `/${parent.slug}` : "/"}>{parent ? `See all ${parent.label}` : "See all"}</DsButton>

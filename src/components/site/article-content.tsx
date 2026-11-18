@@ -2,6 +2,7 @@
 
 import { DS_PROSE_CLASS, DsPlaceholder } from "@beltechi/parabola";
 import { DsNewsletterBlock } from "@beltechi/parabola/blocks";
+import { extractFootnotes, footnoteId, footnoteRefId } from "@/lib/cms/footnotes";
 import { galleryIsFull, READING_WIDTH } from "@/lib/cms/justified-rows";
 import { Gallery } from "@/components/shared/gallery";
 import { FadeInOnScroll } from "@/components/shared/fade-in-on-scroll";
@@ -15,18 +16,23 @@ interface ArticleContentProps {
 }
 
 // READING_WIDTH (lib/cms/justified-rows.ts), written out for Tailwind.
-const READING_COLUMN = "mx-auto w-full max-w-[600px]";
+const READING_COLUMN = "mx-auto w-full max-w-[700px]";
 
 /**
  * Renders a post's blocks, each fading in as it scrolls into view. Text-like
- * blocks sit in the 600px reading column (READING_WIDTH); galleries span the full container.
+ * blocks sit in the 700px reading column (READING_WIDTH); galleries span the full container.
  *
  * Spacing comes from Parabola: 40px (`space-y-ds-40`) between blocks (a text block,
  * a gallery, a quote), so a gallery and the text around it read as separate
  * beats; inside them, 8px between media and its caption, the prose's own
  * paragraph spacing, and the gutter between a gallery's images.
+ *
+ * Notes written in the text (`^[…]`, lib/cms/footnotes.ts) become small
+ * numbers there and a numbered list under a rule at the end, in small text,
+ * each note with a way back to its number.
  */
-export function ArticleContent({ blocks, mediaItems, preview = false }: ArticleContentProps) {
+export function ArticleContent({ blocks: written, mediaItems, preview = false }: ArticleContentProps) {
+  const { blocks, notes } = extractFootnotes(written);
   const mediaMap = new Map<string, MediaItem>();
   mediaItems.forEach((item) => mediaMap.set(item.id, item));
   return (
@@ -166,6 +172,23 @@ export function ArticleContent({ blocks, mediaItems, preview = false }: ArticleC
             return null;
         }
       })}
+      {notes.length > 0 && (
+        <FadeInOnScroll className={READING_COLUMN}>
+          <ol aria-label="Notes" className="flex flex-col gap-ds-8 border-t border-ds-border pt-ds-20 text-small text-ds-fg-muted">
+            {notes.map((note, i) => (
+              <li key={i} id={footnoteId(i + 1)} className="flex scroll-mt-24 gap-ds-8">
+                <span className="shrink-0 tabular-nums text-ds-fg-subtle">{i + 1}</span>
+                <span className="[&_a]:text-ds-fg [&_a]:underline">
+                  <span dangerouslySetInnerHTML={{ __html: note }} />{" "}
+                  <a href={`#${footnoteRefId(i + 1)}`} aria-label={`Back to the text, note ${i + 1}`} className="!no-underline">
+                    ↩
+                  </a>
+                </span>
+              </li>
+            ))}
+          </ol>
+        </FadeInOnScroll>
+      )}
     </div>
   );
 }

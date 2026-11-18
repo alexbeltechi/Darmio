@@ -1,3 +1,4 @@
+import { stripFootnotes } from "@/lib/cms/footnotes";
 import type { Entry, MediaItem } from "@/lib/cms/types";
 import { topLevelOf } from "@/lib/cms/category-groups";
 
@@ -131,7 +132,7 @@ export function getPreviewText(post: Entry): string {
   if (description) return description;
   for (const block of getBlocks(post)) {
     if (block.type !== "text" || !block.html) continue;
-    const text = block.html
+    const text = stripFootnotes(block.html)
       .replace(/<br\s*\/?>/gi, " ")
       .replace(/<\/(p|h\d|li|blockquote)>/gi, " ")
       .replace(/<[^>]+>/g, "")

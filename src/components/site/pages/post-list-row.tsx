@@ -1,11 +1,11 @@
 import * as React from "react";
 
 /**
- * A row of the `list` layout: the post's text, and its picture on the right,
- * centred on each other, with room above and below for the rule between
- * rows. The picture keeps its own shape at one height (56px), so every row
- * is as tall as the next whether or not it has one; a very wide picture is
- * cropped at a third of the row.
+ * A row of the `list` layout, with a rule under it: the post's text at the
+ * top left and its picture on the right. The picture is shown whole, in its
+ * own shape and with no frame (a drawing on white sits on the page as if
+ * drawn there), up to 280px wide and 280px tall, and never more than 40% of
+ * the row. A row without one is just its text.
  */
 export function PostListRow({
   children,
@@ -13,16 +13,20 @@ export function PostListRow({
   aspect,
 }: {
   children: React.ReactNode;
-  /** The picture, filling its box (absolutely positioned, `object-cover`). */
+  /** The picture, filling its box (absolutely positioned, `object-contain`). */
   picture?: React.ReactNode;
   /** Its width over its height. */
   aspect: number;
 }) {
   return (
-    <article className="flex min-h-[96px] items-center gap-ds-20 py-ds-20">
-      <div className="flex min-w-0 flex-1 flex-col gap-ds-4">{children}</div>
+    <article className="flex items-start gap-ds-20 border-b border-ds-border pt-ds-20 pb-ds-40">
+      <div className="flex min-w-0 flex-1 flex-col gap-ds-8">{children}</div>
       {picture && (
-        <div className="relative h-14 max-w-[33%] shrink-0 overflow-hidden" style={{ aspectRatio: aspect }}>
+        <div
+          className="relative max-w-[40%] shrink-0"
+          // As big as fits in a 280px square, in its own shape.
+          style={{ aspectRatio: aspect, width: `${Math.min(280, 280 * aspect)}px` }}
+        >
           {picture}
         </div>
       )}

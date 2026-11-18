@@ -120,7 +120,7 @@ export function SiteNav({
         surface={surface}
         className={`fixed inset-x-0 z-(--ds-z-nav) pt-3 pr-[14px] pl-5 sm:px-5 ${surface === "blur" ? "pb-5" : "pb-3"}`}
       >
-        <div className="mx-auto flex w-full max-w-[600px] items-center justify-between gap-4">
+        <div className="mx-auto flex w-full max-w-[700px] items-center justify-between gap-4">
           <Link href="/" onClick={handleClick("home")} className={`min-w-0 truncate ${LOGO_CLASS}`}>
             {siteName}
           </Link>

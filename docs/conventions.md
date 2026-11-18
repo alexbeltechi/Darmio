@@ -50,6 +50,7 @@ changes in the running app with read-only actions (see `CLAUDE.md`).
 | Uploading a text file as a document | `uploadDocument` from `@/components/admin/docs/upload-document` | |
 | A Library tile's square (picture, poster, or an icon with the file type) | `LibraryThumb` | |
 | Searching media | `mediaMatches` from `@/lib/cms/media-search` (library, picker and `GET /media?q=`) | |
+| A footnote in a post | Written in the text where it belongs, as `^[the note]` (`src/lib/cms/footnotes.ts`): the page numbers the notes and lists them at the end. Never a hand-numbered list or a typed superscript | |
 | Spacing (gaps, margins, section padding) | Parabola's spacings, named by size (`/parabola/spacing/scale`): 4, 8, 16, 20, 40, 80, 160 as `gap-ds-20`, `px-ds-20`, `pt-ds-160`, `space-y-ds-40`… Layouts that do arithmetic use `DS_SPACES` / `DS_GUTTER_PX`. New code uses these, not raw `gap-5` | `check:parabola` keeps CSS and TS in step |
 | Field widths and form layout | Parabola's standard field width (`--ds-field-width`): leave fields their default size and lay a form out with `DS_FIELDS_CLASS` (one field under the other, never side by side). `w-full` only for a field that fills its row, `ds-fields-fill` on a container one field wide. No per-screen `max-w-[…]` on fields | |
 | Space between pictures (galleries, post grids, feeds) | The gutter (`DS_GUTTER_PX`, 20px across and down): no gallery or grid sets its own gap | |

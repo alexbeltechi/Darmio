@@ -4,7 +4,7 @@ import { entryDate } from "@/lib/cms/read-time";
 import type { Entry, MediaItem } from "@/lib/cms/types";
 import { getPostMediaItems, type Category } from "../post-grid-shared";
 import type { ViewIntro } from "../site-views";
-import { PageColumn } from "./page-layout";
+import { PageColumn, PageIntro } from "./page-layout";
 import { PostListRow } from "./post-list-row";
 
 const DAY = new Intl.DateTimeFormat("en", { month: "short", day: "numeric" });
@@ -12,8 +12,8 @@ const MONTH = new Intl.DateTimeFormat("en", { month: "long", year: "numeric" });
 
 /**
  * A category's posts stacked like an archive, newest first, left-aligned in
- * the reading column (the `list` category layout): the title, its line and
- * how many posts, then the posts as rows, each with a rule under it: its
+ * the reading column (the `list` category layout): the category's paragraph
+ * (PageIntro) and how many posts, then the posts as rows, each with a rule under it: its
  * title and, under it in small text, the day and its own categories
  * (each a link to its page); its picture, when it has one, on the right, whole
  * and in its own shape, no frame (post-list-row.tsx; a video plays muted, on
@@ -43,8 +43,7 @@ export function PostList({
   return (
     <PageColumn>
       <header className="flex flex-col gap-ds-8">
-        <h1 className="text-h2 text-ds-fg sm:text-h1">{intro.title}</h1>
-        {intro.description && <p className="text-prose text-ds-fg-muted">{intro.description}</p>}
+        <PageIntro title={intro.title} text={intro.description} />
         <p className="text-p text-ds-fg-subtle">
           {posts.length} {posts.length === 1 ? "post" : "posts"}
         </p>

@@ -11,7 +11,7 @@ import type { Block, Entry } from "@/lib/cms/types";
 import { listCategories } from "@/lib/db/categories";
 import { getPublishedEntries } from "@/lib/db/entries";
 import { childPages, listSitePages, type SitePage } from "@/lib/db/site-pages";
-import { PageColumn, PageSection } from "./page-layout";
+import { PageColumn, PageIntro, PageSection } from "./page-layout";
 
 /**
  * The pages that have a format (lib/cms/page-formats.ts): Text, Links and
@@ -29,7 +29,7 @@ async function Blocks({ page, preview }: { page: Entry; preview: boolean }) {
   return <ArticleContent blocks={blocks} mediaItems={mediaItems} preview={preview} />;
 }
 
-/** The title, the page it sits under above it, and its line under it. */
+/** The page's paragraph (PageIntro), with the page it sits under above it. */
 function PageTitle({ page, parent }: { page: Entry; parent?: SitePage }) {
   const description = page.data.description as string | undefined;
   return (
@@ -39,14 +39,13 @@ function PageTitle({ page, parent }: { page: Entry; parent?: SitePage }) {
           {parent.title}
         </Link>
       )}
-      <h1 className="text-h2 text-ds-fg sm:text-h1">{(page.data.title as string) || page.slug}</h1>
-      {description && <p className="text-prose text-ds-fg-muted">{description}</p>}
+      <PageIntro title={(page.data.title as string) || page.slug} text={description} />
     </header>
   );
 }
 
 /**
- * Text: the title, the blocks, then "More": the pages under it, or, for a
+ * Text: the page's paragraph, the blocks, then "More": the pages under it, or, for a
  * page under another, that page and the others beside it.
  */
 export async function TextPage({ page, preview = false }: { page: Entry; preview?: boolean }) {
@@ -70,7 +69,7 @@ export async function TextPage({ page, preview = false }: { page: Entry; preview
   );
 }
 
-/** Links: the title, the links (each note on the right), then any blocks. */
+/** Links: the page's paragraph, the links (each note on the right), then any blocks. */
 export async function LinksPage({ page, preview = false }: { page: Entry; preview?: boolean }) {
   const { links } = pageSettings(page.data);
   return (

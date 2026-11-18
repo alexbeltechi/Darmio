@@ -53,7 +53,7 @@ export function PostList({
         {months.map((month, i) => (
           <section key={month.label} aria-label={month.label} className="flex flex-col">
             {i > 0 && (
-              <h2 className="pt-ds-20 text-small tracking-wide text-ds-fg-subtle uppercase">{month.label}</h2>
+              <h2 className="pt-ds-16 pb-ds-20 text-small tracking-wide text-ds-fg-subtle uppercase">{month.label}</h2>
             )}
             {month.posts.map((post) => (
               <PostListEntry

@@ -19,7 +19,7 @@ export function PostListRow({
   aspect: number;
 }) {
   return (
-    <article className="flex items-start gap-ds-20 border-b border-ds-border py-ds-20">
+    <article className="flex items-start gap-ds-20 border-b border-ds-border pt-ds-20 pb-ds-40">
       <div className="flex min-w-0 flex-1 flex-col gap-ds-8">{children}</div>
       {picture && (
         <div className="relative h-28 max-w-[40%] shrink-0" style={{ aspectRatio: aspect }}>

@@ -14,11 +14,11 @@ const MONTH = new Intl.DateTimeFormat("en", { month: "long", year: "numeric" });
  * A category's posts stacked like an archive, newest first, left-aligned in
  * the reading column (the `list` category layout): the title, its line and
  * how many posts, then the posts as rows, each with a rule under it: its
- * title and, under it in small capitals, the day and its own categories
+ * title and, under it in small text, the day and its own categories
  * (each a link to its page); its picture, when it has one, on the right, whole
  * and in its own shape, no frame (post-list-row.tsx; a video plays muted, on
- * a loop). No description. A month's posts sit under its name ("December
- * 2025"); the newest month, at the top, needs none.
+ * a loop). No description. A month's posts sit under its name in small
+ * capitals ("DECEMBER 2025"); the newest month, at the top, needs none.
  */
 export function PostList({
   intro,
@@ -90,7 +90,7 @@ function PostListEntry({ post, media, categories }: { post: Entry; media?: Media
           className="size-full object-contain"
         />
       ) : (
-        <MediaImage item={media} alt={media.alt || title} fill sizes="240px" className="object-contain" />
+        <MediaImage item={media} alt={media.alt || title} fill sizes="(max-width: 640px) 40vw, 280px" className="object-contain" />
       )}
     </Link>
   );
@@ -102,11 +102,11 @@ function PostListEntry({ post, media, categories }: { post: Entry; media?: Media
           {title}
         </Link>
       </h3>
-      <p className="text-small tracking-wide text-ds-fg-subtle uppercase">
+      <p className="flex flex-wrap items-baseline gap-x-ds-8 text-small text-ds-fg-subtle">
         <span className="tabular-nums">{DAY.format(entryDate(post))}</span>
         {categories.map((category) => (
-          <span key={category.id}>
-            {" · "}
+          <span key={category.id} className="flex items-baseline gap-x-ds-8">
+            <span aria-hidden>·</span>
             <Link href={`/${category.slug}`} className="hover:text-ds-fg">
               {category.label}
             </Link>

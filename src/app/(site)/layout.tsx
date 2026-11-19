@@ -38,6 +38,8 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       .map((p) => ({ slug: p.slug, label: p.title, members: [p.slug, ...childPages(pages, p.slug).map((c) => c.slug)] })),
   ], settings.menuOrder);
 
+  const { theme } = sitePublishedTheme(settings);
+
   return (
     <ThemeProvider
       attribute="class"
@@ -47,11 +49,11 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
     >
       {/* The project's Parabola theme (Settings › Design), the website's alone. Parabola's
           own fonts are hosted (root layout); a font the theme added loads from Google. */}
-      <DsThemeStyle theme={sitePublishedTheme(settings).theme} hosted={DS_FONTS.map((f) => f.id)} />
+      <DsThemeStyle theme={theme} hosted={DS_FONTS.map((f) => f.id)} />
       <div className="site-root min-h-screen bg-ds-bg flex flex-col">
         {/* Rendered once here, not per-page, so it never unmounts (and never
             flickers) when navigating between views. */}
-        <SiteNav siteName={siteName} sections={sections} />
+        <SiteNav siteName={siteName} sections={sections} surface={theme.nav.surface} />
 
         {/* Full width by default: the homepage and category grids run edge to
             edge. Pages that need a reading measure (article/post detail) apply

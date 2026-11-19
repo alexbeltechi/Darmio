@@ -44,6 +44,8 @@ interface MasonryGridProps {
   dense?: boolean;
   /** Column count at desktop width; narrower containers step down from it. */
   targetColumns?: number;
+  /** Where the columns sit when there are fewer than fit: centred, or from the left under a heading that starts there. */
+  align?: "center" | "start";
 }
 
 /**
@@ -58,6 +60,7 @@ export function MasonryGrid({
   padded = true,
   dense = false,
   targetColumns,
+  align = "center",
 }: MasonryGridProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   // Start at the desktop target rather than 1: the server has no width to
@@ -113,7 +116,7 @@ export function MasonryGrid({
   return (
     <div
       ref={containerRef}
-      className={`flex items-start justify-center ${padded ? "px-5" : ""}`}
+      className={`flex items-start ${align === "start" ? "justify-start" : "justify-center"} ${padded ? "px-5" : ""}`}
       style={{ gap: `${GAP_PX}px` }}
     >
       {columnArrays.map((columnItems, columnIndex) => (

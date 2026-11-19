@@ -187,6 +187,8 @@ export { DsInfoCard } from "./components/info-card";
 export { DsLinkList, type DsLinkListItem } from "./components/link-list";
 export { DsFontPairing, dsFontOptions } from "./components/font-pairing";
 export { DsColourBar, DsColourPicker } from "./components/colour-picker";
+export { DsPromptBox, type DsPromptBoxProps } from "./components/prompt-box";
+export { DsSubscribe, type DsSubscribeProps } from "./components/subscribe";
 export { DsSlider } from "./primitives/slider";
 export { DsScrollRow } from "./primitives/scroll-row";
 export { DsColourField } from "./components/colour-field";
@@ -223,10 +225,18 @@ export {
   type DsButtonStyle,
   type DsFieldStyle,
 } from "./button-style";
+export {
+  DS_DEFAULT_NAV_STYLE,
+  DS_NAV_SURFACES,
+  parseDsNavStyle,
+  type DsNavStyle,
+  type DsNavSurface,
+} from "./nav-style";
 export { DsColourWheel, type DsWheelPoint } from "./components/colour-wheel";
 export {
   DS_THEME_FILE_CONTRACT,
   DS_THEME_FILE_FORMAT,
+  DS_THEME_FILE_LEGACY_FORMATS,
   DS_THEME_FILE_SUFFIX,
   DS_THEME_FILE_VERSION,
   dsThemeFileName,

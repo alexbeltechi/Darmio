@@ -4,9 +4,9 @@ import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
-import { DsButton, DsMenu, DsThemeToggle, DsTopBar } from "@beltechi/parabola";
+import { DsButton, DsMenu, DsThemeToggle, DsTopBar, type DsNavSurface } from "@beltechi/parabola";
 
-/** A section in the nav: a top-level category and the slugs that light it. */
+/** A section in the nav: a top-level category or page, and the slugs inside it. */
 export type NavSection = { slug: string; label: string; members: string[] };
 
 // Pages whose URL doesn't name a category (a post) can light a pill anyway.
@@ -32,19 +32,24 @@ export function NavHighlight({ slug }: { slug: string | null }) {
   return null;
 }
 
-/** The nav pill lit for a given path: home, a section, or a category inside
- * one (e.g. /portrait lights up Photography). */
+/**
+ * The nav item lit for a given path: home, or a section's own page. A
+ * category inside a section (/making, inside Writing) lights nothing: it's
+ * a page of its own, not the section's.
+ */
 function activeSlugForPath(pathname: string, sections: NavSection[]): string {
   if (pathname === "/") return "home";
 
   const segment = pathname.split("/")[1] ?? "";
-  return sections.find((c) => c.members.includes(segment))?.slug ?? "";
+  return sections.find((c) => c.slug === segment)?.slug ?? "";
 }
 
 const LOGO_CLASS = "text-h3 text-ds-fg";
 
-/** The desktop nav's ghost links: muted, the page colour on hover, no current highlight. */
+/** The desktop nav's ghost links: muted, with a light surface on hover. */
 const NAV_LINK_CLASS = "bg-transparent text-ds-fg-muted hover:bg-ds-surface/40 hover:text-ds-fg";
+/** The link to the page you're on: the ghost's hover surface, kept, in the text colour. */
+const NAV_CURRENT_CLASS = "bg-ds-surface/40 text-ds-fg";
 
 /**
  * Site nav, rendered once in the persistent site layout so it never
@@ -53,18 +58,22 @@ const NAV_LINK_CLASS = "bg-transparent text-ds-fg-muted hover:bg-ds-surface/40 h
  * From `sm` up it's the conventional bar: the site's
  * name on the left in H3, a little bigger than the links, the way home; on
  * the right the sections as ghost `DsButton`s 4px apart (muted text, a light
- * surface on hover, the current page not highlighted), then the theme
+ * surface on hover, which the page you're on keeps), then the theme
  * switch, a ghost icon that flips to the other theme. Below `sm` the same
  * bar holds the name and an "Explore" button that opens the Parabola
  * `DsMenu`, which also holds the theme switch. At every width it's as wide as
- * the reading column and fixed to the top on Parabola's blur bar (`DsTopBar`,
- * as in the admin), so the page scrolls softly under it.
+ * the reading column and fixed to the top on Parabola's `DsTopBar`, compact
+ * (12px above and below, as in the admin), with the background the site's
+ * theme picks: none, blur (the page scrolls softly under it) or solid.
  */
 export function SiteNav({
   siteName,
   sections,
+  surface = "blur",
 }: {
   siteName: string;
+  /** What's behind the bar, from the site's theme (`theme.nav.surface`). */
+  surface?: DsNavSurface;
   /** The top-level categories marked for the nav; none means no nav, just the name. */
   sections: NavSection[];
 }) {
@@ -108,17 +117,20 @@ export function SiteNav({
 
   return (
     <>
-      {/* One bar at every width, over the page, which blurs softly beneath it. Its sides on a
-          phone put Explore where the menu's Close button sits. */}
-      <DsTopBar surface="blur" className="fixed inset-x-0 z-(--ds-z-nav) pt-[14px] pr-[14px] pb-5 pl-5 sm:p-5">
-        <div className="mx-auto flex w-full max-w-[600px] items-center justify-between gap-4">
+      {/* One bar at every width, over the page. Its sides on a phone put Explore where the
+          menu's Close button sits. The blur's fade needs room under the row to run out in. */}
+      <DsTopBar
+        surface={surface}
+        className={`fixed inset-x-0 z-(--ds-z-nav) pt-3 pr-[14px] pl-5 sm:px-5 ${surface === "blur" ? "pb-5" : "pb-3"}`}
+      >
+        <div className="mx-auto flex w-full max-w-[700px] items-center justify-between gap-4">
           <Link href="/" onClick={handleClick("home")} className={`min-w-0 truncate ${LOGO_CLASS}`}>
             {siteName}
           </Link>
           <nav className="hidden shrink-0 items-center gap-1 sm:flex">
-            {/* The page you're on isn't highlighted (only aria-current marks it): every link is
-                muted, with the ghost's light surface on hover. */}
-            {NAV_ITEMS.map((item) => navButton(item, NAV_LINK_CLASS, undefined, "text"))}
+            {NAV_ITEMS.map((item) =>
+              navButton(item, active === item.slug ? NAV_CURRENT_CLASS : NAV_LINK_CLASS, undefined, "text")
+            )}
             {/* On mobile the theme switch lives in the menu. */}
             <DsThemeToggle variant="text" className={NAV_LINK_CLASS} />
           </nav>
@@ -135,12 +147,12 @@ export function SiteNav({
       </DsTopBar>
 
       <DsMenu open={mobileOpen} onClose={closeMobile} className="sm:hidden">
-        <Link href="/" onClick={handleClick("home")} className={`absolute top-5 left-5 ${LOGO_CLASS}`}>
+        <Link href="/" onClick={handleClick("home")} className={`absolute top-[18px] left-5 ${LOGO_CLASS}`}>
           {siteName}
         </Link>
 
         {/* Same corner "Explore" sits in; close stays rightmost, theme switch to its left. */}
-        <div className="absolute top-[14px] right-[14px] flex items-center gap-2">
+        <div className="absolute top-3 right-[14px] flex items-center gap-2">
           <DsThemeToggle />
           <DsButton iconLeft={X} onClick={closeMobile}>
             Close

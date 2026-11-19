@@ -36,7 +36,9 @@ export async function GET(
 // PATCH /api/admin/collections/[collection]/entries/[slug] - Update entry
 // `stage: true` saves `data` as unpublished changes on a published entry (the
 // site keeps the live version until /api/admin/publish); `pendingData: null`
-// discards them. Without either it writes the live entry, as before.
+// discards them, and an object merges into them when there are some (so a
+// setting saved straight to the live entry isn't undone by the next publish).
+// Without either it writes the live entry, as before.
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ collection: string; slug: string }> }
@@ -71,7 +73,12 @@ export async function PATCH(
       metadata: body.metadata,
       source: body.source,
       stage: body.stage === true,
-      pendingData: body.pendingData === null ? null : undefined,
+      pendingData:
+        body.pendingData === null
+          ? null
+          : body.pendingData && typeof body.pendingData === "object" && !Array.isArray(body.pendingData)
+            ? (body.pendingData as Record<string, unknown>)
+            : undefined,
     });
 
     if (result.error) {

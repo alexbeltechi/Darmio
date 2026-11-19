@@ -27,7 +27,16 @@ way; it tells you which and why.
 
 - **Posts and pages.** Posts in categories, shown as a feed, a grid or a
   list. Pages as Text, Home, Links or Blocks, pages under pages, and pages in
-  the menu. A post can have custom styling of its own.
+  the menu. A post can have custom styling of its own; delete the post and
+  its custom code goes with it.
+- **Made for reading.** A 700px reading column on every page. Pictures fill
+  it, portraits too. Footnotes: type `^[the note]` in the text (or use the
+  editor's Footnote button) and the notes appear numbered at the end of the
+  post. The list style reads like an archive, grouped by month, and a page
+  can open with one paragraph in its own words instead of a title. Related
+  posts sit under each post.
+- **Categories inside categories.** A sub-category takes its parent's look
+  unless it has its own, and has its own place in the menu.
 - **A blank slate, with an example.** A new site starts with Ilo Odena's
   example site so you see how it fits together; **Remove examples** in
   Settings leaves your own empty site.
@@ -42,9 +51,10 @@ way; it tells you which and why.
 - **Several sites, one admin.** Each project has its own database; switch
   between them from the menu.
 - **Parabola, the design system.** The site and the admin are built on it
-  (version 0.2.0). Make your own theme as one file and add it in Settings ›
-  Design (`docs/themes.md`), or copy Parabola's pieces into another project
-  with `npx`.
+  (version 0.3.0). Make your own theme as one file and add it in Settings ›
+  Design (`docs/themes.md`), choose how the top menu looks (no background,
+  blurred or solid), or copy Parabola's pieces into another project with
+  `npx`.
 - **Skills for Claude Code:** `/landing-page` makes a page from an idea or an
   `.md`; `/post` turns a folder of pictures or video into a post.
 

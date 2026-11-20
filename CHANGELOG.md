@@ -51,10 +51,17 @@ way; it tells you which and why.
 - **Several sites, one admin.** Each project has its own database; switch
   between them from the menu.
 - **Parabola, the design system.** The site and the admin are built on it
-  (version 0.3.0). Make your own theme as one file and add it in Settings ›
+  (version 0.5.3). Make your own theme as one file and add it in Settings ›
   Design (`docs/themes.md`), choose how the top menu looks (no background,
   blurred or solid), or copy Parabola's pieces into another project with
   `npx`.
+- **One set of brand controls for everything.** Parabola's Theme page, at
+  `/parabola/theme`, is a board: your site, a letter, an app, an Instagram
+  carousel and a reel side by side, all changed by the same controls. Start
+  from Classic or one of the styles, change anything, and keep it as your
+  own. A theme carries its social rules too (post size, edges, text on
+  pictures), and **Export** gives the whole style as words to paste into
+  any AI, a brand kit, or a design system.
 - **Skills for Claude Code:** `/landing-page` makes a page from an idea or an
   `.md`; `/post` turns a folder of pictures or video into a post.
 

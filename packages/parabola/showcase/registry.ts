@@ -13,6 +13,7 @@ import {
   MessageSquare,
   Ruler,
   MousePointerClick,
+  LayoutDashboard,
   Paintbrush,
   Palette,
   SquareCheck,
@@ -26,11 +27,13 @@ import { FontsSection } from "./fonts-section";
 import { FontFamiliesSection } from "./font-families-section";
 import { SpacingSection } from "./spacing-section";
 import { IntroSection } from "./intro-section";
+import { BoardSection } from "./board";
 import { ThemeSection } from "./theme-section";
 import { BlocksOverview, ComponentsOverview } from "./tier-overview";
 import * as S from "./specimens";
 
-export type DsPage = { slug: string; label: string; component: ComponentType };
+/** `board`: the page fills the canvas and scrolls itself (showcase/board.tsx). */
+export type DsPage = { slug: string; label: string; component: ComponentType; board?: boolean };
 export type DsGroup = {
   slug: string;
   label: string;
@@ -63,7 +66,14 @@ export const DS_TIERS: DsTier[] = [
         label: "Theme",
         icon: Paintbrush,
         single: true,
-        pages: [{ slug: "fonts", label: "Theme", component: ThemeSection }],
+        pages: [{ slug: "fonts", label: "Theme", component: ThemeSection, board: true }],
+      },
+      {
+        slug: "board",
+        label: "Board",
+        icon: LayoutDashboard,
+        single: true,
+        pages: [{ slug: "all", label: "Board", component: BoardSection, board: true }],
       },
     ],
   },
@@ -267,10 +277,12 @@ export const DS_TIERS: DsTier[] = [
 /** Every group, in sidebar order, for routing and lookups. */
 export const DS_GROUPS: DsGroup[] = DS_TIERS.flatMap((tier) => tier.groups);
 
-export const dsHref = (group: DsGroup, page: DsPage) => `/parabola/${group.slug}/${page.slug}`;
+/** A page's address. A group that is one page (Theme, Board, Intro) is at its own name, /parabola/theme. */
+export const dsHref = (group: DsGroup, page: DsPage) => (group.single ? `/parabola/${group.slug}` : `/parabola/${group.slug}/${page.slug}`);
 
-export function findDsPage(groupSlug: string, pageSlug: string) {
+/** A group and one of its pages, by their slugs; with no page slug, a one-page group's page. */
+export function findDsPage(groupSlug: string, pageSlug?: string) {
   const group = DS_GROUPS.find((g) => g.slug === groupSlug);
-  const page = group?.pages.find((p) => p.slug === pageSlug);
+  const page = pageSlug ? group?.pages.find((p) => p.slug === pageSlug) : group?.single ? group.pages[0] : undefined;
   return group && page ? { group, page } : null;
 }

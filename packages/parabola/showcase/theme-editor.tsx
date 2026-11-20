@@ -3,13 +3,15 @@
 import * as React from "react";
 import { createPortal } from "react-dom";
 import { usePathname } from "next/navigation";
-import { MoreVertical, Redo2, RotateCcw, Undo2 } from "lucide-react";
+import { ChevronsDownUp, ChevronsUpDown, MoreVertical, PanelRightClose, Redo2, RotateCcw, Save, Share, Undo2, Upload } from "lucide-react";
 import { DsAccordion } from "../primitives/accordion";
 import { DsButton } from "../primitives/button";
 import { DsConfirmDialog } from "../primitives/dialog";
-import { DsDropdown, DsDropdownContent, DsDropdownItem, DsDropdownTrigger } from "../primitives/dropdown";
+import { DsDropdown, DsDropdownContent, DsDropdownItem, DsDropdownSeparator, DsDropdownTrigger } from "../primitives/dropdown";
 import { dsToast } from "../primitives/toast";
+import { ThemeExportDialog } from "./theme-export";
 import { useDsThemeLibrary } from "../provider";
+import { dsResetLooks } from "./custom-looks";
 import {
   DS_DEFAULT_LIBRARY,
   DS_DEFAULT_THEME,
@@ -45,18 +47,18 @@ type ThemeEditor = {
   /** The theme open for editing. */
   entry: DsThemeEntry;
   theme: DsThemeConfig;
-  /** Change the open theme, whichever it is. */
-  setTheme: (theme: DsThemeConfig) => void;
+  /** Change the open theme; `into` opens that theme first and changes it. */
+  setTheme: (theme: DsThemeConfig, into?: string) => void;
   /** Whether the open theme is Parabola or one of the themes made. */
   status: "parabola" | "theme";
   /** Open another theme. Not a change: nothing goes on the history. */
   select: (id: string) => void;
-  /** Add a theme called `name`, a copy of the open one, and open it. */
-  addTheme: (name: string) => void;
+  /** Add a theme called `name`, a copy of the open one (or of `from`: another theme's id, or a theme), and open it. */
+  addTheme: (name: string, from?: string | DsThemeConfig) => void;
   renameTheme: (id: string, name: string) => void;
   /** Take a theme out (never Default, nor the one in use). */
   removeTheme: (id: string) => void;
-  /** The open theme back to Parabola's own look. Other themes stay. Returns what undoes it. */
+  /** Back to the start: Classic as Parabola makes it, the kept themes gone (not the website's). Returns what undoes it. */
   restoreTheme: () => () => void;
   /** Changes not saved yet. */
   dirty: boolean;
@@ -147,7 +149,14 @@ export function ThemeEditorProvider({ children }: { children: React.ReactNode })
   const selectedRef = React.useRef(selected);
   selectedRef.current = selected;
 
-  const setTheme = React.useCallback((theme: DsThemeConfig) => {
+  // A change goes into the open theme. The first one (DS_DEFAULT_THEME_ID) is where a style picked on the Theme rail
+  // is worn, Custom while it's changed; + keeps it as a theme of its own (theme-section's ThemeRail). `into` opens
+  // another theme first and puts the change there (a style picked while a kept theme is open).
+  const setTheme = React.useCallback((theme: DsThemeConfig, into?: string) => {
+    if (into && into !== selectedRef.current) {
+      selectedRef.current = into;
+      setSelected(into);
+    }
     setHistory((h) => {
       const lib = h.present;
       const open = lib.themes.find((t) => t.id === selectedRef.current) ?? lib.themes[0];
@@ -230,9 +239,10 @@ export function ThemeEditorProvider({ children }: { children: React.ReactNode })
       setTheme,
       status,
       select: setSelected,
-      addTheme: (name) => {
+      addTheme: (name, from) => {
         const id = dsThemeEntryId(library, name);
-        change({ ...library, themes: [...library.themes, { id, name, theme: entry.theme }] });
+        const theme = typeof from === "object" ? from : (library.themes.find((t) => t.id === from) ?? entry).theme;
+        change({ ...library, themes: [...library.themes, { id, name, theme }] });
         setSelected(id);
       },
       renameTheme: (id, name) => change({ ...library, themes: library.themes.map((t) => (t.id === id ? { ...t, name } : t)) }),
@@ -241,17 +251,30 @@ export function ThemeEditorProvider({ children }: { children: React.ReactNode })
         change({ ...library, themes: library.themes.filter((t) => t.id !== id) });
         if (selected === id) setSelected(library.active);
       },
+      // Factory settings: Classic, as Parabola makes it, the kept themes gone (all but the one the website wears),
+      // and every row's presets back as Parabola names them (custom-looks). Undo puts all of it back.
       restoreTheme: () => {
-        const id = entry.id;
-        const before = entry.theme;
-        const put = (theme: DsThemeConfig) =>
-          setHistory((h) => ({
-            past: [...h.past, h.present].slice(-100),
-            present: { ...h.present, themes: h.present.themes.map((t) => (t.id === id ? { ...t, theme } : t)) },
-            future: [],
-          }));
-        put(DS_DEFAULT_THEME);
-        return () => put(before);
+        const before = library;
+        const open = entry.id;
+        const first = library.themes.find((t) => t.id === DS_DEFAULT_THEME_ID) ?? library.themes[0];
+        const after: DsThemeLibrary = {
+          ...library,
+          themes: library.themes
+            .filter((t) => t.id === first.id || t.id === library.active)
+            .map((t) => (t.id === first.id ? { ...t, theme: DS_DEFAULT_THEME } : t)),
+        };
+        const put = (lib: DsThemeLibrary, id: string) => {
+          selectedRef.current = id;
+          setSelected(id);
+          setHistory((h) => ({ past: [...h.past, h.present].slice(-100), present: lib, future: [] }));
+        };
+        put(after, first.id);
+        // The rows as Parabola makes them too: the presets deleted here back, renamed ones under their own names.
+        const looksBack = dsResetLooks();
+        return () => {
+          put(before, open);
+          looksBack();
+        };
       },
       dirty: JSON.stringify(library) !== JSON.stringify(saved),
       unpublished: published.id !== entry.id || JSON.stringify(published.theme) !== JSON.stringify(entry.theme),
@@ -302,12 +325,68 @@ export function PanelSection({
   actions?: React.ReactNode;
   children: React.ReactNode;
 }) {
+  const { toggle } = React.useContext(ShellSidesContext);
+  const all = React.useContext(PanelAllContext);
   return (
-    <DsAccordion title={title} defaultOpen={defaultOpen} actions={actions} contentClassName="ds-fields-fill">
+    <DsAccordion
+      title={title}
+      defaultOpen={defaultOpen}
+      contentClassName="ds-fields-fill"
+      actions={
+        <div className="flex items-center gap-ds-4">
+          {/* In the first section only: the panel's own collapse (from lg, where the panel is a card of its own), then
+              Collapse all / Expand all, every section of the panel at once. */}
+          <span className="hidden items-center gap-ds-4 [[data-panel-slot]>:first-child_&]:flex">
+            <DsButton
+              size="small"
+              variant="text"
+              iconLeft={PanelRightClose}
+              aria-label="Collapse the panel"
+              title="Collapse the panel (⌘. for both sides)"
+              className="hidden lg:inline-flex"
+              onClick={() => toggle("right")}
+            />
+            {all && (
+              <DsButton
+                size="small"
+                variant="text"
+                iconLeft={all.open ? ChevronsDownUp : ChevronsUpDown}
+                aria-label={all.open ? "Collapse all" : "Expand all"}
+                title={all.open ? "Collapse all" : "Expand all"}
+                onClick={all.toggle}
+              />
+            )}
+          </span>
+          {actions}
+        </div>
+      }
+    >
       {children}
     </DsAccordion>
   );
 }
+
+/**
+ * The showcase's two sides, each collapsed on its own, as Figma's UI does: the sidebar and the panel each down to
+ * one button that names it and opens it again. ⌘. (Ctrl+. elsewhere) does both at once, closing both if either
+ * is open. Held by the shell (ds-shell.tsx); here so a panel section can reach it.
+ */
+export type ShellSides = { left: boolean; right: boolean };
+
+/** Every section of the panel open or folded at once (the canvas holds it; the first section has its button). */
+export const PanelAllContext = React.createContext<{ open: boolean; toggle: () => void } | null>(null);
+/** "Custom", or "Custom 2" and on when that's taken. */
+export function dsCustomName(taken: readonly string[], base = "Custom"): string {
+  if (!taken.includes(base)) return base;
+  let n = 2;
+  while (taken.includes(`${base} ${n}`)) n += 1;
+  return `${base} ${n}`;
+}
+
+export const ShellSidesContext = React.createContext<{ collapsed: ShellSides; toggle: (side: keyof ShellSides) => void }>({
+  collapsed: { left: false, right: false },
+  toggle: () => {},
+});
 
 /** What a restore puts back to Parabola's defaults: this page's part of the open theme, or all of it. */
 type RestoreScope = "families" | "type" | "all";
@@ -329,7 +408,7 @@ export const RESTORE: Record<RestoreScope, { item: string; title: string; descri
   all: {
     item: "Restore all settings",
     title: "Restore all settings?",
-    description: "Every setting of this theme goes back to Parabola's own. Undo brings them back.",
+    description: "Everything as Parabola makes it: Classic, every style and preset back under its own name, and the themes and looks you kept taken out (not the theme your website wears). Undo brings it all back.",
     done: "All settings restored",
   },
 };
@@ -350,7 +429,26 @@ function restored(theme: DsThemeConfig, scope: "families" | "type"): DsThemeConf
  * each after a confirm and with Undo in the toast that follows. Nothing
  * restored is live until it's published.
  */
-export function ThemeHeaderActions({ leading, trailing }: { leading?: React.ReactNode; trailing?: React.ReactNode }) {
+/**
+ * The theme's actions, top right of every page. Floating (the default), each a button of its own; `compact`
+ * (a phone), everything in the one ⋮ menu so it all fits on the title's line: collapse, undo, redo, save,
+ * publish, export and the restores.
+ */
+export function ThemeHeaderActions({
+  leading,
+  trailing,
+  compact = false,
+  allOpen,
+  onToggleAll,
+}: {
+  leading?: React.ReactNode;
+  trailing?: React.ReactNode;
+  compact?: boolean;
+  /** For the menu's Collapse all / Expand all, when compact. */
+  allOpen?: boolean;
+  onToggleAll?: () => void;
+}) {
+  const [exporting, setExporting] = React.useState(false);
   const { theme, setTheme, entry, dirty, unpublished, saving, canSave, save, publish, canUndo, canRedo, undo, redo, restoreTheme } =
     useThemeEditor();
   const pathname = usePathname();
@@ -376,11 +474,19 @@ export function ThemeHeaderActions({ leading, trailing }: { leading?: React.Reac
     dsToast(`${RESTORE[scope].done} (${entry.name})`, { action: { label: "Undo", onClick: () => setTheme(before) } });
   }
 
+  const dialogs = (
+    <>
+      <ThemeExportDialog open={exporting} onOpenChange={setExporting} />
+    </>
+  );
+
   return (
     <div className="flex shrink-0 items-center gap-ds-8">
+      {!compact && (
+        <>
       {leading}
-      <DsButton size="small" variant="text" iconLeft={Undo2} aria-label="Undo" title="Undo" onClick={undo} disabled={!canUndo || saving} />
-      <DsButton size="small" variant="text" iconLeft={Redo2} aria-label="Redo" title="Redo" onClick={redo} disabled={!canRedo || saving} />
+      <DsButton size="small" iconLeft={Undo2} aria-label="Undo" title="Undo" onClick={undo} disabled={!canUndo || saving} />
+      <DsButton size="small" iconLeft={Redo2} aria-label="Redo" title="Redo" onClick={redo} disabled={!canRedo || saving} />
       {canSave && (
         <>
           {/* Save keeps the changes; Publish puts the open theme on the website. */}
@@ -393,11 +499,42 @@ export function ThemeHeaderActions({ leading, trailing }: { leading?: React.Reac
         </>
       )}
       {trailing}
+        </>
+      )}
       <DsDropdown>
         <DsDropdownTrigger asChild>
-          <DsButton size="small" variant="text" iconLeft={MoreVertical} aria-label="More theme actions" disabled={saving} />
+          <DsButton size="small" iconLeft={MoreVertical} aria-label="More theme actions" disabled={saving} />
         </DsDropdownTrigger>
         <DsDropdownContent align="end">
+          {compact && (
+            <>
+              {onToggleAll && (
+                <DsDropdownItem iconLeft={allOpen ? ChevronsDownUp : ChevronsUpDown} onSelect={onToggleAll}>
+                  {allOpen ? "Collapse all" : "Expand all"}
+                </DsDropdownItem>
+              )}
+              <DsDropdownItem iconLeft={Undo2} onSelect={undo} disabled={!canUndo}>
+                Undo
+              </DsDropdownItem>
+              <DsDropdownItem iconLeft={Redo2} onSelect={redo} disabled={!canRedo}>
+                Redo
+              </DsDropdownItem>
+              {canSave && (
+                <>
+                  <DsDropdownItem iconLeft={Save} onSelect={() => save()} disabled={!dirty}>
+                    Save
+                  </DsDropdownItem>
+                  <DsDropdownItem iconLeft={Upload} onSelect={() => setPublishing(true)} disabled={!(dirty || unpublished)}>
+                    Publish
+                  </DsDropdownItem>
+                </>
+              )}
+              <DsDropdownItem iconLeft={Share} onSelect={() => setExporting(true)}>
+                Export
+              </DsDropdownItem>
+              <DsDropdownSeparator />
+            </>
+          )}
           {pageScope && (
             <DsDropdownItem iconLeft={RotateCcw} onSelect={() => setRestoring(pageScope)}>
               {RESTORE[pageScope].item}
@@ -409,6 +546,7 @@ export function ThemeHeaderActions({ leading, trailing }: { leading?: React.Reac
         </DsDropdownContent>
       </DsDropdown>
 
+      {dialogs}
       <DsConfirmDialog
         open={publishing}
         onOpenChange={setPublishing}

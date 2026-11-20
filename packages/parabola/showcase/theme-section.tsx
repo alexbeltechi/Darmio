@@ -10,7 +10,6 @@ import {
   Archive,
   ArrowLeft,
   ArrowRight,
-  BadgeCheck,
   Box,
   CassetteTape,
   Circle,
@@ -25,7 +24,7 @@ import {
   Trophy,
   Disc3,
   Feather,
-  Laptop,
+  Grid3x3,
   Layers,
   MousePointerClick,
   Orbit,
@@ -33,14 +32,7 @@ import {
   Shapes,
   Square,
   SquareDashed,
-  BarChart3,
-  Bookmark,
-  Heart,
   Leaf,
-  MessageCircle,
-  MoreHorizontal,
-  Repeat2,
-  Upload,
   Minus,
   MoreVertical,
   OctagonAlert,
@@ -49,19 +41,24 @@ import {
   Newspaper,
   Pencil,
   Plus,
-  Send,
   RotateCcw,
   Terminal,
   Trash2,
   Type,
   type LucideIcon,
+  Menu,
+  Ban,
+  Blend,
+  Dock,
+  PanelTop,
+  Moon,
+  Sun,
+  Sparkles,
 } from "lucide-react";
 import { DsButton } from "../primitives/button";
 import { DsDisclosure } from "../primitives/disclosure";
 import {
   DsConfirmDialog,
-  DsDialog,
-  DsDialogActions,
 } from "../primitives/dialog";
 import {
   DsDropdown,
@@ -77,13 +74,11 @@ import { DsPill } from "../primitives/pill";
 import { DsSelect } from "../primitives/select";
 import { dsToast } from "../primitives/toast";
 import { DsThemeToggle } from "../primitives/theme-toggle";
-import { DsInfoCard } from "../components/info-card";
 import { dsFontOptions } from "../components/font-pairing";
 import {
   DS_DEFAULT_COLOURS,
   DS_ICON_LIBRARIES,
   dsColourShown,
-  dsContrast,
   dsHexToHsl,
   dsNormalizeHex,
   dsShift,
@@ -98,13 +93,19 @@ import { DsColourWheel } from "../components/colour-wheel";
 import { DsColourBar } from "../components/colour-picker";
 import { DsSwitch } from "../primitives/switch";
 import { DsTopBar } from "../primitives/top-bar";
+import { DsFloatingBar, DsFloatingTitle } from "../primitives/floating-bar";
+import { BoardOutline, BoardSurface, type BoardRow } from "./board";
+import { socialFrames, SocialSettings } from "./social-preview";
+import { STYLES, useThemeLook } from "./theme-look";
+import { dsLookSnapshot, dsSameLook, dsUnhidePresets, dsWithLook, useCustomLooks, type DsLookScope, type DsLookSnapshot } from "./custom-looks";
+import { dsCustomName } from "./theme-editor";
 import {
   DS_DEFAULT_FIELD_STYLE,
   DS_OUTLINE_MAX,
   DS_OUTLINE_WIDTHS,
   type DsButtonStyle,
 } from "../button-style";
-import { DS_DEFAULT_NAV_STYLE, DS_NAV_SURFACES } from "../nav-style";
+import { DS_DEFAULT_NAV_STYLE, DS_NAV_STYLES, DS_NAV_SURFACES } from "../nav-style";
 import { DsAngleDial } from "../components/angle-dial";
 import { DsCheckbox } from "../primitives/checkbox";
 import { DS_RADII, DS_RADIUS_MAX, dsRadiusPx, type DsRadius } from "../radius";
@@ -114,10 +115,8 @@ import {
   dsCharacterBase,
   dsCharacterColourOptions,
   dsMoodDials,
-  dsMoodLabel,
   dsTemperatureLabel,
   type DsCharacter,
-  type DsTasteScope,
 } from "../character";
 import {
   DS_BUTTON_LOOKS,
@@ -126,10 +125,7 @@ import {
   dsButtonLookAt,
   dsButtonLookStyle,
   dsPaletteDraw,
-  dsTasteNames,
   dsTastePeople,
-  dsTasteStory,
-  dsTasteTilt,
   dsTasteVoice,
   dsTypeStyleFonts,
   type DsTone,
@@ -137,7 +133,6 @@ import {
 import {
   DS_BODY_FAMILY,
   DS_DEFAULT_THEME,
-  DS_DEFAULT_THEME_ID,
   DS_HEADING_FAMILY,
   dsThemeButtons,
   dsThemeColourTokens,
@@ -145,6 +140,7 @@ import {
   dsThemeWithFonts,
   parseDsThemeConfig,
   type DsThemeConfig,
+  dsThemeEntryId,
 } from "../theme";
 import {
   InPanel,
@@ -156,10 +152,12 @@ import {
 /** The theme's colours on the wheel, in the order they're picked, named for what they colour. */
 const WHEEL: { kind: DsColourKind; label: string }[] = [
   { kind: "theme", label: "Background" },
-  { kind: "text", label: "Primary" },
-  { kind: "muted", label: "Secondary" },
-  { kind: "accent", label: "Button: primary" },
-  { kind: "buttonSecondary", label: "Button: secondary" },
+  // The text's two colours, then the brand's by rank: Primary carries the brand (the main button, calls to action,
+  // a slide's ground), Secondary the quiet buttons and pills. Stored as text, muted, accent and buttonSecondary.
+  { kind: "text", label: "Text primary" },
+  { kind: "muted", label: "Text secondary" },
+  { kind: "accent", label: "Primary" },
+  { kind: "buttonSecondary", label: "Secondary" },
   { kind: "field", label: "Field" },
   { kind: "surface", label: "Surface" },
 ];
@@ -359,11 +357,14 @@ function SectionRestore({
   theme,
   setTheme,
   restore,
+  looks = [],
 }: {
   section: string;
   theme: DsThemeConfig;
   setTheme: (theme: DsThemeConfig) => void;
   restore: (theme: DsThemeConfig) => DsThemeConfig;
+  /** Its rows of looks, whose deleted presets it brings back. */
+  looks?: readonly DsLookScope[];
 }) {
   return (
     <DsButton
@@ -375,8 +376,15 @@ function SectionRestore({
       onClick={() => {
         const before = theme;
         setTheme(restore(theme));
+        const rehide = dsUnhidePresets(looks);
         dsToast(`${section} restored`, {
-          action: { label: "Undo", onClick: () => setTheme(before) },
+          action: {
+            label: "Undo",
+            onClick: () => {
+              setTheme(before);
+              rehide();
+            },
+          },
         });
       }}
     />
@@ -433,11 +441,11 @@ const SECTION = {
       character: {
         ...t.character,
         scoped: { ...t.character.scoped, colour: "classic" },
-        hue: 40,
-        warmth: 0,
-        colour: 0,
-        brightness: 1,
-        contrast: 0,
+        hue: DS_DEFAULT_CHARACTER.hue,
+        warmth: DS_DEFAULT_CHARACTER.warmth,
+        colour: DS_DEFAULT_CHARACTER.colour,
+        brightness: DS_DEFAULT_CHARACTER.brightness,
+        contrast: DS_DEFAULT_CHARACTER.contrast,
       },
       colours: DS_DEFAULT_COLOURS,
     }),
@@ -529,6 +537,7 @@ const SECTION = {
   },
 } as const;
 
+
 /**
  * The whole look again, at random: each section's own dice, one after the
  * other, and nothing else. So what comes up is always a combination of the
@@ -539,12 +548,6 @@ const drawLook = (t: DsThemeConfig): DsThemeConfig =>
   SECTION.fields.draw(
     SECTION.buttons.draw(SECTION.type.draw(SECTION.colour.draw(t))),
   );
-
-/** Light or dark, for the preview. */
-const MODES = [
-  { id: "light", label: "Light" },
-  { id: "dark", label: "Dark" },
-] as const;
 
 /** What each colour is based on in the light theme until it's given its own (colours.ts); null: Parabola's own. */
 const LIGHT_BASIS: Record<DsColourKind, string | null> = {
@@ -766,57 +769,6 @@ function PreviewAvatar({
   );
 }
 
-/** How a story's words sit on the photo (taste.ts): boxed in the page colour, plain in white, or loud on the button colour. */
-type Story = "boxed" | "plain" | "loud";
-
-/**
- * Words on a photo, as Instagram sets them: each line in its own box, tight,
- * the boxes following the lines (`box-decoration-break: clone`), in the page
- * colour or the button colour, or none at all with the words in white held
- * by a soft shadow. One size for every bit, small, as a person sets them.
- * `alt` swaps the box to the other colour, for the bit
- * that asks for a tap: words, not a button, as Instagram has none.
- */
-function StoryText({
-  story,
-  alt = false,
-  className,
-  children,
-}: {
-  story: Story;
-  alt?: boolean;
-  className?: string;
-  children: React.ReactNode;
-}) {
-  const box =
-    story === "plain"
-      ? alt
-        ? "button"
-        : null
-      : (story === "loud") !== alt
-        ? "button"
-        : "page";
-  return (
-    <p className={cn("text-small leading-[1.35]", className)}>
-      <span
-        className={cn(
-          "[-webkit-box-decoration-break:clone] [box-decoration-break:clone]",
-          box && "rounded-ds-sm px-[0.4em] py-[0.12em]",
-          box === "page" && "bg-ds-bg text-ds-fg",
-          box === "button" && "bg-ds-button text-ds-on-button",
-        )}
-        style={
-          box
-            ? undefined
-            : { color: "white", textShadow: "0 1px 12px rgb(0 0 0 / 0.45)" }
-        }
-      >
-        {children}
-      </span>
-    </p>
-  );
-}
-
 /**
  * The platforms' own look, which a theme can't brand (there's no
  * custom branding there, so the preview doesn't pretend there is): Instagram's,
@@ -832,231 +784,12 @@ const PLATFORM = {
   blue: "rgb(29 155 240)",
   dot: "rgb(0 149 246)",
   faint: "rgb(219 219 219)",
-  /** Gmail's: its inks and the grey of its label chips. */
-  gmailInk: "rgb(31 31 31)",
-  gmailMuted: "rgb(94 94 94)",
-  gmailChip: "rgb(233 235 238)",
 } as const;
 
-/**
- * A story, as Instagram shows one: Ilo's portrait full bleed, the progress
- * bars and her name at the top, then a short story in two moments, small,
- * in the taste's voice and set the way the taste asks (StoryText): her next
- * project, Dragonfly Vision, by her cheek, lined up on the left with her
- * avatar; and low in the middle the line and what to tap, the second in the
- * other colour. A playful mood tilts them a little
- * (dsTasteTilt). Its corners
- * are rounded where the Social piece's outer corners are (`className`).
- */
-function PreviewStory({
-  people,
-  story,
-  tilt,
-  copy,
-  className,
-}: {
-  people: People;
-  story: Story;
-  tilt: boolean;
-  copy: PreviewCopy;
-  className?: string;
-}) {
-  const [title, , cta] = copy.story;
-  return (
-    <div
-      className={cn(
-        "relative min-h-[320px] overflow-hidden bg-ds-surface",
-        className,
-      )}
-    >
-      <img
-        src={`${PREVIEW_MEDIA}/ilo-portrait.jpg`}
-        alt="Ilo, by the water"
-        className="absolute inset-0 size-full object-cover"
-      />
-      <div className="absolute inset-x-3 top-3 flex flex-col gap-ds-8">
-        <div className="flex gap-1">
-          {[1, 0.4, 0.4].map((o, i) => (
-            <span
-              key={i}
-              className="h-0.5 flex-1 rounded-full"
-              style={{ backgroundColor: "white", opacity: o }}
-            />
-          ))}
-        </div>
-        <div className="flex items-center gap-ds-8">
-          <PreviewAvatar people={people} className="size-6" />
-          <span
-            style={{
-              color: "white",
-              fontFamily: PLATFORM.font,
-              fontSize: 13,
-              fontWeight: 600,
-              textShadow: "0 1px 12px rgb(0 0 0 / 0.45)",
-            }}
-          >
-            iloodena
-          </span>
-        </div>
-      </div>
-      {/* Two moments: what's next, by her cheek, left with her avatar; then the line and what to tap, low. */}
-      <StoryText
-        story={story}
-        className={cn(
-          "absolute top-[52%] left-3 max-w-[70%]",
-          tilt && "-rotate-2",
-        )}
-      >
-        {copy.vision}
-      </StoryText>
-      <div className="absolute inset-x-4 bottom-8 flex flex-col items-center gap-ds-8 text-center">
-        <StoryText story={story} className={cn(tilt && "-rotate-2")}>
-          {title}
-        </StoryText>
-        <StoryText story={story} alt className={cn(tilt && "rotate-2")}>
-          {cta}
-        </StoryText>
-      </div>
-    </div>
-  );
-}
-
-/**
- * A post in the feed, beside the story, on Instagram's white in a grey
- * outline (PLATFORM): one photo, square, her at the lake's edge well inside
- * the frame, with nothing written on it (not a carousel), the actions under it, then the likes and her
- * caption in the taste's voice. Its corners are rounded where the Social
- * piece's outer corners are (`className`).
- */
-function PreviewFeedPost({
-  people,
-  copy,
-  className,
-}: {
-  people: People;
-  copy: PreviewCopy;
-  className?: string;
-}) {
-  return (
-    <div
-      className={cn(
-        "flex min-w-0 flex-col gap-ds-8 overflow-hidden border p-3",
-        className,
-      )}
-      style={{
-        borderColor: PLATFORM.faint,
-        backgroundColor: PLATFORM.bg,
-        color: PLATFORM.ink,
-        fontFamily: PLATFORM.font,
-        fontSize: 13,
-        lineHeight: 1.35,
-      }}
-    >
-      <div className="flex items-center gap-ds-8">
-        <PreviewAvatar people={people} className="size-7" />
-        <span style={{ fontSize: 14, fontWeight: 600 }}>iloodena</span>
-        <MoreHorizontal aria-hidden className="ml-auto size-4" />
-      </div>
-      <img
-        src={`${PREVIEW_MEDIA}/ilo-lake-day.jpg`}
-        alt="Ilo sitting at the lake's edge"
-        className="-mx-3 aspect-square w-[calc(100%+1.5rem)] max-w-none object-cover"
-      />
-      <div className="flex items-center gap-3">
-        <Heart aria-label="Like" className="size-5" />
-        <MessageCircle aria-label="Comment" className="size-5" />
-        <Send aria-label="Share" className="size-5" />
-        <Bookmark aria-label="Save" className="ml-auto size-5" />
-      </div>
-      <span style={{ fontWeight: 600 }}>1,204 likes</span>
-      <p>
-        <span style={{ fontWeight: 600 }}>iloodena</span> {copy.story[1]}
-      </p>
-    </div>
-  );
-}
-
-/**
- * A post on X, on X's white in a grey outline, with its inks and font (PLATFORM), laid out as
- * X lays one out: her avatar beside the post, her name, the blue check, her
- * handle and time, the ⋯, the text, the photo (square, her head in), then
- * the counts with their icons and bookmark and share at the end. Its corners
- * are rounded where the Social piece's outer corners are (`className`).
- */
-function PreviewXPost({
-  people,
-  copy,
-  className,
-}: {
-  people: People;
-  copy: PreviewCopy;
-  className?: string;
-}) {
-  const count = (Icon: LucideIcon, n: string, label: string) => (
-    <span
-      className="flex items-center gap-1"
-      style={{ color: PLATFORM.muted, fontSize: 13 }}
-      aria-label={`${n} ${label}`}
-    >
-      <Icon aria-hidden className="size-4" />
-      {n}
-    </span>
-  );
-  return (
-    <div
-      className={cn("flex w-full gap-3 border p-ds-16", className)}
-      style={{
-        borderColor: PLATFORM.faint,
-        backgroundColor: PLATFORM.bg,
-        color: PLATFORM.ink,
-        fontFamily: PLATFORM.font,
-        fontSize: 15,
-        lineHeight: 1.35,
-      }}
-    >
-      <PreviewAvatar people={people} className="size-10" />
-      <div className="flex min-w-0 flex-1 flex-col gap-ds-8">
-        <div className="flex items-center gap-1">
-          <span className="truncate" style={{ fontWeight: 700 }}>
-            Ilo Odena
-          </span>
-          <BadgeCheck
-            aria-label="Verified"
-            className="size-4 shrink-0"
-            style={{ color: PLATFORM.blue }}
-          />
-          <span className="truncate" style={{ color: PLATFORM.muted }}>
-            @iloodena · 2h
-          </span>
-          <MoreHorizontal
-            aria-hidden
-            className="ml-auto size-4 shrink-0"
-            style={{ color: PLATFORM.muted }}
-          />
-        </div>
-        <p>{copy.x}</p>
-        <img
-          src={`${PREVIEW_MEDIA}/ilo-black-sand.jpg`}
-          alt="Black sand and a line of foam"
-          className="aspect-square w-full rounded-2xl object-cover object-[50%_30%]"
-        />
-        <div className="flex items-center justify-between gap-ds-8 pr-1">
-          {count(MessageCircle, "12", "replies")}
-          {count(Repeat2, "48", "reposts")}
-          {count(Heart, "310", "likes")}
-          {count(BarChart3, "4.1K", "views")}
-          <span
-            className="flex items-center gap-ds-8"
-            style={{ color: PLATFORM.muted }}
-          >
-            <Bookmark aria-label="Bookmark" className="size-4" />
-            <Upload aria-label="Share" className="size-4" />
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-}
+/** Gmail's own look, light, or dark when the preview is: its page, inks and the grey of its label chips. */
+const GMAIL =
+  "[--gm-bg:white] [--gm-ink:rgb(31_31_31)] [--gm-muted:rgb(94_94_94)] [--gm-chip:rgb(233_235_238)] " +
+  "dark:[--gm-bg:rgb(18_18_18)] dark:[--gm-ink:rgb(227_227_227)] dark:[--gm-muted:rgb(160_160_160)] dark:[--gm-chip:rgb(48_48_48)]";
 
 /**
  * Her newsletter as a reader opens it in Gmail ("create a
@@ -1064,50 +797,35 @@ function PreviewXPost({
  * white, inks and font (PLATFORM), its toolbar, the subject with its Inbox
  * label, the sender's row (avatar, name and address, "to me", the time,
  * star and reply), then the letter itself: short and whole (no
- * fade), in the theme's fonts on white (the theme's own
- * colours only far up Playful), its masthead and issue, the title, a
+ * fade), in the theme's fonts and colours (light or dark, as the preview
+ * is, with Gmail around it), its masthead and issue, the title, a
  * greeting, a few lines in the taste's voice, a link on and her name.
  */
 function PreviewEmail({
-  theme,
   people,
   copy,
 }: {
-  theme: DsThemeConfig;
   people: People;
   copy: PreviewCopy;
 }) {
-  // White, as letters mostly are, in Gmail's inks, unless the mood is far up Playful ("only like
-  // funky stuff would do that"); the link in the button colour where it reads on white.
-  const coloured = theme.character.mood >= 0.85;
-  const white = dsThemeColourTokens(DS_DEFAULT_THEME, "light").bg;
-  const button = dsThemeColourTokens(theme, "light").highlight;
-  const letter: React.CSSProperties | undefined = coloured
-    ? undefined
-    : ({
-        "--ds-bg": white,
-        "--ds-fg": PLATFORM.gmailInk,
-        "--ds-fg-muted": PLATFORM.gmailMuted,
-        "--ds-border": PLATFORM.faint,
-        "--ds-highlight":
-          dsContrast(button, white) >= 3 ? button : PLATFORM.gmailInk,
-      } as React.CSSProperties);
+  // Gmail itself: white, or its dark look when the preview's in dark (GMAIL). The letter is hers, in the theme's
+  // colours for that mode ("at least the title should be in the orange").
   const tool = (Icon: LucideIcon, label: string) => (
     <Icon aria-label={label} className="size-4" />
   );
   return (
     <div
-      className="flex flex-col gap-ds-16 overflow-hidden rounded-ds-lg border p-ds-16"
+      className={`relative flex flex-col gap-ds-16 overflow-hidden rounded-ds-lg p-ds-16 ${GMAIL}`}
       style={{
-        borderColor: PLATFORM.faint,
-        backgroundColor: PLATFORM.bg,
-        color: PLATFORM.gmailInk,
+        backgroundColor: "var(--gm-bg)",
+        color: "var(--gm-ink)",
         fontFamily: PLATFORM.font,
       }}
     >
+      <BoardOutline />
       <div
         className="flex items-center gap-ds-20"
-        style={{ color: PLATFORM.gmailMuted }}
+        style={{ color: "var(--gm-muted)" }}
       >
         {tool(ArrowLeft, "Back to Inbox")}
         {tool(Archive, "Archive")}
@@ -1122,8 +840,8 @@ function PreviewEmail({
         <span
           className="rounded px-1.5"
           style={{
-            backgroundColor: PLATFORM.gmailChip,
-            color: PLATFORM.gmailMuted,
+            backgroundColor: "var(--gm-chip)",
+            color: "var(--gm-muted)",
             fontSize: 12,
           }}
         >
@@ -1139,13 +857,13 @@ function PreviewEmail({
             </span>
             <span
               className="truncate"
-              style={{ color: PLATFORM.gmailMuted, fontSize: 12 }}
+              style={{ color: "var(--gm-muted)", fontSize: 12 }}
             >
               &lt;letters@example.com&gt;
             </span>
             <span
               className="ml-auto flex shrink-0 items-center gap-3 pl-ds-8"
-              style={{ color: PLATFORM.gmailMuted, fontSize: 12 }}
+              style={{ color: "var(--gm-muted)", fontSize: 12 }}
             >
               9:14 AM (2 hours ago)
               <Star aria-label="Star" className="size-4" />
@@ -1155,7 +873,7 @@ function PreviewEmail({
           </div>
           <span
             className="flex items-center gap-0.5"
-            style={{ color: PLATFORM.gmailMuted, fontSize: 12 }}
+            style={{ color: "var(--gm-muted)", fontSize: 12 }}
           >
             to me
             <ChevronDown aria-hidden className="size-3" />
@@ -1163,7 +881,7 @@ function PreviewEmail({
         </div>
       </div>
       {/* The letter: hers, so in the theme, its column centred as a newsletter's is. */}
-      <div className="ml-[52px] bg-ds-bg p-ds-20" style={letter}>
+      <div className="ml-[52px] bg-ds-bg p-ds-20">
         <div className="mx-auto flex max-w-[480px] flex-col gap-ds-20">
           <div className="flex items-baseline justify-between gap-ds-16">
             <span className="text-h3 text-ds-fg">Ilo Odena</span>
@@ -1187,70 +905,193 @@ function PreviewEmail({
   );
 }
 
-/** A part of the preview: a divider, its name as the panel's sections show theirs, then what it shows. */
-function PreviewPart({
-  title,
-  className,
-  children,
-}: {
-  title: string;
-  className?: string;
-  children: React.ReactNode;
-}) {
+/** The nav choices' icons: its style, and the bar's background. */
+const NAV_ICONS: Record<string, LucideIcon> = { floating: Dock, bar: PanelTop, transparent: Ban, blur: Blend, solid: Square };
+
+/** How wide a page's reading column runs on a desktop: its words, and its nav's row. */
+const READING = 600;
+
+/** A phone's screen, in px (the latest regular iPhone, iPhone 17: 402 × 874 points): room above its first row and below its last, and in from its sides. */
+const PHONE = { width: 402, height: 874, top: 28, bottom: 28, side: 24 };
+
+/** A phone, as a plain outline: what it holds scrolls inside it, as on the device. */
+function Phone({ children }: { children: React.ReactNode }) {
   return (
-    <section className="flex flex-col gap-ds-20" aria-label={title}>
-      <div className="flex flex-col gap-ds-16">
-        <DsDivider />
-        <p className="text-p text-ds-fg-muted">{title}</p>
-      </div>
-      <div className={cn("flex flex-col gap-ds-20", className)}>{children}</div>
-    </section>
+    <div className="relative overflow-hidden bg-ds-bg" style={{ width: PHONE.width, height: PHONE.height, borderRadius: 48 }}>
+      <div className="size-full overflow-y-auto [scrollbar-width:none]">{children}</div>
+      <BoardOutline />
+    </div>
+  );
+}
+
+/** A wider screen (a laptop, a tablet on its side), as a plain outline: what it holds scrolls inside it. */
+function Screen({ height, children }: { height: number; children: React.ReactNode }) {
+  return (
+    <div className="relative overflow-hidden bg-ds-bg" style={{ height, borderRadius: 20 }}>
+      <div className="size-full overflow-y-auto [scrollbar-width:none]">{children}</div>
+      <BoardOutline />
+    </div>
   );
 }
 
 /**
- * The brand in words ("taste rules, brand rules"): a
- * style statement from the pills and the chips (the tastes, then the mood,
- * the palette and the fonts it's set in), then the
- * voice, a rule from each taste picked. What the preview's words follow,
- * and what an agent writing for the brand would read.
+ * Ilo's site: the nav as a site pins it, on the background the theme picks
+ * (Navigation), an essay's opening with the one big button, a picture, and a
+ * card with the subscribe field. Scroll it and the page goes under the nav.
  */
-function PreviewBrand({
-  theme,
-  rules,
-}: {
-  theme: DsThemeConfig;
-  rules: string[];
-}) {
-  const c = theme.character;
-  const tastes = dsTasteNames(c.tastes);
-  const named = tastes.length
-    ? `${tastes.slice(0, -1).join(", ")}${tastes.length > 1 ? " and " : ""}${tastes.at(-1)}. `
-    : "";
-  const palette = DS_PALETTES.find((p) => p.id === c.scoped.colour);
-  const mood = dsMoodLabel(c.mood);
-  const names = new Map(dsFontOptions(theme).map((o) => [o.value, o.label]));
-  const fonts = [
-    ...new Set(theme.families.map((f) => names.get(f.font) ?? f.font)),
-  ];
+function PreviewWeb({ theme, phone = false }: { theme: DsThemeConfig; phone?: boolean }) {
+  // In from the frame's sides: the nav's row and the page alike. The bar itself runs edge to edge, so its blur does too;
+  // on a desktop its row keeps to the page's reading column (DsTopBar's `column`), as the page does.
+  const side = phone ? PHONE.side : 32;
   return (
-    <PreviewPart title="Brand">
-      <p className="text-h3 text-ds-fg">
-        {named}
-        {`${mood}${palette ? `, in ${palette.label.toLowerCase()} colours` : ""}, set in ${fonts.join(" and ")}.`}
-      </p>
-      <div className="flex flex-col gap-ds-8">
-        <span className="text-p text-ds-fg">Voice</span>
-        <ul className="flex list-disc flex-col gap-ds-4 pl-5 text-p text-ds-fg-muted">
-          {(rules.length
-            ? rules
-            : ["Plain words and short sentences; nothing shouted."]
-          ).map((rule) => (
-            <li key={rule}>{rule}</li>
-          ))}
-        </ul>
+    <div className="flex flex-col">
+        {/* The nav as a site pins it, on the background the theme picks (Navigation): scroll the preview and the page goes
+            under it. On a phone, the name and a menu button; on a desktop, the links. */}
+        {theme.nav.style === "floating" ? (
+          // Floating, as a website wears it: her name on the left, the menu (a phone) or the links (a desktop) on the
+          // right, both in line with the page under them.
+          <DsFloatingBar
+            surface={theme.nav.surface}
+            column={phone ? undefined : READING}
+            style={{ paddingInline: side, paddingTop: phone ? PHONE.top : 20 }}
+            leading={<DsFloatingTitle size="small">Ilo Odena</DsFloatingTitle>}
+            trailing={
+              phone ? (
+                <DsButton size="small" iconLeft={Menu} aria-label="Menu" />
+              ) : (
+                <>
+                  <DsButton size="small">Work</DsButton>
+                  <DsButton size="small" current>
+                    Writing
+                  </DsButton>
+                  <DsButton size="small">About</DsButton>
+                  <DsThemeToggle size="small" />
+                </>
+              )
+            }
+          />
+        ) : (
+        <DsTopBar surface={theme.nav.surface} column={phone ? undefined : READING} style={{ paddingTop: phone ? PHONE.top : undefined, paddingInline: side }}>
+            {phone ? (
+              <div className="flex items-center justify-between gap-ds-16 py-ds-4">
+                <span className="text-p whitespace-nowrap text-ds-fg">Ilo Odena</span>
+                <DsButton size="small" variant="text" iconLeft={Menu} aria-label="Menu" />
+              </div>
+            ) : (
+              <div className="flex items-center justify-between gap-ds-16 py-ds-16">
+                <span className="text-p whitespace-nowrap text-ds-fg">Ilo Odena</span>
+                <nav className="flex items-center gap-ds-4" aria-label="Preview nav">
+                  <DsButton variant="text">Work</DsButton>
+                  <DsButton variant="text" current>
+                    Writing
+                  </DsButton>
+                  <DsButton variant="text">About</DsButton>
+                  <DsThemeToggle variant="text" />
+                </nav>
+              </div>
+            )}
+          </DsTopBar>
+        )}
+
+      <div className="pt-ds-20" style={{ paddingInline: side, paddingBottom: phone ? 40 : 80 }}>
+      <div className="mx-auto flex flex-col gap-ds-40" style={{ maxWidth: phone ? undefined : READING }}>
+        <article className="flex flex-col gap-ds-20">
+          <div className="flex flex-wrap items-center gap-ds-8">
+            <DsPill variant="highlight">New</DsPill>
+            <DsPill>Essay</DsPill>
+            <DsPill variant="dark">Published</DsPill>
+          </div>
+          <h1 className="text-display text-ds-fg">
+            Creating tasteful AI in an AI-infested world
+          </h1>
+          <h2 className="text-h2 text-ds-fg">
+            Where to let it decide, and where to keep the choice
+          </h2>
+          <p className="text-prose text-ds-fg-muted">
+            The hard part isn&apos;t what AI can do. It&apos;s knowing which
+            decisions to hand over and which ones have to stay mine, because the
+            ones I keep are the ones people recognise me by.
+          </p>
+          <p className="text-small text-ds-fg-muted">
+            2026 · 4 min · Taste, the floor
+          </p>
+          {/* The one big marketing button on the page, in its context: on to the essay. */}
+          <div>
+            <DsButton variant="primary" size="large" iconRight={ArrowRight}>
+              Read the essay
+            </DsButton>
+          </div>
+        </article>
+
+        <figure className="flex flex-col gap-ds-8">
+          <img
+            src={`${PREVIEW_MEDIA}/ilo-lake.jpg`}
+            alt="A still lake at dawn"
+            className="aspect-[3/2] w-full rounded-ds-lg object-cover"
+          />
+          <figcaption className="text-small text-ds-fg-muted">
+            Three summers at the lake, and one drop of it kept.
+          </figcaption>
+        </figure>
+
+        {/* A card above the fold, on the surface, with the big marketing buttons. */}
+        <section className="@container flex flex-col gap-ds-16 rounded-ds-lg bg-ds-surface-subtle p-ds-20">
+          <div className="flex flex-col gap-ds-4">
+            <h3 className="text-h3 text-ds-fg">Keep up with my thoughts</h3>
+            <p className="text-p text-ds-fg-muted">
+              One letter in your inbox a week.
+            </p>
+          </div>
+          <div className="@max-2xl:ds-fields-fill">
+            <DsInput aria-label="Email" placeholder="you@example.com" />
+          </div>
+          <div className="flex flex-wrap items-center gap-ds-8">
+            <DsButton variant="primary">Subscribe</DsButton>
+            <DsButton>Learn more</DsButton>
+          </div>
+        </section>
       </div>
-    </PreviewPart>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Ilo's own app: Hollow's (Ilo made Hollow, a palm-sized
+ * stone left in the lake overnight that answers a question as pulse and
+ * warmth). The app is the voice beside it: it listened to the lake all night
+ * and tells you what it heard. The stone's dish, big in the middle and
+ * breathing slowly, is the one thing to touch: hold it to ask. Under it what
+ * it says now, strongest, then what it heard before, everything centred.
+ */
+function PreviewApp() {
+  const heard = ["The frogs went quiet at 4:10.", "The water is two degrees colder than last night."];
+  return (
+    <div className="flex min-h-full flex-col items-center text-center" style={{ padding: `${PHONE.top + 8}px ${PHONE.side}px ${PHONE.bottom}px` }}>
+      <style>{`@keyframes ds-hollow{0%,100%{transform:scale(1);opacity:.55}50%{transform:scale(1.06);opacity:1}}`}</style>
+      <div className="flex flex-col items-center gap-ds-4">
+        <span className="text-p text-ds-fg">Hollow</span>
+        <span className="text-small text-ds-fg-muted">Listening since 21:40</span>
+      </div>
+      <div className="flex flex-1 flex-col items-center justify-center gap-ds-32">
+        {/* The dish: one drop of lake water, breathing while it listens. Hold it to ask. */}
+        <div className="relative grid size-56 place-items-center">
+          <div className="absolute inset-0 rounded-full bg-ds-surface-subtle motion-safe:animate-[ds-hollow_6s_ease-in-out_infinite]" />
+          <div className="absolute inset-8 rounded-full bg-ds-surface" />
+          <div className="relative size-3 rounded-full bg-ds-fg" />
+        </div>
+        {/* What it says now first, strongest; what it heard before under it, in Text secondary. */}
+        <div className="flex flex-col items-center gap-ds-8">
+          <p className="text-h3 text-ds-fg">Rain by noon. Bring the stone in before then.</p>
+          {heard.map((line) => (
+            <p key={line} className="text-p text-ds-fg-muted">
+              {line}
+            </p>
+          ))}
+        </div>
+      </div>
+      <span className="text-small text-ds-fg-muted">Hold to ask</span>
+    </div>
   );
 }
 
@@ -1273,9 +1114,9 @@ const TASTE_ICONS: Record<string, LucideIcon> = {
   vintage: Film,
   neon: Lightbulb,
   // Typography's rail.
-  friendly: Hand,
+  humanist: Hand,
   futurist: Orbit,
-  startup: Laptop,
+  swiss: Grid3x3,
   elegant: Feather,
   funky: Disc3,
   quirky: Shapes,
@@ -1292,85 +1133,325 @@ const TASTE_ICONS: Record<string, LucideIcon> = {
 /**
  * A row of pills that slides sideways (DsScrollRow), the light kind (text
  * buttons): no fill at rest, a soft one when picked, with an icon each
- * (`plain`: text only).
+ * (`plain`: text only). A pill given `onRename` is renamed by double-clicking
+ * it. `onAdd` puts a + at the row's end, outside the slide, so it's always in
+ * reach; a new pill being named is scrolled into view.
  */
+type Pill = {
+  id: string;
+  label: string;
+  icon?: LucideIcon;
+  onRename?: (name: string) => void;
+  onDuplicate?: () => void;
+  onRemove?: () => void;
+  /** The unsaved Custom: deleting it puts back the look it came from, so the row picks nothing else. */
+  restores?: boolean;
+};
+
 function PillRow({
   label,
   options,
   picked,
   onToggle,
   plain,
-  after,
+  onAdd,
+  addLabel = "New",
+  renaming,
+  onRenameEnd,
 }: {
   label: string;
-  options: readonly { id: string; label: string }[];
+  options: readonly Pill[];
   picked: readonly string[];
   onToggle: (id: string) => void;
-  /** Text only, no icons: the themes, and light or dark. */
+  /** Text only, no icons: the themes. */
   plain?: boolean;
-  /** One more button after the options, e.g. New +. */
-  after?: React.ReactNode;
+  /** The + at the row's end. */
+  onAdd?: () => void;
+  addLabel?: string;
+  /** The pill being named, its field open. */
+  renaming?: string | null;
+  onRenameEnd?: () => void;
 }) {
+  const row = React.useRef<HTMLDivElement>(null);
+  const [menu, setMenu] = React.useState<string | null>(null);
+  const [naming, setNaming] = React.useState<string | null>(null);
+  // Deleting the chip picked picks the one after it (or before, at the end), as closing a tab opens its neighbour.
+  const remove = (o: Pill) => {
+    const at = options.indexOf(o);
+    const next = picked.includes(o.id) && !o.restores ? (options[at + 1] ?? options[at - 1]) : undefined;
+    o.onRemove?.();
+    if (next) onToggle(next.id);
+  };
+  React.useEffect(() => {
+    if (!renaming) return;
+    const scroller = row.current?.querySelector<HTMLElement>("[role=group]");
+    scroller?.scrollTo({ left: scroller.scrollWidth, behavior: "smooth" });
+  }, [renaming]);
   return (
-    <DsScrollRow role="group" aria-label={label} className="-mx-2 px-2">
-      {options.map((o) => (
-        <DsButton
-          key={o.id}
-          size="small"
-          variant="text"
-          iconLeft={plain ? undefined : TASTE_ICONS[o.id]}
-          pressed={picked.includes(o.id)}
-          onClick={() => onToggle(o.id)}
-        >
-          {o.label}
-        </DsButton>
-      ))}
-      {after}
-    </DsScrollRow>
+    <div ref={row} className="flex min-w-0 items-center gap-ds-4">
+      <DsScrollRow role="group" aria-label={label} className="-mx-2 min-w-0 flex-1 px-2">
+        {options.map((o) => {
+          const on = picked.includes(o.id);
+          const menuable = Boolean(o.onRename || o.onDuplicate || o.onRemove);
+          const pill = (
+            <DsButton
+              size="small"
+              variant="text"
+              className={menuable ? "pr-6" : undefined}
+              iconLeft={plain ? undefined : (o.icon ?? TASTE_ICONS[o.id])}
+              pressed={on}
+              onClick={() => onToggle(o.id)}
+              onContextMenu={
+                menuable
+                  ? (e: React.MouseEvent) => {
+                      e.preventDefault();
+                      setMenu(o.id);
+                    }
+                  : undefined
+              }
+              onRename={o.onRename}
+              renaming={renaming === o.id || naming === o.id}
+              onRenameEnd={() => {
+                setNaming(null);
+                onRenameEnd?.();
+              }}
+              title={o.onRename ? "Double-click to rename" : undefined}
+            >
+              {o.label}
+            </DsButton>
+          );
+          if (!menuable) return <React.Fragment key={o.id}>{pill}</React.Fragment>;
+          // Each chip's own ⋮, at its end: always there on the one picked, on the others when the pointer's over
+          // them (or right-click anywhere on it). Clicking the chip picks it; the ⋮ holds the rest.
+          return (
+            <div key={o.id} className="group/pill relative flex shrink-0">
+              {pill}
+              <DsDropdown open={menu === o.id} onOpenChange={(open) => setMenu(open ? o.id : null)} modal={false}>
+                <DsDropdownTrigger asChild>
+                  <DsButton
+                    size="small"
+                    variant="text"
+                    iconLeft={MoreVertical}
+                    aria-label={`More for ${o.label}`}
+                    className={cn(
+                      "absolute right-0.5 top-1/2 size-5 -translate-y-1/2 text-ds-fg-muted hover:bg-transparent hover:text-ds-fg [&_svg]:size-3.5",
+                      on || menu === o.id ? "opacity-100" : "opacity-0 focus-visible:opacity-100 group-hover/pill:opacity-100",
+                    )}
+                  />
+                </DsDropdownTrigger>
+                <DsDropdownContent align="start">
+                  {o.onRename && (
+                    <DsDropdownItem iconLeft={Pencil} onSelect={() => setNaming(o.id)}>
+                      Rename
+                    </DsDropdownItem>
+                  )}
+                  {o.onDuplicate && (
+                    <DsDropdownItem iconLeft={Copy} onSelect={o.onDuplicate}>
+                      Duplicate
+                    </DsDropdownItem>
+                  )}
+                  {o.onRemove && (
+                    // The last chip in a row stays: there'd be nothing to pick.
+                    <DsDropdownItem tone="danger" iconLeft={Trash2} disabled={options.length === 1} onSelect={() => remove(o)}>
+                      Delete
+                    </DsDropdownItem>
+                  )}
+                </DsDropdownContent>
+              </DsDropdown>
+            </div>
+          );
+        })}
+      </DsScrollRow>
+      {onAdd && <DsButton size="small" variant="text" iconLeft={Plus} aria-label={addLabel} title={addLabel} onClick={onAdd} />}
+    </div>
   );
 }
 
 /**
- * A section's one rail: in Colour a palette, in
- * Typography a kind of type, in Buttons a kind of button, nothing else. The
- * style picks one on each; picking another by hand decides only that
- * section's values. One at a time, as tabs are. Kept on
- * the theme (`character.scoped`).
+ * A row of looks: Parabola's presets, then the custom looks kept, then, when
+ * the values match none of them, Custom, picked. One at a time, as tabs are;
+ * picking the one picked does nothing (another look is the dice's job).
+ * Any of them renames on a double-click; naming Custom keeps it, and + keeps
+ * the look as it is now, named Custom, ready to rename. Style looks at the
+ * whole look, the others at their own section (custom-looks.ts).
  */
-function SectionRail({
+function LookRail({
   scope,
   label,
-  options,
+  presets,
   theme,
   onTheme,
   apply,
 }: {
-  scope: DsTasteScope;
+  scope: DsLookScope;
   label: string;
-  options: readonly { id: string; label: string }[];
+  presets: readonly { id: string; label: string }[];
   theme: DsThemeConfig;
   onTheme: (theme: DsThemeConfig) => void;
-  /** The theme with this section's values from the pick (null: Parabola's own). */
-  apply: (id: string | null, theme: DsThemeConfig) => DsThemeConfig;
+  /** The theme with this row's values from a preset. */
+  apply: (id: string, theme: DsThemeConfig) => DsThemeConfig;
 }) {
-  const picked = theme.character.scoped[scope];
+  const custom = useCustomLooks();
+  const [renaming, setRenaming] = React.useState<string | null>(null);
+  const looks = custom.looks(scope);
+  const current = scope === "style" ? theme.character.tastes[0] : theme.character.scoped[scope];
+  // A preset applied: the theme saying so, for the export's words and the dice.
+  const marked = (id: string, t: DsThemeConfig): DsThemeConfig =>
+    scope === "style" ? t : { ...t, character: { ...t.character, scoped: { ...t.character.scoped, [scope]: id } } };
+  const snap = dsLookSnapshot(scope, theme);
+  // The kept look picked last (or just made with +) stays picked while the values are its own, even when a preset
+  // has the same ones; otherwise the preset the theme names, then any kept look that matches.
+  const [chosen, setChosen] = React.useState<string | null>(null);
+  const chosenLook = looks.find((l) => l.id === chosen && dsSameLook(l.snap, snap));
+  const preset = chosenLook
+    ? undefined
+    : presets.find((p) => p.id === current && dsSameLook(dsLookSnapshot(scope, apply(p.id, marked(p.id, theme))), snap));
+  const kept = chosenLook ?? (preset ? undefined : looks.find((l) => dsSameLook(l.snap, snap)));
+  const taken = looks.map((l) => l.name);
+  const live = !preset && !kept;
+  // A copy is a kept look of its own, at the row's end, its name open to change.
+  const duplicate = (name: string, look: DsLookSnapshot) => setRenaming(custom.add(scope, dsCustomName([...taken, name], `${name} copy`), look));
+  const options: Pill[] = [
+    ...presets
+      // A preset deleted here is only hidden: the section's Restore brings it back. The one in use stays.
+      .filter((p) => p.id === preset?.id || !custom.hidden(scope, p.id))
+      .map((p) => {
+        const name = custom.name(scope, p.id, p.label);
+        return {
+          id: p.id,
+          label: name,
+          onRename: (next: string) => custom.renamePreset(scope, p.id, next),
+          onDuplicate: () => duplicate(name, dsLookSnapshot(scope, apply(p.id, marked(p.id, theme)))),
+          onRemove: () => custom.hide(scope, p.id),
+        };
+      }),
+    ...looks.map((l) => ({
+      id: l.id,
+      label: l.name,
+      icon: Sparkles,
+      onRename: (name: string) => custom.rename(scope, l.id, name),
+      onDuplicate: () => duplicate(l.name, l.snap),
+      onRemove: () => custom.remove(scope, l.id),
+    })),
+    ...(live
+      ? [
+          {
+            id: "custom",
+            label: dsCustomName(taken),
+            icon: Sparkles,
+            onRename: (name: string) => setChosen(custom.add(scope, name, snap)),
+            onDuplicate: () => duplicate(dsCustomName(taken), snap),
+            restores: true,
+            // Not kept yet: deleting it puts the row back on the preset it came from (the first, if none).
+            onRemove: () => {
+              const back = presets.find((p) => p.id === current) ?? presets[0];
+              setChosen(null);
+              onTheme(apply(back.id, marked(back.id, theme)));
+            },
+          },
+        ]
+      : []),
+  ];
   return (
     <PillRow
       label={label}
       options={options}
-      picked={picked ? [picked] : []}
-      // One at a time, as tabs are: picking the one picked does nothing.
+      picked={[preset?.id ?? kept?.id ?? "custom"]}
+      renaming={renaming}
+      onRenameEnd={() => setRenaming(null)}
+      addLabel={`Keep this ${scope === "style" ? "style" : "look"}`}
+      onAdd={() => {
+        const id = custom.add(scope, dsCustomName(taken), snap);
+        setChosen(id);
+        setRenaming(id);
+      }}
       onToggle={(id) => {
-        if (id === picked) return;
-        onTheme(
-          apply(id, {
-            ...theme,
-            character: {
-              ...theme.character,
-              scoped: { ...theme.character.scoped, [scope]: id },
+        const look = looks.find((l) => l.id === id);
+        if (id === "custom" || id === preset?.id || id === kept?.id) return;
+        setChosen(look ? id : null);
+        if (look) onTheme(dsWithLook(scope, theme, look.snap));
+        else onTheme(apply(id, marked(id, theme)));
+      }}
+    />
+  );
+}
+
+/** The unsaved Custom chip's id: never a kept theme's (those are slugs of their names, "custom" included). */
+const LIVE = ":custom";
+
+/**
+ * The Theme rail, one row for every look: Parabola's styles (Classic first,
+ * the default), then the themes kept, then Custom. A style is worn by the
+ * first theme, the one a maker starts on; change anything and Custom takes
+ * its place, picked, until it's kept (+, or naming it), deleted (back to the
+ * style) or another chip is picked. A kept theme is picked to open it, and
+ * changes go into it. Each chip's ⋮ renames, duplicates and deletes it; a
+ * style deleted is only hidden, and Restore all brings it back.
+ */
+function ThemeRail() {
+  const { library, entry, setTheme, select, addTheme, renameTheme, removeTheme } = useThemeEditor();
+  const { first, kept, onFirst, style, live, fresh, current } = useThemeLook();
+  const custom = useCustomLooks();
+  const [renaming, setRenaming] = React.useState<string | null>(null);
+  const names = library.themes.map((t) => t.name);
+  // Keep a look as a theme of its own, opened, its name ready to change.
+  const keep = (name: string, from?: string | DsThemeConfig) => {
+    const unique = dsCustomName(names, name);
+    setRenaming(dsThemeEntryId(library, unique));
+    addTheme(unique, from);
+  };
+  const options: Pill[] = [
+    ...STYLES.filter((p) => p.id === style?.id || !custom.hidden("style", p.id)).map((p) => {
+      const name = custom.name("style", p.id, p.label);
+      return {
+        id: p.id,
+        label: name,
+        onRename: (next: string) => custom.renamePreset("style", p.id, next),
+        onDuplicate: () => keep(`${name} copy`, fresh(p.id)),
+        onRemove: () => custom.hide("style", p.id),
+      };
+    }),
+    ...kept.map((t) => ({
+      id: t.id,
+      label: t.name,
+      onRename: (name: string) => renameTheme(t.id, name),
+      onDuplicate: () => keep(`${t.name} copy`, t.id),
+      // The theme the website wears stays.
+      onRemove: t.id === library.active ? undefined : () => removeTheme(t.id),
+    })),
+    ...(live
+      ? [
+          {
+            id: LIVE,
+            // The name it would be kept under, so it never reads the same as a kept one.
+            label: dsCustomName(names),
+            onRename: (name: string) => {
+              const unique = dsCustomName(names, name);
+              addTheme(unique);
             },
-          }),
-        );
+            onDuplicate: () => keep(`${dsCustomName(names)} copy`),
+            restores: true,
+            // Not kept: deleting it puts the style it came from back (Classic, if none).
+            onRemove: () => setTheme(fresh(STYLES.find((p) => p.id === current)?.id ?? STYLES[0].id)),
+          },
+        ]
+      : []),
+  ];
+  return (
+    <PillRow
+      label="Theme"
+      options={options}
+      picked={[onFirst ? (style?.id ?? LIVE) : entry.id]}
+      renaming={renaming}
+      onRenameEnd={() => setRenaming(null)}
+      addLabel="Keep this theme"
+      onAdd={() => keep("Custom")}
+      onToggle={(id) => {
+        if (id === LIVE) return;
+        if (STYLES.some((p) => p.id === id)) {
+          if (onFirst && id === style?.id) return;
+          setTheme(fresh(id), first.id);
+        } else if (id !== entry.id) select(id);
       }}
     />
   );
@@ -1471,15 +1552,16 @@ function ColourChoice({
   };
   return (
     <div className="flex flex-col gap-ds-16">
-      <SectionRail
+      <LookRail
         scope="colour"
         label="Palette"
-        options={DS_PALETTES}
+        presets={DS_PALETTES}
         theme={theme}
         onTheme={onTheme}
         apply={(id, t) => {
+          // A palette is one look, the same every time: its first page and its first button. The dice draws from the rest.
           const drawn = id
-            ? dsPaletteDraw(id, t.character)
+            ? dsPaletteDraw(id, t.character, t.character.mood, true)
             : {
                 character: {
                   hue: 40,
@@ -1611,8 +1693,9 @@ function OutlineChoice({
       </label>
       {on && (
         <>
+          {/* Three equal columns: 1px, 2px and the custom width, the field no wider than a button. */}
           <div
-            className="flex items-center gap-ds-4"
+            className="grid grid-cols-3 items-center gap-ds-4"
             role="group"
             aria-label={`${label} thickness`}
           >
@@ -1620,7 +1703,7 @@ function OutlineChoice({
               <DsButton
                 key={w}
                 size="small"
-                className="min-w-0 flex-1 px-0"
+                className="w-full min-w-0 px-0"
                 pressed={width === w}
                 onClick={() => {
                   setText("");
@@ -1630,11 +1713,12 @@ function OutlineChoice({
                 {w}px
               </DsButton>
             ))}
+            <div className="min-w-0 [&>*]:w-full [&>*]:min-w-0">
             <DsInput
               size="small"
               aria-label={`${label} thickness in pixels`}
               inputMode="numeric"
-              className="min-w-0 flex-1"
+              className="min-w-0"
               value={text}
               placeholder="Custom"
               meta="px"
@@ -1647,6 +1731,7 @@ function OutlineChoice({
                   });
               }}
             />
+            </div>
           </div>
           <DsColourBar
             label={`${label} transparency`}
@@ -1867,56 +1952,6 @@ function RadiusChoice({
   );
 }
 
-/** A theme's name in a dialog: for a new theme (a copy of the open one) or to rename one. */
-function ThemeNameDialog({
-  title,
-  description,
-  initial,
-  action,
-  onClose,
-  onSave,
-}: {
-  title: string;
-  description: string;
-  initial: string;
-  action: string;
-  onClose: () => void;
-  onSave: (name: string) => void;
-}) {
-  const [name, setName] = React.useState(initial);
-  return (
-    <DsDialog
-      open
-      onOpenChange={(open) => !open && onClose()}
-      title={title}
-      description={description}
-    >
-      <form
-        className="flex flex-col gap-ds-20"
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (name.trim()) onSave(name.trim());
-        }}
-      >
-        <DsField label="Name">
-          <DsInput
-            autoFocus
-            value={name}
-            maxLength={60}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Evening"
-          />
-        </DsField>
-        <DsDialogActions>
-          <DsButton type="submit" variant="primary" disabled={!name.trim()}>
-            {action}
-          </DsButton>
-        </DsDialogActions>
-      </form>
-    </DsDialog>
-  );
-}
-
 /**
  * Theme: Parabola's home screen for making a theme, in the manner of
  * shadcn's create page. The page is a site's page
@@ -1933,21 +1968,13 @@ function ThemeNameDialog({
  */
 export function ThemeSection() {
   const {
-    library,
-    entry,
     theme,
     setTheme,
-    select,
-    addTheme,
-    renameTheme,
-    removeTheme,
     restoreTheme,
     previewMode: mode,
+    pickedMode,
     setPreviewMode,
   } = useThemeEditor();
-  const [naming, setNaming] = React.useState<
-    "add" | "rename" | null
-  >(null);
   const [restoring, setRestoring] = React.useState(false);
 
   const setFamilyFont = (familyId: string, font: string) =>
@@ -1965,153 +1992,70 @@ export function ThemeSection() {
   // Ilo shows as her photo in a friendly look, her initials in a branded one; her story's words boxed, plain or
   // loud (taste.ts).
   const people = dsTastePeople(theme.character.tastes, theme.character.mood);
-  const story = dsTasteStory(theme.character.tastes, theme.character.mood);
-  const tilt = dsTasteTilt(theme.character.tastes, theme.character.mood);
   const voice = dsTasteVoice(theme.character.tastes, theme.character.mood);
   const copy = VOICE_COPY[voice.tone];
+  const social = socialFrames(theme.social);
+  const rows: BoardRow[] = [
+    {
+      name: "Web",
+      frames: [
+        {
+          name: "iPhone 17 · 402",
+          width: PHONE.width,
+          chrome: false,
+          render: () => (
+            <Phone>
+              <PreviewWeb theme={theme} phone />
+            </Phone>
+          ),
+        },
+        {
+          name: "Desktop · 1280",
+          width: 1280,
+          chrome: false,
+          render: () => (
+            <Screen height={PHONE.height}>
+              <PreviewWeb theme={theme} />
+            </Screen>
+          ),
+        },
+      ],
+    },
+    { name: "Email", frames: [{ name: "Gmail · 640", width: 640, chrome: false, render: () => <PreviewEmail people={people} copy={copy} /> }] },
+    {
+      name: `Carousel · ${social.slides.length} slides · 1080 × ${social.slideHeight}`,
+      frames: social.slides.map((slide, i) => ({ name: `${i + 1} / ${social.slides.length}`, width: 470, chrome: false, render: () => slide })),
+    },
+    {
+      name: `Reel · ${social.scenes.length} scenes · 1080 × 1920`,
+      frames: social.scenes.map((scene, i) => ({ name: `Scene ${i + 1}`, width: 300, chrome: false, render: () => scene })),
+    },
+    {
+      name: "App",
+      frames: [
+        {
+          name: "iPhone 17 · 402",
+          width: PHONE.width,
+          chrome: false,
+          render: () => (
+            <Phone>
+              <PreviewApp />
+            </Phone>
+          ),
+        },
+      ],
+    },
+  ];
   const heading = theme.families.find((f) => f.id === DS_HEADING_FAMILY);
   const body =
     theme.families.find((f) => f.id === DS_BODY_FAMILY) ?? theme.families[0];
 
   return (
-    // The brand, not just the UI: the look in each place, at a site's reading width (600px),
-    // the site (Web), the top of a letter (Email), a story, a feed post and a post on X (Social), and the admin's own card
-    // (App), with Ilo's own photos and words in the taste's voice; then what it says and how (Brand).
-    <div className="flex w-full max-w-[600px] flex-col gap-ds-80">
-      <PreviewPart title="Web" className="gap-ds-40">
-        {/* The nav as a site pins it, on the background the theme picks (Navigation): scroll the preview and the page goes under it. */}
-        <DsTopBar
-          surface={theme.nav.surface}
-          // The canvas has room above the preview: a solid bar covers that too, so nothing shows over it.
-          className={cn(theme.nav.surface === "solid" && "before:absolute before:inset-x-0 before:bottom-full before:h-ds-160 before:bg-ds-bg")}
-        >
-          <div className="flex items-center justify-between gap-ds-16 py-ds-12">
-            <span className="text-p text-ds-fg">Ilo Odena</span>
-            <nav className="flex items-center gap-ds-4" aria-label="Preview nav">
-              <DsButton variant="text">Work</DsButton>
-              <DsButton variant="text" current>
-                Writing
-              </DsButton>
-              <DsButton variant="text">About</DsButton>
-              <DsThemeToggle variant="text" />
-            </nav>
-          </div>
-        </DsTopBar>
-
-        <article className="flex flex-col gap-ds-20">
-          <div className="flex flex-wrap items-center gap-ds-8">
-            <DsPill variant="highlight">New</DsPill>
-            <DsPill>Essay</DsPill>
-            <DsPill variant="dark">Published</DsPill>
-          </div>
-          <h1 className="text-display text-ds-fg">
-            Creating tasteful AI in an AI-infested world
-          </h1>
-          <h2 className="text-h2 text-ds-fg">
-            Where to let it decide, and where to keep the choice
-          </h2>
-          <p className="text-prose text-ds-fg-muted">
-            The hard part isn&apos;t what AI can do. It&apos;s knowing which
-            decisions to hand over and which ones have to stay mine, because the
-            ones I keep are the ones people recognise me by.
-          </p>
-          <p className="text-small text-ds-fg-muted">
-            2026 · 4 min · Taste, the floor
-          </p>
-          {/* The one big marketing button on the page, in its context: on to the essay. */}
-          <div>
-            <DsButton variant="primary" size="large" iconRight={ArrowRight}>
-              Read the essay
-            </DsButton>
-          </div>
-        </article>
-
-        <figure className="flex flex-col gap-ds-8">
-          <img
-            src={`${PREVIEW_MEDIA}/ilo-lake.jpg`}
-            alt="A still lake at dawn"
-            className="aspect-[3/2] w-full rounded-ds-lg object-cover"
-          />
-          <figcaption className="text-small text-ds-fg-muted">
-            Three summers at the lake, and one drop of it kept.
-          </figcaption>
-        </figure>
-
-        {/* A card above the fold, on the surface, with the big marketing buttons. */}
-        <section className="@container flex flex-col gap-ds-16 rounded-ds-lg bg-ds-surface-subtle p-ds-20">
-          <div className="flex flex-col gap-ds-4">
-            <h3 className="text-h3 text-ds-fg">Keep up with my thoughts</h3>
-            <p className="text-p text-ds-fg-muted">
-              One letter in your inbox a week.
-            </p>
-          </div>
-          <div className="@max-2xl:ds-fields-fill">
-            <DsInput aria-label="Email" placeholder="you@example.com" />
-          </div>
-          <div className="flex flex-wrap items-center gap-ds-8">
-            <DsButton variant="primary">Subscribe</DsButton>
-            <DsButton>Learn more</DsButton>
-          </div>
-        </section>
-      </PreviewPart>
-
-      <PreviewPart title="Email">
-        <PreviewEmail theme={theme} people={people} copy={copy} />
-      </PreviewPart>
-
-      <PreviewPart title="Social">
-        {/* One piece: the story and the feed post side by side over the post on X, 4px apart,
-            rounded only at the piece's outer corners. The story stretches to the post's height. */}
-        <div className="flex flex-col gap-1">
-          <div className="grid grid-cols-[23fr_35fr] gap-1">
-            <PreviewStory
-              people={people}
-              story={story}
-              tilt={tilt}
-              copy={copy}
-              className="rounded-tl-ds-lg"
-            />
-            <PreviewFeedPost
-              people={people}
-              copy={copy}
-              className="rounded-tr-ds-lg"
-            />
-          </div>
-          <PreviewXPost
-            people={people}
-            copy={copy}
-            className="rounded-b-ds-lg"
-          />
-        </div>
-      </PreviewPart>
-
-      <PreviewPart title="App">
-        {/* Her project, as the admin shows a draft: its name and state, a note, its actions. */}
-        <section className="flex flex-col gap-ds-16 rounded-ds-lg bg-ds-surface-subtle p-ds-20">
-          <div className="flex items-start justify-between gap-ds-16">
-            <div className="flex flex-col gap-ds-4">
-              <h3 className="text-h3 text-ds-fg">Dragonfly</h3>
-              <p className="text-small text-ds-fg-muted">
-                Project · Craft, sound, writing · 14 images, 3 recordings
-              </p>
-            </div>
-            <DsPill>Draft</DsPill>
-          </div>
-          <DsInfoCard title="Not live yet">
-            <p>
-              The process notes and the recordings go out with it when you
-              publish.
-            </p>
-          </DsInfoCard>
-          <div className="flex flex-wrap items-center gap-ds-8">
-            <DsButton variant="primary">Publish</DsButton>
-            <DsButton>Save</DsButton>
-            <DsButton variant="text">Preview</DsButton>
-          </div>
-        </section>
-      </PreviewPart>
-
-      <PreviewBrand theme={theme} rules={voice.rules} />
+    // The brand, not just the UI, on a board to move around and zoom (BoardSurface): the site on a phone and
+    // on a desktop, a letter, a carousel and a reel, and the app on a phone, with Ilo's own photos and words
+    // in the taste's voice. The panel beside it changes all of them at once.
+    <>
+      <BoardSurface rows={rows} mode={pickedMode} startZoom={0.5} />
 
       <InPanel>
         <PanelSection
@@ -2133,71 +2077,23 @@ export function ThemeSection() {
                 title="Restore"
                 onClick={() => setRestoring(true)}
               />
-              <DsDropdown>
-                <DsDropdownTrigger asChild>
-                  <DsButton
-                    size="small"
-                    variant="text"
-                    iconLeft={MoreVertical}
-                    aria-label={`More for ${entry.name}`}
-                  />
-                </DsDropdownTrigger>
-                <DsDropdownContent align="end">
-                  <DsDropdownItem
-                    iconLeft={Pencil}
-                    disabled={entry.id === DS_DEFAULT_THEME_ID}
-                    onSelect={() => setNaming("rename")}
-                  >
-                    Rename
-                  </DsDropdownItem>
-                  <DsDropdownItem
-                    iconLeft={Copy}
-                    onSelect={() => addTheme(`${entry.name} copy`)}
-                  >
-                    Duplicate
-                  </DsDropdownItem>
-                  <DsDropdownItem
-                    tone="danger"
-                    iconLeft={Trash2}
-                    disabled={
-                      entry.id === DS_DEFAULT_THEME_ID ||
-                      entry.id === library.active
-                    }
-                    onSelect={() => removeTheme(entry.id)}
-                  >
-                    Delete
-                  </DsDropdownItem>
-                </DsDropdownContent>
-              </DsDropdown>
             </div>
           }
         >
-          {/* The themes, as text: Parabola first (its own, never changed), then any made from it.
-              A change goes into the open theme, Parabola included (Restore puts it back); New +, the last tab, adds a copy. */}
-          <PillRow
-            plain
-            label="Theme"
-            options={library.themes.map((t) => ({ id: t.id, label: t.name }))}
-            picked={[entry.id]}
-            onToggle={(id) => {
-              if (id === entry.id) return;
-              select(id);
-            }}
-            // The last tab: a new theme, a copy of the open one, named first.
-            after={
-              <DsButton size="small" variant="text" iconRight={Plus} onClick={() => setNaming("add")}>
-                New
-              </DsButton>
-            }
-          />
-          {/* The preview's mode, right under the themes, the same kind of row; the UI's is the sidebar's toggle. */}
-          <PillRow
-            plain
-            label="Mode"
-            options={MODES}
-            picked={[mode]}
-            onToggle={(id) => setPreviewMode(id as "light" | "dark")}
-          />
+          {/* One rail for every look (ThemeRail), and on the right the preview's light or dark. */}
+          <div className="flex items-center gap-ds-8">
+            <div className="min-w-0 flex-1">
+              <ThemeRail />
+            </div>
+            <DsButton
+              size="small"
+              variant="text"
+              iconLeft={mode === "dark" ? Sun : Moon}
+              aria-label={mode === "dark" ? "Show the preview in light" : "Show the preview in dark"}
+              title={mode === "dark" ? "Light" : "Dark"}
+              onClick={() => setPreviewMode(mode === "dark" ? "light" : "dark")}
+            />
+          </div>
         </PanelSection>
 
         <PanelSection
@@ -2212,6 +2108,7 @@ export function ThemeSection() {
               />
               <SectionRestore
                 section="Colour"
+                looks={["colour"]}
                 theme={theme}
                 setTheme={setTheme}
                 restore={SECTION.colour.restore}
@@ -2234,6 +2131,7 @@ export function ThemeSection() {
               />
               <SectionRestore
                 section="Typography"
+                looks={["type"]}
                 theme={theme}
                 setTheme={setTheme}
                 restore={SECTION.type.restore}
@@ -2241,17 +2139,14 @@ export function ThemeSection() {
             </div>
           }
         >
-          <SectionRail
+          <LookRail
             scope="type"
             label="Kind of type"
-            options={DS_TYPE_STYLES}
+            presets={DS_TYPE_STYLES}
             theme={theme}
             onTheme={setTheme}
             apply={(id, t) =>
-              dsThemeWithFonts(
-                t,
-                id ? dsTypeStyleFonts(id, t.character.mood) : null,
-              )
+              dsThemeWithFonts(t, dsTypeStyleFonts(id, t.character.mood))
             }
           />
           <TypeContrast theme={theme} mode={mode} onTheme={setTheme} />
@@ -2297,6 +2192,7 @@ export function ThemeSection() {
               />
               <SectionRestore
                 section="Buttons"
+                looks={["buttons"]}
                 theme={theme}
                 setTheme={setTheme}
                 restore={SECTION.buttons.restore}
@@ -2304,14 +2200,14 @@ export function ThemeSection() {
             </div>
           }
         >
-          <SectionRail
+          <LookRail
             scope="buttons"
             label="Kind of button"
-            options={DS_BUTTON_LOOKS}
+            presets={DS_BUTTON_LOOKS}
             theme={theme}
             onTheme={setTheme}
             apply={(id, t) => {
-              const look = id ? dsButtonLookAt(id, t.character.mood) : null;
+              const look = dsButtonLookAt(id, t.character.mood);
               return {
                 ...t,
                 character: {
@@ -2323,7 +2219,7 @@ export function ThemeSection() {
                 radius: null,
                 pillRadius: null,
                 // Outline and Text have a look of their own (no fill); the others come from the depth.
-                buttons: dsButtonLookStyle(id ?? undefined),
+                buttons: dsButtonLookStyle(id),
               };
             }}
           />
@@ -2401,15 +2297,36 @@ export function ThemeSection() {
           }
         >
           <div className="flex flex-col gap-ds-8">
+            <span className="text-p text-ds-fg">Style</span>
+            <div role="group" aria-label="Navigation style" className="flex items-center gap-ds-4">
+              {DS_NAV_STYLES.map((s) => (
+                <DsButton
+                  key={s.id}
+                  size="small"
+                  variant="text"
+                  className="min-w-0 flex-1"
+                  iconLeft={NAV_ICONS[s.id]}
+                  pressed={theme.nav.style === s.id}
+                  onClick={() => setTheme({ ...theme, nav: { ...theme.nav, style: s.id } })}
+                >
+                  {s.label}
+                </DsButton>
+              ))}
+            </div>
+          </div>
+          {/* What's behind the nav, either style: nothing, the blur (the page blurring away under it) or the page colour. */}
+          <div className="flex flex-col gap-ds-8">
             <span className="text-p text-ds-fg">Background</span>
-            <div className="flex items-center gap-ds-4" role="group" aria-label="Navigation background">
+            <div role="group" aria-label="Navigation background" className="flex items-center gap-ds-4">
               {DS_NAV_SURFACES.map((s) => (
                 <DsButton
                   key={s.id}
                   size="small"
-                  className="min-w-0 flex-1 px-0"
+                  variant="text"
+                  className="min-w-0 flex-1"
+                  iconLeft={NAV_ICONS[s.id]}
                   pressed={theme.nav.surface === s.id}
-                  onClick={() => setTheme({ ...theme, nav: { surface: s.id } })}
+                  onClick={() => setTheme({ ...theme, nav: { ...theme.nav, surface: s.id } })}
                 >
                   {s.label}
                 </DsButton>
@@ -2419,6 +2336,20 @@ export function ThemeSection() {
         </PanelSection>
 
         {/* No dice here: Lucide is the only library that works (colours.ts), so a draw has nothing to pick. */}
+        <PanelSection
+          title="Social"
+          actions={
+            <SectionRestore
+              section="Social"
+              theme={theme}
+              setTheme={setTheme}
+              restore={(t) => ({ ...t, social: DS_DEFAULT_THEME.social })}
+            />
+          }
+        >
+          <SocialSettings social={theme.social} onChange={(social) => setTheme({ ...theme, social })} />
+        </PanelSection>
+
         <PanelSection
           title="Icons"
           actions={
@@ -2454,38 +2385,10 @@ export function ThemeSection() {
         onConfirm={() => {
           setRestoring(false);
           const undoIt = restoreTheme();
-          dsToast(RESTORE.all.done, {
-            action: { label: "Undo", onClick: undoIt },
-          });
+          dsToast(RESTORE.all.done, { action: { label: "Undo", onClick: undoIt } });
         }}
       />
 
-      {naming === "add" && (
-        <ThemeNameDialog
-          title="Add a theme"
-          description={`A copy of ${entry.name}, to change as you like.`}
-          initial=""
-          action="Add theme"
-          onClose={() => setNaming(null)}
-          onSave={(name) => {
-            addTheme(name);
-            setNaming(null);
-          }}
-        />
-      )}
-      {naming === "rename" && (
-        <ThemeNameDialog
-          title={`Rename ${entry.name}`}
-          description="What it's called here and wherever a site picks it."
-          initial={entry.name}
-          action="Rename"
-          onClose={() => setNaming(null)}
-          onSave={(name) => {
-            renameTheme(entry.id, name);
-            setNaming(null);
-          }}
-        />
-      )}
-    </div>
+    </>
   );
 }

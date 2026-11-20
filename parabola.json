@@ -1,7 +1,7 @@
 {
   "source": "https://github.com/alexbeltechi/parabola.git",
-  "version": "0.4.0",
-  "commit": "b9535cfdea9b6cfaf79cba3460736b41b5f4bc47",
+  "version": "0.5.2",
+  "commit": "c848f5ac94a46fbf95be2f76772d79fde7bdd29c",
   "dir": "packages/parabola",
   "files": "*",
   "exclude": [

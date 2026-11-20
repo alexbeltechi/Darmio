@@ -387,7 +387,10 @@ export function parseDsThemeConfig(value: unknown): DsThemeConfig {
   const chips = { ...parsed.scoped };
   if (!stored || typeof stored !== "object" || Array.isArray(stored) || Object.values(stored).every(Array.isArray)) {
     const c = parsed;
-    if (!chips.colour && c.colour === 0 && c.brightness === 1 && c.contrast === 0 && Object.values(colours).every((v) => !v.light && !v.dark)) chips.colour = "classic";
+    // Paper's dials (Parabola's own since 0.5.0), or the plain white Parabola had before.
+    const d = DS_DEFAULT_CHARACTER;
+    const paper = (c.colour === d.colour && c.brightness === d.brightness && c.contrast === d.contrast) || (c.colour === 0 && c.brightness === 1 && c.contrast === 0);
+    if (!chips.colour && paper && Object.values(colours).every((v) => !v.light && !v.dark)) chips.colour = "classic";
     if (!chips.type && families.find((f) => f.id === DS_BODY_FAMILY)?.font === DS_DEFAULT_FONT && families.find((f) => f.id === DS_HEADING_FAMILY)?.font === DS_DEFAULT_HEADING_FONT) chips.type = "classic";
     if (!chips.buttons && c.roundness === 1 && c.depth === 0 && radius === null && !storedButtons) chips.buttons = "soft";
   }
@@ -748,13 +751,13 @@ export function dsSameLook(a: DsThemeConfig, b: DsThemeConfig): boolean {
 /** A named theme in a library. */
 export type DsThemeEntry = { id: string; name: string; theme: DsThemeConfig };
 
-/** Parabola, the default (always first, can't go), and any themes added; `active` is the one the site wears. */
+/** Classic, the default (always first, can't go), and any themes added; `active` is the one the site wears. */
 export type DsThemeLibrary = { themes: DsThemeEntry[]; active: string };
 
 export const DS_DEFAULT_THEME_ID = "default";
 
 export const DS_DEFAULT_LIBRARY: DsThemeLibrary = {
-  themes: [{ id: DS_DEFAULT_THEME_ID, name: "Parabola", theme: DS_DEFAULT_THEME }],
+  themes: [{ id: DS_DEFAULT_THEME_ID, name: "Classic", theme: DS_DEFAULT_THEME }],
   active: DS_DEFAULT_THEME_ID,
 };
 
@@ -786,14 +789,14 @@ export function parseDsThemeLibrary(value: unknown, legacy?: unknown): DsThemeLi
         if (!id || seen.has(id)) return [];
         seen.add(id);
         const named = typeof entry.name === "string" && entry.name.trim() ? entry.name.trim().slice(0, 60) : id;
-        // The default theme was called Default before it was Parabola.
-        const name = id === DS_DEFAULT_THEME_ID && named === "Default" ? "Parabola" : named;
+        // The default theme was called Default, then Parabola, before it was Classic.
+        const name = id === DS_DEFAULT_THEME_ID && (named === "Default" || named === "Parabola") ? "Classic" : named;
         return [{ id, name, theme: parseDsThemeConfig(entry.theme) }];
       })
     : [];
   const fallbackDefault: DsThemeEntry = {
     id: DS_DEFAULT_THEME_ID,
-    name: "Parabola",
+    name: "Classic",
     theme: legacy !== undefined ? parseDsThemeConfig(legacy) : DS_DEFAULT_THEME,
   };
   const first = themes.find((t) => t.id === DS_DEFAULT_THEME_ID) ?? fallbackDefault;

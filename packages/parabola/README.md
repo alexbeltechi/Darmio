@@ -205,10 +205,12 @@ A theme is data (`theme.ts`), much as shadcn's create page sets a style:
   (`pillRadius`, `--ds-radius-chip`, `rounded-ds-chip`). Fields have their
   own outline (`fields`: on, 2px, solid by default; `--ds-field-border-width`;
   an invalid field's red outline, `DS_FIELD_INVALID_CLASS`, is always 2px).
-- **Navigation** (`nav-style.ts`, `theme.nav.surface`): what's behind the
-  site's pinned nav, one of three (`DS_NAV_SURFACES`): None, Blur (the nav
-  fade, the default) or Solid (the page colour alone, hiding what scrolls
-  under it). A site passes it to its `DsTopBar` as `surface`.
+- **Navigation** (`nav-style.ts`, `theme.nav`): its style (`DS_NAV_STYLES`),
+  Floating (`DsFloatingBar`, the default: buttons over the page, the title
+  in the middle as a button, a soft fade behind) or Bar (`DsTopBar`); and the
+  bar's background (`surface`, `DS_NAV_SURFACES`): None, Blur (the nav fade,
+  the default) or Solid (the page colour alone, hiding what scrolls under
+  it). A site passes it to its `DsTopBar` as `surface`.
 - **Radius** (`radius.ts`): None, Small (2px), Medium, Large (the default) or a
   custom number of pixels (the cards' and pills' corner, the rest scaled),
   for every corner (`rounded-ds-sm` … `rounded-ds-lg`) and the pill
@@ -338,11 +340,16 @@ they update.
 
 ### Releasing a version
 
-Change things here, add an entry to `CHANGELOG.md` in plain words (say which
-files a project is likely to have edited), raise `version` in
-`package.json`, `npm run bundle`, `npm test`, `npm run check`, commit, and
-tag it `v<version>`. `update` takes the newest tag. Nothing happens in any
-project until it runs `update`.
+Change things here and add an entry under `## Unreleased` in `CHANGELOG.md`
+in plain words (say which files a project is likely to have edited). To
+release: raise `version` in `package.json`, turn `## Unreleased` into
+`## <version> — <date>` (a new empty `## Unreleased` above it), `npm run
+bundle`, `npm test`, `npm run check`, and merge to `main`. The tag
+`v<version>` is made for you when it lands
+(`.github/workflows/tag-release.yml`), so a release can't miss its tag.
+`update` takes the newest tag, so a project gets the release with plain
+`update`; work merged without a version stays on `main` until the next
+release. Nothing happens in any project until it runs `update`.
 
 Publishing a GitHub release for the tag puts that version on npm
 (`.github/workflows/publish.yml`; it needs the repo's `NPM_TOKEN` secret).

@@ -5,7 +5,7 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { DsButton, DsCopyField, DsField, DsInput, DsRadio, DsRadioGroup, dsToast } from "@beltechi/parabola";
 import { PASSWORD_MIN } from "@/lib/cms/password";
-import { isEmail } from "@/lib/cms/email";
+import { emailProblem, isEmail } from "@/lib/cms/email";
 import { InstallProblemNotice } from "@/components/admin/install-problem";
 import { installProblem, type InstallProblem } from "@/lib/cms/install-problems";
 import type { ExampleSite } from "@/lib/cms/examples";
@@ -81,7 +81,7 @@ export default function SetupPage() {
   }, [router]);
 
   const mismatch = repeat.length > 0 && password !== repeat;
-  const badEmail = email.trim().length > 0 && !isEmail(email);
+  const emailError = email.trim().length > 0 ? emailProblem(email) : null;
   const youReady = Boolean(isEmail(email) && password.length >= PASSWORD_MIN && password === repeat);
   async function create() {
     if (!youReady || saving) return;
@@ -159,7 +159,7 @@ export default function SetupPage() {
           }}
         >
           <div className="flex flex-col gap-ds-20">
-            <DsField label="Email" error={badEmail ? "That doesn't look like an email" : undefined}>
+            <DsField label="Email" error={emailError ?? undefined}>
               <DsInput type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" autoFocus />
             </DsField>
             <DsField label="Password" description={`At least ${PASSWORD_MIN} characters.`}>

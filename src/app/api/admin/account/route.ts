@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getUserId } from "@/lib/agent/actor";
 import { handleDatabaseError, isDatabaseError } from "@/lib/api/error-handler";
 import { PASSWORD_MIN } from "@/lib/cms/password";
-import { isEmail } from "@/lib/cms/email";
+import { emailProblem } from "@/lib/cms/email";
 import { getUserByEmail, getUserById, updateUser, verifyPassword } from "@/lib/cms/users";
 
 /** The signed-in person's account. Agents (a bearer token) have none. */
@@ -37,7 +37,8 @@ export async function PATCH(request: NextRequest) {
 
     if (typeof body.newEmail === "string") {
       const newEmail = body.newEmail.trim().toLowerCase();
-      if (!isEmail(newEmail)) return NextResponse.json({ error: "That doesn't look like an email" }, { status: 400 });
+      const emailError = emailProblem(newEmail);
+      if (emailError) return NextResponse.json({ error: emailError }, { status: 400 });
       const safe = await getUserById(userId);
       const user = safe && (await getUserByEmail(safe.email));
       if (!user) return NextResponse.json({ error: "Account not found" }, { status: 404 });

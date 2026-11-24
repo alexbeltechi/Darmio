@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { handleDatabaseError, isDatabaseError } from "@/lib/api/error-handler";
 import { PASSWORD_MIN } from "@/lib/cms/password";
-import { isEmail } from "@/lib/cms/email";
+import { emailProblem } from "@/lib/cms/email";
 import { parseBrain, parseProjectName, PROJECTS_MAX } from "@/lib/cms/projects";
 import { createUser, hasUsers } from "@/lib/cms/users";
 import { listExampleSites, loadExampleSite, parseExampleName } from "@/lib/cms/examples";
@@ -94,7 +94,8 @@ export async function POST(request: NextRequest) {
 
     // Optional: an account is its email until its owner adds a name (Settings › Account).
     if (name.length > 80) return NextResponse.json({ error: "A name can be at most 80 characters" }, { status: 400 });
-    if (!isEmail(email)) return NextResponse.json({ error: "Enter a valid email" }, { status: 400 });
+    const emailError = emailProblem(email);
+    if (emailError) return NextResponse.json({ error: emailError }, { status: 400 });
     if (password.length < PASSWORD_MIN || password.length > 200) {
       return NextResponse.json({ error: `The password needs ${PASSWORD_MIN} to 200 characters` }, { status: 400 });
     }

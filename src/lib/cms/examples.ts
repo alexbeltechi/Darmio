@@ -250,38 +250,6 @@ export async function loadExampleSite(name: string, log: (line: string) => void 
   }
 }
 
-/** Seeds present in the current project, inferred from example-marked items and seed batches. */
-async function detectLoadedSeeds(): Promise<Set<string>> {
-  const seeds = new Set<string>();
-  // Example entries carry metadata.seed
-  for (const entry of await listAllEntries()) {
-    if (isExample(entry) && typeof entry.metadata?.seed === "string") seeds.add(String(entry.metadata.seed));
-  }
-  // Categories may carry it now; older ones don't.
-  for (const category of await listCategories()) {
-    if (isExample(category) && typeof category.metadata?.seed === "string") seeds.add(String(category.metadata.seed));
-  }
-  // Media uploaded by the seed script carries batchId "seed-<name>"
-  for (const item of await listExampleMedia(await seedBatches())) {
-    const batch = item.source?.batchId;
-    if (item.source?.origin === "script" && typeof batch === "string" && batch.startsWith("seed-")) {
-      seeds.add(batch.slice("seed-".length));
-    }
-  }
-  return seeds;
-}
-
-/** Slugs of categories that belong to loaded seeds but may predate example marking (legacy seed runs). */
-async function legacyExampleCategorySlugs(seeds: Set<string>): Promise<Set<string>> {
-  const slugs = new Set<string>();
-  for (const seed of seeds) {
-    const site = await readSeed(seed).catch(() => null);
-    if (!site?.categories) continue;
-    for (const c of site.categories) slugs.add(c.slug);
-  }
-  return slugs;
-}
-
 /** The batches the seed script gave uploads before media carried the example mark. */
 async function seedBatches(): Promise<string[]> {
   return (await listExampleSites()).map((site) => `seed-${site.name}`);
@@ -292,10 +260,8 @@ const countOf = (entries: { collection: string }[], collection: string) => entri
 /** How much of the current project is examples. */
 export async function exampleCounts(): Promise<ExampleCounts> {
   const entries = await countExampleEntries();
-  const allCategories = await listCategories();
-  const seeds = await detectLoadedSeeds();
-  const legacySlugs = await legacyExampleCategorySlugs(seeds);
-  const categories = allCategories.filter((c) => isExample(c) || legacySlugs.has(c.slug)).length;
+  // Only categories the example made carry its mark; a maker's own category with the same slug is theirs.
+  const categories = (await listCategories()).filter(isExample).length;
   const media = (await listExampleMedia(await seedBatches())).length;
   return {
     posts: entries.posts ?? 0,
@@ -319,13 +285,9 @@ export type ExampleRemoval = {
  */
 export async function removeExamples(): Promise<ExampleRemoval> {
   const entries = await listAllEntries();
-  const categoriesInDb = await listCategories();
+  // A category is an example only by its mark, never by a slug it shares with one: the maker's own stays.
+  const categories = await listCategories();
   const media = await listExampleMedia(await seedBatches());
-  // Treat legacy seed categories (matching loaded seeds' slugs) as examples for planning purposes,
-  // so earlier runs without metadata.example are still removable when unused.
-  const seeds = await detectLoadedSeeds();
-  const legacySlugs = await legacyExampleCategorySlugs(seeds);
-  const categories = categoriesInDb.map((c) => (legacySlugs.has(c.slug) ? { ...c, metadata: { ...(c.metadata || {}), example: true } } : c));
   const plan = planExampleRemoval({ entries, categories, exampleMedia: media.map((item) => item.id) });
 
   for (const entry of plan.entries) {

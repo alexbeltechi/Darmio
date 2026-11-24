@@ -60,6 +60,11 @@ in `DS_FONTS` (`packages/parabola/fonts.ts`), or a font added in `customFonts`.
   `outlineWidth` (1 to 8), `outlineOpacity` (0 to 1), `shadow`, `shadowAngle` (0 to 360).
 - `fields`: `outline`, `outlineWidth`, `outlineOpacity`.
 - `icons`: `"lucide"` (the only library ready).
+- `nav`: `style` (`"floating"` or `"bar"`) and `surface` (`"transparent"`, `"blur"`, `"solid"`): what's
+  behind the top menu. The site's menu follows `surface` today; `style` is shown on `/parabola`.
+- `composition`, `brief`, `social`: objects, read leniently (anything unknown falls back to Parabola's
+  own). `social` is the style as a post, a carousel slide or a reel. Easiest made in the builder
+  at `/parabola/theme` and saved as a file.
 
 ### `character`
 

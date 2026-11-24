@@ -209,3 +209,21 @@ describe("parseExampleName", () => {
   });
 });
 
+
+describe("a maker's own category that shares an example's slug", () => {
+  it("is kept by the plan when it carries no example mark", () => {
+    const categories: Category[] = [
+      { id: "own", slug: "writing" },
+      { id: "ex", slug: "listening", metadata: { example: true, seed: "ilo" } },
+    ];
+    const plan = planExampleRemoval({ entries: [], categories, exampleMedia: [] });
+    assert.deepEqual(plan.categories.map((c) => c.id), ["ex"]);
+  });
+
+  it("is never marked as an example by its slug before planning", async () => {
+    const src = await fs.readFile(path.join(process.cwd(), "src/lib/cms/examples.ts"), "utf8");
+    const body = src.slice(src.indexOf("export async function removeExamples"));
+    assert.doesNotMatch(body, /example:\s*true/, "removeExamples must not add the example mark to categories it reads");
+    assert.doesNotMatch(src, /legacyExampleCategorySlugs/);
+  });
+});

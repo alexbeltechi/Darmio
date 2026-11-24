@@ -24,13 +24,49 @@ Parabola's token check, the leak check, the unit tests (`npm test`), and a produ
 server code, such as the database; Vercel's build doesn't). It must pass. Data is the live database, so check UI
 changes in the running app with read-only actions (see `CLAUDE.md`).
 
+## Parabola's version
+
+The Parabola in `packages/parabola` works on its own at the version
+`parabola.json` names. Nobody has to take a newer one, and nothing here
+assumes the latest.
+
+- **When work touches Parabola** (a screen, the theme, a part Parabola
+  lacks), check whether a newer Parabola exists and say so: `status` lists
+  what it would change. Take it only if the person wants it.
+- **Where to look:** Parabola's repo (`source` in `parabola.json`,
+  [github.com/alexbeltechi/parabola](https://github.com/alexbeltechi/parabola)),
+  its [changelog](https://github.com/alexbeltechi/parabola/blob/main/CHANGELOG.md),
+  and its README's "Taking a newer Parabola" for `status` and `update`.
+  Until Parabola is on npm, run them from a checkout of that repo:
+  `node <parabola>/bin/parabola.mjs status` in this repo's root.
+- **Taking it:** on its own branch, with `update`. Never paste files over
+  the copy by hand.
+
+After an update, look for problems, roughly in this order:
+
+1. Settle any `<<<<<<< yours` markers `update` left.
+2. Read the changelog entries it printed. Search this repo for every name
+   under "Changed" (a prop, a token, an export) and fix what uses it. A line
+   like "a project serving the showcase adds…" means a file to add here.
+3. `npm run verify`.
+4. Open the site on the dev database with content in it: home, a category
+   list, a post, a page with a button, `/parabola/theme`, the admin, and any
+   custom pages. The build only draws pages that need no database, so a
+   page that crashes shows only when it's opened.
+5. Look in `packages/parabola` for files that use React hooks or `window`
+   and `document` without `"use client"` at the top. A server page that
+   draws one crashes (Parabola 0.5.0's button, fixed in 0.5.4).
+
+A problem that's Parabola's is fixed in Parabola's repo, then taken here
+with `update`, never in the copy first.
+
 ## Paved paths
 
 | Job | The way | Enforced |
 | --- | --- | --- |
 | UI | Parabola components and tokens (`packages/parabola/README.md`, imported as `@beltechi/parabola`) | lint: raw palette, shadcn colour names, raw Radix |
 | A primitive Parabola lacks | Add it to Parabola, on Radix if needed, then use it | lint: raw Radix outside Parabola |
-| A newer Parabola | `packages/parabola` is a copy; `parabola.json` records its version. Take a newer one with Parabola's `update`, on its own branch (Parabola's README, "Taking a newer Parabola"). Never paste files over the copy by hand | |
+| A newer Parabola | Optional. "Parabola's version" above: how to check for one, take it, and look for problems after | |
 | A post that needs a page of its own | A custom page in `src/extensions/post-pages/`, listed in `src/extensions/post-pages.ts` and named by the post's `customPage` (`src/lib/cms/custom-pages.ts`). All content stays in the post; the page arranges it, and deleting the post deletes the page's code (`custom-page-files.ts`), with the pieces in `src/components/site/custom`. Never a second copy of a word or a file, never a change to the standard layout for one post | |
 | An empty section (no posts, nothing chosen, nothing matches) | `DsEmptyState`: one line, an optional button, centred in the section. Never a title plus a sentence | |
 | A side note on a screen (another way to do it, a tip) | `DsInfoCard` | |

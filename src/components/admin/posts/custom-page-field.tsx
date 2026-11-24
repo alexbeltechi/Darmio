@@ -10,6 +10,7 @@ import type { CustomPageSetting } from "@/lib/cms/custom-pages";
  * title and only appears when there is a custom page to turn on or off; off
  * shows the standard layout and keeps the custom page. It saves on its own,
  * straight to the live post: it changes how the post looks, not what it says.
+ * Unpublished edits get the same value, or publishing them would undo it.
  */
 export function CustomPageField({
   slug,
@@ -40,7 +41,7 @@ export function CustomPageField({
       const res = await fetch(`/api/admin/collections/posts/entries/${slug}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ data: { customPage: next } }),
+        body: JSON.stringify({ data: { customPage: next }, pendingData: { customPage: next } }),
       });
       if (!res.ok) throw new Error((await res.json()).error);
       onChange(next);

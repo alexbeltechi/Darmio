@@ -10,8 +10,9 @@ a designer, not a code reviewer: your summary is for them.
 Work arrives as a branch and a pull request, never merged or published by an agent. The
 maintainer merges.
 
-1. **Find the task.** The PR's review card quotes the task's "Done when" and "Limits". Missing:
-   say so as a P1.
+1. **Find the task.** The PR's review card quotes the task's "Done when" and "Limits". An agent's
+   PR without them: say so as a P1. An outside contribution may have no task: judge it against
+   what its card says it changes.
 2. **Judge against "Done when", not your own taste.** Run or open what can be run or opened. The
    Vercel preview link on the PR is the first place to look.
 3. **P1, always:** "Done when" not met; a limit broken; anything merged or published; real

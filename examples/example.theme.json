@@ -10,8 +10,8 @@
       "accent": { "light": "#B5532F", "dark": "#E08A63" }
     },
     "families": [
-      { "id": "body", "label": "Font", "font": "instrument-sans" },
-      { "id": "heading", "label": "Heading", "font": "instrument-serif" }
+      { "id": "body", "label": "Font", "font": "geist" },
+      { "id": "heading", "label": "Heading", "font": "geist-serif" }
     ],
     "type": {
       "h1": { "size": 44, "lineHeight": 52 }

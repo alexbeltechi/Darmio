@@ -47,8 +47,9 @@ UI is built on **Parabola**, its own package in this workspace
 - After changing a token, run `npm run check:parabola`.
 - `packages/parabola` is this repo's own copy of Parabola, which has its own
   repo; `parabola.json` says which version the copy came from. Change it here
-  like any other code. A newer Parabola comes in only when someone runs its
-  `update` (Parabola's README, "Taking a newer Parabola"), on a branch, as
+  like any other code. It works on its own at that version; a newer one is
+  optional and comes in only when someone runs its `update` (see "Parabola's
+  version" in `docs/conventions.md`), on a branch, as
   its own pull request. A change every project should have goes to
   Parabola's repo as a pull request too.
 

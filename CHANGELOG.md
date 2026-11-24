@@ -7,6 +7,8 @@
   Categories carry the required star, like Title.
 - Choosing Text, Quote or YouTube from a post's or page's + menu puts the
   cursor in the new block, so what you type goes there.
+- The sign-in, setup, password reset and new project screens' fields fill
+  their column, as on a phone, instead of sitting short on the left.
 
 ## 0.1.0 · 2026-11-24 · the first public pre-release
 

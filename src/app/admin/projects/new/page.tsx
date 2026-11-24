@@ -39,7 +39,7 @@ export default function NewProjectPage() {
 
   return (
     <div className="flex justify-center px-ds-20 py-ds-80">
-      <form onSubmit={create} className="flex w-full max-w-[440px] flex-col gap-ds-40">
+      <form onSubmit={create} className="flex w-full max-w-[440px] flex-col ds-fields-fill gap-ds-40">
         <h1 className="text-h2 text-ds-fg">New project</h1>
         <DsField label="Name" description="A site, a newsletter, a brand. It gets its own posts, library and settings.">
           <DsInput value={name} onChange={(e) => setName(e.target.value)} maxLength={PROJECT_NAME_MAX} placeholder="Studio North" autoFocus />

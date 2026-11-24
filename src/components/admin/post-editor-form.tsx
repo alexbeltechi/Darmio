@@ -44,6 +44,7 @@ import {
 } from "@beltechi/parabola";
 import { UnsavedChangesModal } from "@/components/admin/unsaved-changes-modal";
 import { announceSaved, publishPosts, useOnPublished } from "@/components/admin/publish/events";
+import { useFocusNewBlock } from "@/components/admin/focus-new-block";
 import { MediaPicker } from "@/components/admin/media-picker";
 import { CustomPageField } from "@/components/admin/posts/custom-page-field";
 import { customPageOf, type CustomPageSetting } from "@/lib/cms/custom-pages";
@@ -92,6 +93,9 @@ export function PostEditorForm({
   const [previewImage, setPreviewImage] = useState<MediaItem | null>(null);
   const [showPreviewImagePicker, setShowPreviewImagePicker] = useState(false);
   const [categories, setCategories] = useState<string[]>([]);
+  // Set when Publish is pressed with a required field empty: marks those fields.
+  const [showMissing, setShowMissing] = useState(false);
+  const newBlockFocus = useFocusNewBlock();
   const [tags, setTags] = useState("");
   const [description, setDescription] = useState("");
   // The post's custom page, if it has one: shown in the details, saved by its own switch.
@@ -627,6 +631,27 @@ export function PostEditorForm({
    * edits first, then make the post live. One post, this one; several at once
    * is the Posts list's bulk Publish.
    */
+  // What publishing needs and this post lacks, in the form's order.
+  const missing = [
+    !title.trim() && "post-title",
+    categories.length === 0 && "post-categories",
+  ].filter(Boolean) as string[];
+
+  /** Publish or Update, unless a required field is empty: then mark it and go to it. */
+  const startPublish = () => {
+    if (missing.length > 0) {
+      setShowMissing(true);
+      const field = document.getElementById(missing[0]);
+      field?.scrollIntoView({ block: "center", behavior: "smooth" });
+      // The title takes the cursor; the categories field would open its list
+      // over the message, so it's only shown.
+      if (missing[0] === "post-title") field?.focus();
+      return;
+    }
+    if (entry?.status === "published") handlePublish();
+    else setPublishDialog(true);
+  };
+
   const handlePublish = async () => {
     const wasPublished = entry?.status === "published";
     setPublishing(true);
@@ -875,7 +900,7 @@ export function PostEditorForm({
             variant="primary"
             loading={publishing}
             disabled={entry?.status === "published" && !hasChanges}
-            onClick={() => (entry?.status === "published" ? handlePublish() : setPublishDialog(true))}
+            onClick={startPublish}
           >
             {entry?.status !== "published" ? "Publish" : hasChanges ? "Update" : "Published"}
           </DsButton>
@@ -924,7 +949,12 @@ export function PostEditorForm({
         {/* Details */}
         {/* `@container`: the DS_COLUMNS_CLASS rows below size to this form, not the screen. */}
         <div className={cn("@container px-5 pb-5", DS_FIELDS_CLASS)}>
-          <DsField label="Title" required>
+          <DsField
+            label="Title"
+            id="post-title"
+            required
+            error={showMissing && !title.trim() ? "Add a title to publish" : undefined}
+          >
             <DsInput value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Post title" />
           </DsField>
 
@@ -968,7 +998,12 @@ export function PostEditorForm({
             )}
           </DsField>
 
-          <DsField label="Categories">
+          <DsField
+            label="Categories"
+            id="post-categories"
+            required
+            error={showMissing && categories.length === 0 ? "Pick a category to publish" : undefined}
+          >
             <CategoryInput value={categories} onChange={setCategories} />
           </DsField>
 
@@ -1030,7 +1065,7 @@ export function PostEditorForm({
           </div>
 
           {/* Content Blocks */}
-          <div className="flex flex-col gap-8">
+          <div ref={newBlockFocus.listRef} className="flex flex-col gap-8">
             {blocks.map((block, index) => (
               <ContentBlockEditor
                 key={block.id}
@@ -1106,8 +1141,14 @@ export function PostEditorForm({
               <DsDropdownTrigger asChild>
                 <DsButton iconLeft={Plus} aria-label="Add block" />
               </DsDropdownTrigger>
-              <DsDropdownContent align="start">
-                <DsDropdownItem iconLeft={Type} onSelect={() => addBlock("text")}>
+              <DsDropdownContent align="start" onCloseAutoFocus={newBlockFocus.onCloseAutoFocus}>
+                <DsDropdownItem
+                  iconLeft={Type}
+                  onSelect={() => {
+                    newBlockFocus.focusNext();
+                    addBlock("text");
+                  }}
+                >
                   Text
                 </DsDropdownItem>
                 <DsDropdownItem iconLeft={Upload} onSelect={() => addImages("upload")}>
@@ -1116,10 +1157,22 @@ export function PostEditorForm({
                 <DsDropdownItem iconLeft={Image} onSelect={() => addImages("library")}>
                   Add from library
                 </DsDropdownItem>
-                <DsDropdownItem iconLeft={Youtube} onSelect={() => addBlock("youtube")}>
+                <DsDropdownItem
+                  iconLeft={Youtube}
+                  onSelect={() => {
+                    newBlockFocus.focusNext();
+                    addBlock("youtube");
+                  }}
+                >
                   YouTube
                 </DsDropdownItem>
-                <DsDropdownItem iconLeft={Quote} onSelect={() => addBlock("quote")}>
+                <DsDropdownItem
+                  iconLeft={Quote}
+                  onSelect={() => {
+                    newBlockFocus.focusNext();
+                    addBlock("quote");
+                  }}
+                >
                   Quote
                 </DsDropdownItem>
                 <DsDropdownItem iconLeft={Minus} onSelect={() => addBlock("divider")}>

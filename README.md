@@ -38,6 +38,11 @@ A maker's site is an install: their own copy of this repo, their own
 database and keys. Installs pull updates from here. Customise through
 settings, themes and blocks rather than code, and updates stay easy to take.
 
+## Feedback
+
+Found a bug, got stuck, or have an idea? Email alexbeltechi@gmail.com.
+Anything goes, a line is enough.
+
 ## Licence
 
 Darmio is MIT. Use it however you like. If you run it for clients on more

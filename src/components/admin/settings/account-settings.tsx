@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { DsButton, DsField, DsInput, dsToast } from "@beltechi/parabola";
 import { PASSWORD_MIN } from "@/lib/cms/password";
-import { isEmail } from "@/lib/cms/email";
+import { emailProblem } from "@/lib/cms/email";
 import { SettingsSection } from "./settings-section";
 
 type Account = { name: string; email: string; role: string };
@@ -63,7 +63,7 @@ function AccountCard({ account, onChange }: { account: Account | null; onChange:
 
   const nameChanged = account !== null && name.trim() !== (account.name ?? "");
   const emailChanged = account !== null && email.trim().toLowerCase() !== account.email;
-  const badEmail = emailChanged && email.trim().length > 0 && !isEmail(email);
+  const emailError = emailChanged && email.trim().length > 0 ? emailProblem(email) : null;
 
   async function saveName(event: React.FormEvent) {
     event.preventDefault();
@@ -82,7 +82,7 @@ function AccountCard({ account, onChange }: { account: Account | null; onChange:
 
   async function saveEmail(event: React.FormEvent) {
     event.preventDefault();
-    if (!account || !emailChanged || badEmail || !password || savingEmail) return;
+    if (!account || !emailChanged || emailError !== null || !password || savingEmail) return;
     setSavingEmail(true);
     try {
       const data = await patchAccount({ newEmail: email, currentPassword: password });
@@ -116,7 +116,7 @@ function AccountCard({ account, onChange }: { account: Account | null; onChange:
         <DsField
           label="Email"
           description="You sign in with it. Darmio can't email you yet, so there's no confirmation link: check it's right."
-          error={badEmail ? "That doesn't look like an email" : undefined}
+          error={emailError ?? undefined}
         >
           <DsInput type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" disabled={!account} />
         </DsField>
@@ -127,7 +127,7 @@ function AccountCard({ account, onChange }: { account: Account | null; onChange:
         )}
         <DsButton
           type="submit"
-          disabled={!emailChanged || badEmail || !password || savingEmail}
+          disabled={!emailChanged || emailError !== null || !password || savingEmail}
           loading={savingEmail}
           className="self-start"
         >

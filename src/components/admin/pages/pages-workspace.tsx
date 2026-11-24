@@ -208,7 +208,7 @@ export function PagesWorkspace({ children }: { children: React.ReactNode }) {
           thumbnailIcon={rowIcon(menuIndex, isHome ? House : File)}
           title={title}
           pill={!published && <DsPill variant="dark">Draft</DsPill>}
-          meta={isHome ? "/" : `/${entry.slug}`}
+          meta={isHome ? undefined : `/${entry.slug}`}
           detail={[
             PAGE_FORMAT_LABELS[settings.format].label,
             parent ? `Under ${pageTitle(parent)}` : settings.nav && menuIndex === undefined ? "In the nav" : null,
@@ -260,7 +260,7 @@ export function PagesWorkspace({ children }: { children: React.ReactNode }) {
         thumbnailIcon={rowIcon(menuIndex, page.kind === "home" ? House : FolderOpen)}
         title={page.title}
         pill={<DsPill>System</DsPill>}
-        meta={page.path}
+        meta={page.kind === "home" ? undefined : page.path}
         detail="Hardcoded"
         actions={
           <DsDropdown>

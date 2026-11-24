@@ -40,6 +40,7 @@ import {
   DsTopBar,
 } from "@beltechi/parabola";
 import { useEditorSelection } from "@/components/admin/remove-items-dialog";
+import { useFocusNewBlock } from "@/components/admin/focus-new-block";
 import { ContentBlockEditor, isBlockEmpty } from "@/components/admin/content-block-editor";
 import { DocsField } from "@/components/admin/docs/docs-field";
 import { describePageDeletion } from "@/components/admin/pages/page-deletion";
@@ -459,6 +460,8 @@ export function PageEditorForm({ slug, preset: presetId, onClose }: { slug?: str
 
   // ---- Blocks (as in the post editor) ----
 
+  const newBlockFocus = useFocusNewBlock();
+
   const addBlock = (type: Block["type"]) => {
     const block = newBlock(type);
     if (!block) return;
@@ -770,7 +773,7 @@ export function PageEditorForm({ slug, preset: presetId, onClose }: { slug?: str
             </span>
           </div>
 
-          <div className="flex flex-col gap-8">
+          <div ref={newBlockFocus.listRef} className="flex flex-col gap-8">
             {blocks.map((block, index) => (
               <ContentBlockEditor
                 key={block.id}
@@ -838,8 +841,14 @@ export function PageEditorForm({ slug, preset: presetId, onClose }: { slug?: str
               <DsDropdownTrigger asChild>
                 <DsButton iconLeft={Plus} aria-label="Add block" />
               </DsDropdownTrigger>
-              <DsDropdownContent align="start">
-                <DsDropdownItem iconLeft={Type} onSelect={() => addBlock("text")}>
+              <DsDropdownContent align="start" onCloseAutoFocus={newBlockFocus.onCloseAutoFocus}>
+                <DsDropdownItem
+                  iconLeft={Type}
+                  onSelect={() => {
+                    newBlockFocus.focusNext();
+                    addBlock("text");
+                  }}
+                >
                   Text
                 </DsDropdownItem>
                 <DsDropdownItem iconLeft={Upload} onSelect={() => addImages("upload")}>
@@ -848,10 +857,22 @@ export function PageEditorForm({ slug, preset: presetId, onClose }: { slug?: str
                 <DsDropdownItem iconLeft={Image} onSelect={() => addImages("library")}>
                   Add from library
                 </DsDropdownItem>
-                <DsDropdownItem iconLeft={Youtube} onSelect={() => addBlock("youtube")}>
+                <DsDropdownItem
+                  iconLeft={Youtube}
+                  onSelect={() => {
+                    newBlockFocus.focusNext();
+                    addBlock("youtube");
+                  }}
+                >
                   YouTube
                 </DsDropdownItem>
-                <DsDropdownItem iconLeft={Quote} onSelect={() => addBlock("quote")}>
+                <DsDropdownItem
+                  iconLeft={Quote}
+                  onSelect={() => {
+                    newBlockFocus.focusNext();
+                    addBlock("quote");
+                  }}
+                >
                   Quote
                 </DsDropdownItem>
                 <DsDropdownItem iconLeft={Minus} onSelect={() => addBlock("divider")}>

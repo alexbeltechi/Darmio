@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- Publishing a post without a title or a category says so on the field,
+  before the "Publish post?" confirm, instead of failing after it.
+  Categories carry the required star, like Title.
+- Choosing Text, Quote or YouTube from a post's or page's + menu puts the
+  cursor in the new block, so what you type goes there.
+
 ## 0.1.0 · 2026-11-24 · the first public pre-release
 
 Darmio is a publishing platform for makers, built to be run by your AI. You

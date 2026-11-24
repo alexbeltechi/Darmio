@@ -16,7 +16,7 @@ import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 
 const ALLOWED = [
-  /Copyright \(c\) \d{4} Alex Beltechi/,
+  /Copyright \(c\) \d{4} Andrei Alexandru Beltechi/,
   /github\.com\/alexbeltechi\/(darmio|techistack|parabola)(\.git)?/g,
   /alexbeltechi\/(darmio|parabola)\b/g,
   /@beltechi\/parabola/g,

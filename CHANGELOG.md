@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.0 · 2026-11-25 · the first public pre-release
+## 0.1.0 · 2026-11-24 · the first public pre-release
 
 Darmio is a publishing platform for makers, built to be run by your AI. You
 write, publish and change your site by asking your agent, or by hand in a
@@ -51,7 +51,7 @@ way; it tells you which and why.
 - **Several sites, one admin.** Each project has its own database; switch
   between them from the menu.
 - **Parabola, the design system.** The site and the admin are built on it
-  (version 0.5.3). Make your own theme as one file and add it in Settings ›
+  (version 0.5.4). Make your own theme as one file and add it in Settings ›
   Design (`docs/themes.md`), choose how the top menu looks (no background,
   blurred or solid), or copy Parabola's pieces into another project with
   `npx`.

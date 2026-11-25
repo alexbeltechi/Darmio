@@ -4,7 +4,9 @@ You're setting up Darmio, an open-source publishing platform, for its
 owner. They may not be technical. The goal: their own Darmio **online**,
 at a web address they can open anywhere, and them signed in to it. Don't
 set it up on their computer first and don't talk about localhost: the
-first address they see is their live site.
+first address they see is their live site. If the owner asks to try it
+on their computer first, or you're a developer, go to "Running it on a
+computer" at the bottom; otherwise follow steps 1 to 6.
 
 Talk plainly, and **narrate every action**, including the ones you do
 yourself without stopping: before it, one line saying what you're about
@@ -45,6 +47,10 @@ Atlas (the database; Vercel creates it for them). GitHub isn't optional:
 Vercel builds the site from it, and Darmio's updates reach them through
 it.
 
+Check first: run `git --version` and `node --version` (Node must be 20 or
+newer). If either is missing, ask before installing it: Node from
+nodejs.org, git from git-scm.com.
+
 ## 1. Their copy
 
 Tell them: "GitHub keeps your own copy of Darmio's code. Your site is
@@ -79,7 +85,8 @@ push `main`, and keep Darmio as `upstream`
 so updates still come in with `git pull upstream main`.
 
 Check: `gh repo view <their-name>/<repo>` shows their copy. Tell them its
-address.
+address. Work from inside the cloned folder from here on (`cd <repo>`):
+every `npx vercel` and `npm` command runs there.
 
 ## 2. The site on Vercel
 
@@ -211,10 +218,18 @@ failing with "Image storage isn't connected" (no Blob store connected to
 Production); `MONGODB_DB`
 missing (the site then uses a database called `test`); Atlas network access not open
 to Vercel; a key added to Preview instead of Production; `NEXTAUTH_URL`
-not matching the address they use.
+not matching the address they use; the setup page says "Darmio can't
+reach its database" even though the link is right (`GET /api/setup`
+answers 500): check `MONGODB_URI` and Atlas network access.
 
 ## Running it on a computer (developers)
 
 `npm install` (Node 20 or newer), copy `.env.example` to `.env.local` and
-fill it in (any MongoDB, a `SETUP_CODE` of 16+ characters), `npm run dev`,
-then open `http://localhost:3010/admin/setup?code=<SETUP_CODE>`.
+fill it in, `npm run dev`, then open
+`http://localhost:3010/admin/setup?code=<SETUP_CODE>`. Make the secrets
+and the `SETUP_CODE` (16+ characters) with the command in step 4. Before
+committing, run `npm run verify`.
+
+Where the database comes from: a free MongoDB Atlas cluster, or one on
+your computer, for example `docker run -d -p 27017:27017 mongo:7` with
+`MONGODB_URI=mongodb://127.0.0.1:27017/darmio-dev` in `.env.local`.

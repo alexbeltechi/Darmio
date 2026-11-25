@@ -16,8 +16,8 @@ const PROBLEMS: Record<string, InstallProblem> = {
     fix: "Ask your AI to check MONGODB_URI: INSTALL.md, step 3.",
   },
   DB_CONNECTION_ERROR: {
-    title: "This site can't reach its database.",
-    fix: "Try again in a minute. If it keeps happening, ask your AI to check the database: INSTALL.md, step 3.",
+    title: "Darmio can't reach its database.",
+    fix: "Tell your AI: \"My Darmio site can't reach its database. Check MONGODB_URI and MongoDB Atlas network access.\"",
   },
   DB_TIMEOUT: {
     title: "The database took too long to answer.",

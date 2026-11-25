@@ -62,7 +62,8 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     if (isDatabaseError(error)) return handleDatabaseError(error);
-    return NextResponse.json({ error: "Couldn't check the setup" }, { status: 500 });
+    // The check only reads the database, so a failure here is the database not answering.
+    return NextResponse.json({ error: "Couldn't check the setup", code: "DB_CONNECTION_ERROR" }, { status: 500 });
   }
 }
 

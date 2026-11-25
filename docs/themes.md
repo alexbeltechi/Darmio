@@ -44,7 +44,7 @@ highlights), `buttonSecondary`, `field` (inputs). Each is `{ "light": "#RRGGBB" 
 ### `families` and `type`
 
 `families` is a list of `{ "id", "label", "font" }`. `body` (the text) and `heading` are the two
-every theme has. `font` is one of Parabola's: `instrument-sans`, `instrument-serif`, `system`, and the rest
+every theme has. `font` is one of Parabola's: `geist`, `geist-serif`, `system`, and the rest
 in `DS_FONTS` (`packages/parabola/fonts.ts`), or a font added in `customFonts`.
 
 `customFonts` is a list of `{ "id", "label", "google" }`: a Google font by name and weights, like

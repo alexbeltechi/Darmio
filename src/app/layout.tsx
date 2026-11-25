@@ -1,25 +1,28 @@
 import type { Metadata } from "next";
-import { Instrument_Sans, Instrument_Serif } from "next/font/google";
+import localFont from "next/font/local";
 import { DEFAULT_SETTINGS, getSiteSettings } from "@/lib/db/settings";
 import "./globals.css";
 
-// Parabola's Google fonts, hosted with the app by next/font (no request to
-// Google from a visitor's browser). Each sets the `--ds-font-<id>` that its
-// stack in Parabola's fonts.ts tries first; a theme picks among them. The
+// Parabola's own fonts, Geist Sans and Geist Serif, hosted with the app by
+// next/font from Vercel's `geist` package (no request to Google or a CDN,
+// from a visitor's browser or at build). Each sets the `--ds-font-<id>` that
+// its stack in Parabola's fonts.ts tries first; a theme picks among them. The
 // theme itself is the website's only ((site) layout) and /parabola's canvas:
 // the admin always wears Parabola's own, so a theme can't make it unusable.
-const instrumentSans = Instrument_Sans({
-  subsets: ["latin"],
-  variable: "--ds-font-instrument-sans",
+const geistSans = localFont({
+  src: [
+    { path: "../../node_modules/geist/dist/fonts/geist-sans/Geist-Variable.woff2", style: "normal" },
+    { path: "../../node_modules/geist/dist/fonts/geist-sans/Geist-Italic[wght].woff2", style: "italic" },
+  ],
+  weight: "400 700",
+  variable: "--ds-font-geist",
   display: "swap",
 });
-const instrumentSerif = Instrument_Serif({
-  subsets: ["latin"],
+const geistSerif = localFont({
+  src: [{ path: "../../node_modules/geist/dist/fonts/geist-serif/GeistSerif-Regular.woff2", style: "normal" }],
   weight: "400",
-  variable: "--ds-font-instrument-serif",
+  variable: "--ds-font-geist-serif",
   display: "swap",
-  // Only for a theme that pairs it; not worth fetching on every first visit.
-  preload: false,
 });
 
 /** The browser title is the site's name (Settings › Site); pages add their own before it. */
@@ -37,7 +40,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${instrumentSans.variable} ${instrumentSerif.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`${geistSans.variable} ${geistSerif.variable}`}>
       <body className="antialiased">
         {children}
       </body>
